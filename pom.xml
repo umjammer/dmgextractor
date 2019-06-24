@@ -35,13 +35,8 @@
       <version>2.3.9</version>
     </dependency>
     <dependency>
-      <groupId>catacombae</groupId>
-      <artifactId>csframework</artifactId>
-      <version>0.0.1</version>
-    </dependency>
-    <dependency>
-      <groupId>catacombae</groupId>
-      <artifactId>csframework</artifactId>
+      <groupId>com.github.umjammer</groupId>
+      <artifactId>catacombaeframework</artifactId>
       <version>0.0.1</version>
     </dependency>
     <dependency>
