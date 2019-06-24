@@ -20,7 +20,7 @@ package org.catacombae.dmg.udif;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
-import net.iharder.base64.Base64;
+import net.iharder.Base64;
 import org.catacombae.dmgextractor.Util;
 import org.catacombae.dmgextractor.io.*;
 import org.catacombae.plist.PlistNode;
