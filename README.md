@@ -1,4 +1,4 @@
-[![](https://jitpack.io/v/umjammer/dmgextractor.svg)](https://jitpack.io/#umjammer/dmgextractor)
+[![jitpack](https://jitpack.io/v/umjammer/dmgextractor.svg)](https://jitpack.io/#umjammer/dmgextractor) [![Parent](https://img.shields.io/badge/Parent-vavi--apps--fuse-pink)](https://github.com/umjammer/vavi-apps-fuse)
 
 # dmg extractor
 
