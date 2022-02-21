@@ -19,36 +19,39 @@
 
 package org.catacombae.dmgextractor;
 
-import org.catacombae.dmg.udif.Debug;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.io.RandomAccessFile;
-import java.util.LinkedList;
-import java.util.Iterator;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.logging.Logger;
+
 import javax.swing.JOptionPane;
+
 import org.catacombae.dmg.encrypted.ReadableCEncryptedEncodingStream;
 import org.catacombae.dmg.sparsebundle.ReadableSparseBundleStream;
 import org.catacombae.dmg.sparseimage.ReadableSparseImageStream;
 import org.catacombae.dmg.sparseimage.SparseImageRecognizer;
-import org.catacombae.io.FileStream;
-import org.catacombae.io.ReadableFileStream;
-import org.catacombae.io.ReadableRandomAccessStream;
-import org.catacombae.io.TruncatableRandomAccessStream;
 import org.catacombae.dmg.udif.Koly;
 import org.catacombae.dmg.udif.Plist;
 import org.catacombae.dmg.udif.PlistPartition;
 import org.catacombae.dmg.udif.UDIFBlock;
 import org.catacombae.dmg.udif.UDIFDetector;
+import org.catacombae.io.FileStream;
+import org.catacombae.io.ReadableFileStream;
+import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.RuntimeIOException;
-import org.catacombae.io.SynchronizedReadableRandomAccessStream;
+import org.catacombae.io.TruncatableRandomAccessStream;
 import org.xml.sax.XMLReader;
 
 public class DMGExtractor {
+    private static Logger logger = Logger.getLogger(DMGExtractor.class.getName());
+
     public static final String BASE_APP_NAME = "DMGExtractor";
     public static final String VERSION = "0.70";
-    
+
     public static final String APPNAME = BASE_APP_NAME + " " + VERSION;
     public static final String BUILDSTRING = "(Build #" + BuildNumber.BUILD_NUMBER + ")";
     public static final String[] COPYRIGHT_MESSAGE = new String[] {
@@ -80,7 +83,7 @@ public class DMGExtractor {
         public File dmgFile = null;
         public File isoFile = null;
     }
-    
+
     public static void main(String[] args) throws Exception {
         Session ses = null;
         try {
@@ -133,7 +136,7 @@ public class DMGExtractor {
             }
             else
                 printUsageInstructions(ui, ses.startupCommand, ses.parseArgsErrorMessage);
-            
+
         } catch(Exception e) {
             if(ses != null && ses.graphical) {
                 String stackTrace = e.toString() + "\n";
@@ -149,7 +152,7 @@ public class DMGExtractor {
     private static boolean extractProcedure(Session ses, UserInterface ui)
             throws Exception
     {
-        
+
         ui.displayMessageVerbose("Processing: \"" + ses.dmgFile + "\"");
 
         ReadableRandomAccessStream dmgRaf = null;
@@ -624,7 +627,6 @@ public class DMGExtractor {
                 else if(cur.equals("-v"))
                     ses.verbose = true;
                 else if(cur.equals("-debug")) {
-                    Debug.debug = true;
                     ses.debug = true;
                 }
                 else if(cur.equals("-startupcommand")) {

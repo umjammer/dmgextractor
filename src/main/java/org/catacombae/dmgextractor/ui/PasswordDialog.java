@@ -86,15 +86,4 @@ public class PasswordDialog extends JDialog {
         pd.setVisible(true);
         return pd.getPassword();
     }
-    
-    /*
-    public static void main(String[] args) {
-        char[] pwd = showDialog(null, "hej", "apa");
-        //String pwd = JOptionPane.showInputDialog(null, "apa", "hej");
-        if(pwd != null)
-            System.out.println("Password: \"" + new String(pwd) + "\"");
-        else
-            System.out.println("User canceled dialog.");
-    }
-    */
 }
