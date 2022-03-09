@@ -237,7 +237,7 @@ public abstract class CommonCEncryptedEncodingHeader {
             this.header = header;
 
             LinkedList<V2KeyDataImplementation> keyList =
-                    new LinkedList<V2KeyDataImplementation>();
+                    new LinkedList<>();
             for(V2Header.KeyData kd : header.getKeys()) {
                 if(kd instanceof V2Header.UserKeyData) {
                     keyList.add(new V2KeyDataImplementation(header,

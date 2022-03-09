@@ -17,25 +17,34 @@
 
 package org.catacombae.dmg.udif;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
-import net.iharder.Base64;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.catacombae.dmgextractor.Util;
-import org.catacombae.dmgextractor.io.*;
+import org.catacombae.dmgextractor.io.ReaderInputStream;
 import org.catacombae.plist.PlistNode;
 import org.catacombae.plist.XmlPlist;
+import org.catacombae.plist.XmlPlistNode;
+
+import net.iharder.Base64;
 
 public class Plist extends XmlPlist {
 
+    static Logger logger = Logger.getLogger(Plist.class.getName());
+
     public Plist(byte[] data) {
-	this(data, 0, data.length);
+        this(data, 0, data.length);
     }
     public Plist(byte[] data, boolean useSAXParser) {
-	this(data, 0, data.length, useSAXParser);
+        this(data, 0, data.length, useSAXParser);
     }
     public Plist(byte[] data, int offset, int length) {
-	this(data, offset, length, false);
+        this(data, offset, length, false);
     }
     public Plist(byte[] data, int offset, int length, boolean useSAXParser) {
         super(data, offset, length, useSAXParser);
@@ -44,19 +53,22 @@ public class Plist extends XmlPlist {
     //public byte[] getData() { return Util.createCopy(plistData); }
 
     public PlistPartition[] getPartitions() throws IOException {
-	LinkedList<PlistPartition> partitionList = new LinkedList<PlistPartition>();
-	PlistNode current = getRootNode();
-	current = current.cd("dict");
-	current = current.cdkey("resource-fork");
-	current = current.cdkey("blkx");
+        LinkedList<PlistPartition> partitionList = new LinkedList<>();
+        PlistNode current = getRootNode();
+if (logger.isLoggable(Level.FINE)) {
+ ((XmlPlistNode) current).getXMLNode().printTree(System.err);
+}
+        current = current.cd("dict");
+        current = current.cdkey("resource-fork");
+        current = current.cdkey("blkx");
 
-	// Variables to keep track of the pointers of the previous partition
-	long previousOutOffset = 0;
-	long previousInOffset = 0;
+        // Variables to keep track of the pointers of the previous partition
+        long previousOutOffset = 0;
+        long previousInOffset = 0;
 
-	// Iterate over the partitions and gather data
+        // Iterate over the partitions and gather data
         for(PlistNode pn : current.getChildren()) {
-            String partitionName = Util.readFully(pn.getKeyValue("Name"));
+            String partitionName = pn.getKeyValue("Name") != null ? Util.readFully(pn.getKeyValue("Name")) : "";
             String partitionID = Util.readFully(pn.getKeyValue("ID"));
             String partitionAttributes = Util.readFully(pn.getKeyValue("Attributes"));
             //System.err.println("Retrieving data...");

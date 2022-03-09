@@ -59,7 +59,7 @@ public class DMGMetadata {
         unknown1_256 = new byte[256];
         dmgFile.readFully(unknown1_256);
 
-        LinkedList<PartitionBlockList> blockListList = new LinkedList<PartitionBlockList>();
+        LinkedList<PartitionBlockList> blockListList = new LinkedList<>();
         int length = dmgFile.readInt();
         byte[] fourcc = new byte[4];
         dmgFile.readFully(fourcc);
@@ -77,7 +77,7 @@ public class DMGMetadata {
         unknown2_12 = new byte[12];
         dmgFile.readFully(unknown2_12);
 
-        LinkedList<APMPartition> partitionList = new LinkedList<APMPartition>();
+        LinkedList<APMPartition> partitionList = new LinkedList<>();
         byte[] currentPartitionEntry = new byte[0x200];
         dmgFile.readFully(currentPartitionEntry);
         byte[] pmSig = new byte[2];
@@ -134,7 +134,7 @@ public class DMGMetadata {
             int position = 0;
             di.readFully(header);
             position += header.length;
-            LinkedList<BlockDescriptor> descs = new LinkedList<BlockDescriptor>();
+            LinkedList<BlockDescriptor> descs = new LinkedList<>();
             while(position < length) {
                 descs.addLast(new BlockDescriptor(di));
                 position += 0x28;

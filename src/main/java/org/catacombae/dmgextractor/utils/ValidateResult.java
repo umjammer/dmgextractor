@@ -21,8 +21,8 @@ import java.util.LinkedList;
 
 public class ValidateResult {
 
-    private final LinkedList<String> errors = new LinkedList<String>();
-    private final LinkedList<String> warnings = new LinkedList<String>();
+    private final LinkedList<String> errors = new LinkedList<>();
+    private final LinkedList<String> warnings = new LinkedList<>();
 
     public ValidateResult() {
     }

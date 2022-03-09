@@ -20,7 +20,7 @@ package org.catacombae.dmgextractor;
 import java.util.*;
 
 public class ConcatenatedIterator<E> implements Iterator<E> {
-    private ArrayList<Iterator<E>> sequence = new ArrayList<Iterator<E>>();
+    private ArrayList<Iterator<E>> sequence = new ArrayList<>();
     private int index = 0;
     public void add(Iterator<E> next) { sequence.add(next); }
 

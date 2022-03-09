@@ -26,7 +26,7 @@ public class SimpleFileFilter extends javax.swing.filechooser.FileFilter {
     private String description;
     
     public SimpleFileFilter() {
-	extensions = new Vector<String>();
+	extensions = new Vector<>();
 	description = "";
     }
     public void addExtension(String extension) { extensions.add(extension); }

@@ -20,6 +20,7 @@ package org.catacombae.xml;
 import org.catacombae.dmgextractor.io.*;
 import java.io.*;
 import java.nio.charset.Charset;
+import java.util.Scanner;
 
 public class XMLText extends XMLElement {
     private static final char CR = '\r';
@@ -30,19 +31,20 @@ public class XMLText extends XMLElement {
     private long beginOffset, endOffset;
     private final SynchronizedRandomAccessStream xmlFile;
     private Charset encoding;
-    
+
     public XMLText(String text) {
-	this.text = text;
-	this.xmlFile = null;
+        this.text = text;
+        this.xmlFile = null;
     }
+
     public XMLText(SynchronizedRandomAccessStream xmlFile, Charset encoding,
-		   long beginOffset, long endOffset) {
-	this.text = null;
-	this.xmlFile = xmlFile;
-	this.encoding = encoding;
-	this.beginOffset = beginOffset;
-	this.endOffset = endOffset;
-	//SynchronizedRandomAccessStream sras = new SynchronizedRandomAccessStream(new RandomAccessFileStream(raf));
+                   long beginOffset, long endOffset) {
+        this.text = null;
+        this.xmlFile = xmlFile;
+        this.encoding = encoding;
+        this.beginOffset = beginOffset;
+        this.endOffset = endOffset;
+        //SynchronizedRandomAccessStream sras = new SynchronizedRandomAccessStream(new RandomAccessFileStream(raf));
     }
 
     /** This way of dealing with the issue of lines and columns is very heavy and fragile as it tries to
@@ -127,13 +129,25 @@ public class XMLText extends XMLElement {
 // 	else
 // 	    System.out.println("Terminating with beginOffset=" + beginOffset + " endOffset=" + endOffset);
     }
-        
+
     protected void _printTree(PrintStream pw, int level) {
-	for(int i = 0; i < level; ++i)
-	    pw.print(" ");
-	pw.println(text.toString());
+        for (int i = 0; i < level; ++i)
+            pw.print(" ");
+        pw.println(text != null ? text.toString() : getTextAsString());
     }
 
+    private String getTextAsString() {
+        try {
+            Scanner s = new Scanner(getText());
+            StringBuilder sb = new StringBuilder();
+            while (s.hasNextLine()) {
+                sb.append(s.nextLine());
+            }
+            return sb.toString();
+        } catch (IOException e) {
+            return null;
+        }
+    }
 //     public static void main(String[] args) {
 // 	System.out.println(args[0] + " " + args[1]);
 //     }

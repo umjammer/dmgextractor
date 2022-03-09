@@ -37,12 +37,12 @@ public class XmlPlistNode extends PlistNode {
         this.xmlNode = xmlNode;
     }
 
-    private XMLNode getXMLNode() {
+    public XMLNode getXMLNode() {
         return xmlNode;
     }
 
     private String[] getKeys() throws RuntimeIOException {
-        final LinkedList<String> keyList = new LinkedList<String>();
+        final LinkedList<String> keyList = new LinkedList<>();
 
         for(XMLElement xe : xmlNode.getChildren()) {
             if(xe instanceof XMLNode) {
@@ -70,7 +70,7 @@ public class XmlPlistNode extends PlistNode {
     }
 
     public PlistNode[] getChildren() {
-        final LinkedList<PlistNode> children = new LinkedList<PlistNode>();
+        final LinkedList<PlistNode> children = new LinkedList<>();
 
         if(xmlNode.qName.equals("dict")) {
             for(String key : getKeys()) {
@@ -169,7 +169,7 @@ public class XmlPlistNode extends PlistNode {
         if(nodeChildren.length != 1) {
             //System.out.println("  nodeChildren.length == " + nodeChildren.length);
 
-            LinkedList<Reader> collectedReaders = new LinkedList<Reader>();
+            LinkedList<Reader> collectedReaders = new LinkedList<>();
             for(XMLElement xe : keyNode.getXMLNode().getChildren()) {
                 if(xe instanceof XMLText) {
                     try {

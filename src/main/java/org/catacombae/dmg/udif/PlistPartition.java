@@ -22,22 +22,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.logging.Logger;
 
 public class PlistPartition {
+    private static Logger logger = Logger.getLogger(PlistPartition.class.getName());
+
     private String name;
     private String id;
     private String attributes;
     private UDIFBlock[] blockList;
     private long partitionSize;
-    
+
     // Incoming variables
     private final long previousOutOffset;
     private final long previousInOffset;
-    
+
     // Outgoing variables
     private long finalOutOffset = -1;
     private long finalInOffset = -1;
-    
+
     public PlistPartition(String name, String id, String attributes, byte[] data,
             long previousOutOffset, long previousInOffset) throws IOException {
         this(name, id, attributes, new ByteArrayInputStream(data),
@@ -71,7 +74,7 @@ public class PlistPartition {
     public long getPartitionSize() {
         return partitionSize;
     }
-    
+
     /** Copies all blocks to a newly allocated array. Might waste some memory. */
     public UDIFBlock[] getBlocks() {
         UDIFBlock[] res = new UDIFBlock[blockList.length];
@@ -100,7 +103,7 @@ public class PlistPartition {
             throw new RuntimeException("parseBlocks has not yet been called!");
         return finalInOffset;
     }
-    
+
     private UDIFBlock[] parseBlocks(InputStream is) throws IOException {
         long bytesSkipped = is.read(new byte[0xCC]);
 
@@ -115,7 +118,7 @@ public class PlistPartition {
 
         byte[] blockData = new byte[UDIFBlock.structSize()];
 
-        LinkedList<UDIFBlock> blocks = new LinkedList<UDIFBlock>();
+        LinkedList<UDIFBlock> blocks = new LinkedList<>();
 
         int bytesRead = is.read(blockData);
         while(bytesRead > 0) { //offset <= data.length-UDIFBlock) {
@@ -142,12 +145,12 @@ public class PlistPartition {
              * doesn't (meaning the actual position 0 in the dmg file).
              */
             if(inOffset == 0 && blockNumber == 0) {
-                Debug.notification("Detected inOffset == 0, setting addInOffset flag.");
+                logger.fine("Detected inOffset == 0, setting addInOffset flag.");
                 addInOffset = true;
             }
             long inOffsetCompensation = 0;
             if(addInOffset) {
-                Debug.notification("addInOffset mode: inOffset tranformation " + inOffset + "->" +
+                logger.fine("addInOffset mode: inOffset tranformation " + inOffset + "->" +
                         (inOffset + previousInOffset));
                 inOffsetCompensation = previousInOffset;
             }
@@ -164,25 +167,25 @@ public class PlistPartition {
                 finalInOffset = previousInOffset + lastByteReadInBlock;
 
                 if(is.read() != -1)
-                    Debug.warning("Encountered additional data in blkx blob.");
+                    logger.warning("Encountered additional data in blkx blob.");
                 return blocks.toArray(new UDIFBlock[blocks.size()]);
             }
 
             bytesRead = is.read(blockData);
         }
-        
+
         throw new RuntimeException("No BT_END block found!");
     }
-        
+
     public static long calculatePartitionSize(UDIFBlock[] data) throws IOException {
         long partitionSize = 0;
 
         for(UDIFBlock db : data)
             partitionSize += db.getOutSize();
-            
+
         return partitionSize;
     }
-    
+
     private class BlockIterator implements Iterator<UDIFBlock> {
 
         private UDIFBlock[] blocks;
