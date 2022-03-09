@@ -118,7 +118,7 @@ public class PlistPartition {
 
         byte[] blockData = new byte[UDIFBlock.structSize()];
 
-        LinkedList<UDIFBlock> blocks = new LinkedList<UDIFBlock>();
+        LinkedList<UDIFBlock> blocks = new LinkedList<>();
 
         int bytesRead = is.read(blockData);
         while(bytesRead > 0) { //offset <= data.length-UDIFBlock) {

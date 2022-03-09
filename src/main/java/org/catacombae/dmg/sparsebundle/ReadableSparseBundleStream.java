@@ -211,7 +211,7 @@ public class ReadableSparseBundleStream extends BasicReadableRandomAccessStream
                         }
                         else {
                             /* Add previous hole to list and begin new hole. */
-                            holeList.add(new Pair<Long, Long>(curHoleStart,
+                            holeList.add(new Pair<>(curHoleStart,
                                     curHoleLength));
 
                             if(bandHoleLength != 0) {
@@ -236,7 +236,7 @@ public class ReadableSparseBundleStream extends BasicReadableRandomAccessStream
         }
 
         if(holeList != null && curHoleLength != 0) {
-            holeList.add(new Pair<Long, Long>(curHoleStart,
+            holeList.add(new Pair<>(curHoleStart,
                     curHoleLength));
         }
 

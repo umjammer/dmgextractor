@@ -35,7 +35,7 @@ public class XMLNode extends XMLElement {
 	this.qName = qName;
 	this.attrs = attrs;
 	this.parent = parent;
-	this.children = new LinkedList<XMLElement>();
+	this.children = new LinkedList<>();
     }
     
     public void addChild(XMLElement x) {

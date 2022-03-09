@@ -31,7 +31,7 @@ import java.util.LinkedList;
 public class ValidateDmgs {
 
     public static void main(String[] args) throws IOException {
-        LinkedList<String> fileList = new LinkedList<String>();
+        LinkedList<String> fileList = new LinkedList<>();
         for(String currentList : args) {
             try {
                 BufferedReader listIn = new BufferedReader(new InputStreamReader(new FileInputStream(new File(currentList))));

@@ -394,7 +394,7 @@ public class APXParser implements APXParserConstants {
   final public void element() throws ParseException {
         String name;
         Attribute currentAttribute;
-        LinkedList<Attribute> attributes = new LinkedList<Attribute>();
+        LinkedList<Attribute> attributes = new LinkedList<>();
     jj_consume_token(STARTTAG);
     // DEFAULT -> WithinTag
             name = elementname();
@@ -439,7 +439,7 @@ public class APXParser implements APXParserConstants {
   final public Attribute attribute() throws ParseException {
         Token t;
         String name;
-        LinkedList<Attribute.ValueComponent> value = new LinkedList<Attribute.ValueComponent>();
+        LinkedList<Attribute.ValueComponent> value = new LinkedList<>();
     name = elementname();
     jj_consume_token(WT_EQ);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -752,7 +752,7 @@ public class APXParser implements APXParserConstants {
       return (jj_ntk = jj_nt.kind);
   }
 
-  private java.util.Vector<int[]> jj_expentries = new java.util.Vector<int[]>();
+  private java.util.Vector<int[]> jj_expentries = new java.util.Vector<>();
   private int[] jj_expentry;
   private int jj_kind = -1;
 

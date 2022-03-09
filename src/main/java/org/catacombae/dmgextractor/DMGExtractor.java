@@ -488,11 +488,11 @@ public class DMGExtractor {
         ui.reportFinished(isoRaf == null, errorsReported, warningsReported, totalSize);
 
         if(ses.debug) {
-            ConcatenatedIterator<UDIFBlock> cit = new ConcatenatedIterator<UDIFBlock>();
+            ConcatenatedIterator<UDIFBlock> cit = new ConcatenatedIterator<>();
             for(PlistPartition dpp : partitions)
                 cit.add(dpp.getBlockIterator());
 
-            LinkedList<UDIFBlock> blocks = new LinkedList<UDIFBlock>();
+            LinkedList<UDIFBlock> blocks = new LinkedList<>();
             while(cit.hasNext()) {
                 UDIFBlock b = cit.next();
                 if(b.getInSize() == 0)
@@ -748,7 +748,7 @@ public class DMGExtractor {
     }
 
     private static LinkedList<UDIFBlock> mergeBlocks(Iterator<UDIFBlock> it) {
-        LinkedList<UDIFBlock> result = new LinkedList<UDIFBlock>();
+        LinkedList<UDIFBlock> result = new LinkedList<>();
         UDIFBlock previous = it.next();
         while(previous.getInSize() == 0 && it.hasNext()) {
             //System.err.println("Skipping: " + previous.toString());

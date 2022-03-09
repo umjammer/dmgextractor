@@ -293,7 +293,7 @@ public class ReadableCEncryptedEncodingStream extends BasicReadableRandomAccessS
 
                 if(sbStream != null) {
                     if(holeList == null) {
-                        holeList = new LinkedList<Pair<Long, Long>>();
+                        holeList = new LinkedList<>();
                     }
                     else {
                         holeList.clear();
