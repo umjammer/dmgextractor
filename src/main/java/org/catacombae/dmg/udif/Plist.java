@@ -53,9 +53,11 @@ public class Plist extends XmlPlist {
     //public byte[] getData() { return Util.createCopy(plistData); }
 
     public PlistPartition[] getPartitions() throws IOException {
-	LinkedList<PlistPartition> partitionList = new LinkedList<PlistPartition>();
+        LinkedList<PlistPartition> partitionList = new LinkedList<>();
         PlistNode current = getRootNode();
+if (logger.isLoggable(Level.FINE)) {
  ((XmlPlistNode) current).getXMLNode().printTree(System.err);
+}
         current = current.cd("dict");
         current = current.cdkey("resource-fork");
         current = current.cdkey("blkx");
