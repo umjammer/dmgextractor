@@ -37,7 +37,7 @@ public class XmlPlistNode extends PlistNode {
         this.xmlNode = xmlNode;
     }
 
-    private XMLNode getXMLNode() {
+    public XMLNode getXMLNode() {
         return xmlNode;
     }
 

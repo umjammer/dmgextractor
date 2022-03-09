@@ -25,6 +25,9 @@ import org.catacombae.dmgextractor.Util;
 import org.catacombae.dmgextractor.io.*;
 import org.catacombae.plist.PlistNode;
 import org.catacombae.plist.XmlPlist;
+import org.catacombae.plist.XmlPlistNode;
+
+import vavi.xml.util.PrettyPrinter;
 
 public class Plist extends XmlPlist {
 
@@ -46,6 +49,7 @@ public class Plist extends XmlPlist {
     public PlistPartition[] getPartitions() throws IOException {
 	LinkedList<PlistPartition> partitionList = new LinkedList<PlistPartition>();
 	PlistNode current = getRootNode();
+((XmlPlistNode) current).getXMLNode().printTree(System.err);
 	current = current.cd("dict");
 	current = current.cdkey("resource-fork");
 	current = current.cdkey("blkx");
@@ -56,7 +60,7 @@ public class Plist extends XmlPlist {
 
 	// Iterate over the partitions and gather data
         for(PlistNode pn : current.getChildren()) {
-            String partitionName = Util.readFully(pn.getKeyValue("Name"));
+            String partitionName = pn.getKeyValue("Name") != null ? Util.readFully(pn.getKeyValue("Name")) : "";
             String partitionID = Util.readFully(pn.getKeyValue("ID"));
             String partitionAttributes = Util.readFully(pn.getKeyValue("Attributes"));
             //System.err.println("Retrieving data...");
