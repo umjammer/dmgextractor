@@ -3,7 +3,40 @@
 
   <groupId>catacombae</groupId>
   <artifactId>hfsx_dmglib</artifactId>
-  <version>0.70.1-SNAPSHOT</version>
+  <version>0.70.1</version>
+
+  <profiles>
+    <profile>
+      <id>dmginfo</id>
+      <activation>
+        <property>
+          <name>dmginfo</name>
+          <value></value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <!-- exec:exec -->
+            <!-- $ mvn -P dmginfo exec:java -Dexec.args='"file"' -->
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>1.6.0</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>java</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <mainClass>org.catacombae.dmgextractor.utils.DMGInfo</mainClass>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
   <build>
     <plugins>
@@ -13,6 +46,31 @@
           <source>1.8</source>
           <target>1.8</target>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>javacc-maven-plugin</artifactId>
+        <version>2.5</version>
+        <executions>
+          <execution>
+            <id>jjtree-javacc</id>
+            <goals>
+              <goal>jjtree-javacc</goal>
+            </goals>
+            <configuration>
+              <!-- options for JJTree and JavaCC go here -->
+            </configuration>
+          </execution>
+          <execution>
+            <id>javacc</id>
+            <goals>
+              <goal>javacc</goal>
+            </goals>
+            <configuration>
+              <isStatic>false</isStatic>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -31,10 +89,6 @@
     <repository>
       <id>jitpack.io</id>
       <url>https://jitpack.io</url>
-    </repository>
-    <repository>
-      <id>NetBeans Repository</id>
-      <url> http://bits.netbeans.org/maven2/</url>
     </repository>
   </repositories>
 
@@ -67,9 +121,9 @@
       <version>1.10.11</version>
     </dependency>
     <dependency>
-      <groupId>org.netbeans.external</groupId>
-      <artifactId>swing-layout-1.0.4</artifactId>
-      <version>RELEASE731</version>
+      <groupId>org.swinglabs</groupId>
+      <artifactId>swing-layout</artifactId>
+      <version>1.0.3</version>
     </dependency>
     <dependency>
       <groupId>com.github.umjammer</groupId>
