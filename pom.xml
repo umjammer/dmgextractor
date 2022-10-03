@@ -114,9 +114,10 @@
       <version>2.3.9</version>
     </dependency>
     <dependency>
-      <groupId>com.github.umjammer</groupId>
-      <artifactId>catacombaeframework</artifactId>
-      <version>0.0.2</version>
+      <!-- catacombae:csframework, catacombaeframework -->
+      <groupId>catacombae</groupId>
+      <artifactId>csframework</artifactId>
+      <version>0.0.3-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.ant</groupId>
