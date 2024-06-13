@@ -29,8 +29,8 @@ import javax.swing.filechooser.FileFilter;
  */
 public class SimplerFileFilter extends FileFilter {
 
-    private String extension;
-    private String description;
+    private final String extension;
+    private final String description;
     
     public SimplerFileFilter(String extension, String description) {
         this.extension = extension;

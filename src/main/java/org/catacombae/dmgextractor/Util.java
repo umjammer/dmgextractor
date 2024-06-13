@@ -18,5 +18,5 @@
 package org.catacombae.dmgextractor;
 
 public class Util extends org.catacombae.util.Util {
-    //public static int sectorSize = 0x800;
+//    public static int sectorSize = 0x800;
 }

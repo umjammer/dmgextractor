@@ -21,12 +21,12 @@ import java.io.*;
 import java.nio.charset.*;
 
 public class ReaderInputStream extends InputStream {
-    private Reader r;
-    private CharsetEncoder encoder;
-    private byte[] chardata;
+    private final Reader r;
+    private final CharsetEncoder encoder;
+    private final byte[] chardata;
     private int remainingChardata = 0;
-    private LousyByteArrayStream lbas;
-    private OutputStreamWriter osw;
+    private final LousyByteArrayStream lbas;
+    private final OutputStreamWriter osw;
     
     private static class LousyByteArrayStream extends OutputStream {
 	private final byte[] buffer;
@@ -35,7 +35,8 @@ public class ReaderInputStream extends InputStream {
 	    //System.err.println("Creating a LousyByteArrayStream with length " + buflen);
 	    buffer = new byte[buflen];
 	}
-	public void write(int b) {
+	@Override
+    public void write(int b) {
 	    buffer[bufpos++] = (byte)b;
 	}
 	public int reset(byte[] chardata) {
@@ -57,6 +58,7 @@ public class ReaderInputStream extends InputStream {
 
     }
 
+    @Override
     public int read() throws IOException {
 	byte[] b = new byte[1];
 	int res = read(b, 0, 1);
@@ -119,7 +121,7 @@ public class ReaderInputStream extends InputStream {
 		cur = Character.toCodePoint((char)cur, (char)lowSurrogate);
 	    }
 	    char[] charArray = Character.toChars(cur);
-	    String charString = new String(charArray, 0, charArray.length);
+	    String charString = new String(charArray);
 	    
 	    // Now we need to write
 	    //System.out.println("Writing codepoint: 0x" + Util.toHexStringBE(cur));

@@ -37,8 +37,8 @@ public class GeneralInfoPanel extends javax.swing.JPanel {
         numberOfPartitionsField.setOpaque(false);
     }
 
-    public void setFields(final String filename, long size,
-            long numberOfPartitions)
+    public void setFields(String filename, long size,
+                          long numberOfPartitions)
     {
         filenameField.setText(filename);
         sizeField.setText(size + " bytes");

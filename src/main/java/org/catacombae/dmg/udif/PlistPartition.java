@@ -25,13 +25,13 @@ import java.util.LinkedList;
 import java.util.logging.Logger;
 
 public class PlistPartition {
-    private static Logger logger = Logger.getLogger(PlistPartition.class.getName());
+    private static final Logger logger = Logger.getLogger(PlistPartition.class.getName());
 
-    private String name;
-    private String id;
-    private String attributes;
-    private UDIFBlock[] blockList;
-    private long partitionSize;
+    private final String name;
+    private final String id;
+    private final String attributes;
+    private final UDIFBlock[] blockList;
+    private final long partitionSize;
 
     // Incoming variables
     private final long previousOutOffset;
@@ -78,8 +78,7 @@ public class PlistPartition {
     /** Copies all blocks to a newly allocated array. Might waste some memory. */
     public UDIFBlock[] getBlocks() {
         UDIFBlock[] res = new UDIFBlock[blockList.length];
-        for(int i = 0; i < res.length; ++i)
-            res[i] = blockList[i];
+        System.arraycopy(blockList, 0, res, 0, res.length);
         return res;
     }
 
@@ -168,7 +167,7 @@ public class PlistPartition {
 
                 if(is.read() != -1)
                     logger.warning("Encountered additional data in blkx blob.");
-                return blocks.toArray(new UDIFBlock[blocks.size()]);
+                return blocks.toArray(UDIFBlock[]::new);
             }
 
             bytesRead = is.read(blockData);
@@ -186,10 +185,11 @@ public class PlistPartition {
         return partitionSize;
     }
 
-    private class BlockIterator implements Iterator<UDIFBlock> {
+    private static class BlockIterator implements Iterator<UDIFBlock> {
 
-        private UDIFBlock[] blocks;
-        private int pointer, endOffset;
+        private final UDIFBlock[] blocks;
+        private int pointer;
+        private final int endOffset;
 
         public BlockIterator(UDIFBlock[] blocks) {
             this(blocks, 0, blocks.length);
@@ -201,14 +201,17 @@ public class PlistPartition {
             this.endOffset = offset + length;
         }
 
+        @Override
         public boolean hasNext() {
             return pointer < endOffset;
         }
 
+        @Override
         public UDIFBlock next() {
             return blocks[pointer++];
         }
 
+        @Override
         public void remove() {
             throw new UnsupportedOperationException();
         }

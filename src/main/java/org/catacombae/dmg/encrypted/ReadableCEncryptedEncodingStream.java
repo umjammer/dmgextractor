@@ -41,6 +41,8 @@ package org.catacombae.dmg.encrypted;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.security.Key;
 import java.util.LinkedList;
 import javax.crypto.Cipher;
@@ -59,6 +61,9 @@ import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.RuntimeIOException;
 import org.catacombae.util.Util.Pair;
 
+import static java.lang.System.getLogger;
+
+
 /**
  * Filtering stream that takes the data of a Mac OS X encrypted disk image and a password as input
  * and acts as a transparent decryption layer, allowing the user to access the unencrypted
@@ -73,6 +78,8 @@ import org.catacombae.util.Util.Pair;
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class ReadableCEncryptedEncodingStream extends BasicReadableRandomAccessStream {
+
+    private static final Logger logger = getLogger(ReadableCEncryptedEncodingStream.class.getName());
     private final ReadableRandomAccessStream backingStream;
     private final ReadableSparseBundleStream sbStream;
     private final CommonCEncryptedEncodingHeader header;
@@ -88,7 +95,7 @@ public class ReadableCEncryptedEncodingStream extends BasicReadableRandomAccessS
 
     public ReadableCEncryptedEncodingStream(ReadableRandomAccessStream backingStream,
             char[] password) throws RuntimeIOException {
-        Debug.print("ReadableCEncryptedEncodingStream(" + backingStream + ", " + password +");");
+        logger.log(Level.DEBUG, "ReadableCEncryptedEncodingStream(" + backingStream + ", " + password +");");
         this.backingStream = backingStream;
 
         if(backingStream instanceof ReadableSparseBundleStream) {
@@ -99,22 +106,20 @@ public class ReadableCEncryptedEncodingStream extends BasicReadableRandomAccessS
         }
 
         int headerVersion = CEncryptedEncodingUtil.detectVersion(backingStream);
-        Debug.print("  headerVersion = " + headerVersion);
+        logger.log(Level.DEBUG, "  headerVersion = " + headerVersion);
         switch(headerVersion) {
             case 1:
                 byte[] v1HeaderData = new byte[V1Header.length()];
                 backingStream.seek(backingStream.length()-V1Header.length());
                 backingStream.readFully(v1HeaderData);
                 V1Header v1header = new V1Header(v1HeaderData, 0);
-                Debug.print("  V1 header:");
-                v1header.print(Debug.ps, "    ");
+                logger.log(Level.DEBUG, "  V1 header:" + v1header);
                 header = CommonCEncryptedEncodingHeader.create(v1header);
                 break;
             case 2:
                 backingStream.seek(0);
                 V2Header v2header = new V2Header(backingStream);
-                Debug.print("  V2 header:");
-                v2header.print(Debug.ps, "    ");
+                logger.log(Level.DEBUG, "  V2 header:" + v2header);
                 header = CommonCEncryptedEncodingHeader.create(v2header);
                 break;
             case -1:
@@ -150,7 +155,7 @@ public class ReadableCEncryptedEncodingStream extends BasicReadableRandomAccessS
                 Key k = fact.generateSecret(ks);
 
                 byte[] keyData = k.getEncoded();
-                Debug.print("Derived key: 0x" +
+                logger.log(Level.DEBUG, "Derived key: 0x" +
                         Util.byteArrayToHexString(keyData));
 
                 // Set up the cipher
@@ -163,9 +168,9 @@ public class ReadableCEncryptedEncodingStream extends BasicReadableRandomAccessS
                 // Call the version specific unwrap function.
                 KeySet keys = key.unwrapKeys(k2, keyDecryptionCipher);
 
-                Debug.print("AES key: 0x" +
+                logger.log(Level.DEBUG, "AES key: 0x" +
                         Util.byteArrayToHexString(keys.getAesKey()));
-                Debug.print("HmacSHA1 key: 0x" +
+                logger.log(Level.DEBUG, "HmacSHA1 key: 0x" +
                         Util.byteArrayToHexString(keys.getHmacSha1Key()));
 
                 curAesKey = new SecretKeySpec(keys.getAesKey(), "AES");
@@ -319,7 +324,7 @@ public class ReadableCEncryptedEncodingStream extends BasicReadableRandomAccessS
                             isHole = false;
                             break;
                         case 1:
-                            final Pair<Long, Long> hole = holeList.getFirst();
+                            Pair<Long, Long> hole = holeList.getFirst();
 
                             if(hole.getA() != 0 ||
                                 hole.getB() != encBlockData.length)
@@ -348,7 +353,7 @@ public class ReadableCEncryptedEncodingStream extends BasicReadableRandomAccessS
                     Util.arrayCopy(encBlockData, decBlockData);
                 }
                 else {
-                    final long virtualBlockNumber;
+                    long virtualBlockNumber;
                     if(sbStream != null) {
                         virtualBlockNumber = blockNumber % bandBlockCount;
                     }
@@ -362,9 +367,9 @@ public class ReadableCEncryptedEncodingStream extends BasicReadableRandomAccessS
                     Assert.eq(bytesDecrypted, decBlockData.length);
                 }
                 
-                final int blockSize;
+                int blockSize;
                 if(streamLength > 0) {
-                    final long bytesLeftInStream =
+                    long bytesLeftInStream =
                             streamLength - blockNumber * header.getBlockSize();
 
                     blockSize =
@@ -376,8 +381,8 @@ public class ReadableCEncryptedEncodingStream extends BasicReadableRandomAccessS
                 }
 
 
-                final int bytesLeftToRead = len-totalBytesRead;
-                final int bytesLeftInBlock = blockSize-posInBlock;
+                int bytesLeftToRead = len-totalBytesRead;
+                int bytesLeftInBlock = blockSize-posInBlock;
                 int bytesToCopy = bytesLeftToRead < bytesLeftInBlock ? bytesLeftToRead : bytesLeftInBlock;
                 
                 System.arraycopy(decBlockData, posInBlock, b, off + totalBytesRead, bytesToCopy);
@@ -404,11 +409,11 @@ public class ReadableCEncryptedEncodingStream extends BasicReadableRandomAccessS
     }
 
     private int decrypt(byte[] encBlockData, byte[] decBlockData, long blockNumber) {
-        Debug.print("decrypt(byte[" + encBlockData.length + "], byte[" +
+        logger.log(Level.DEBUG, "decrypt(byte[" + encBlockData.length + "], byte[" +
                 decBlockData.length + "], " + blockNumber + ");");
         if(blockNumber < 0 || blockNumber > Integer.MAX_VALUE)
             throw new RuntimeException("Block number out of range: " + blockNumber);
-        int blockNumberInt = (int)(blockNumber & 0xFFFFFFFF);
+        int blockNumberInt = (int)(blockNumber & 0xFFFFFFFFL);
         hmacSha1.reset();
         hmacSha1.update(Util.toByteArrayBE(blockNumberInt));
         byte[] iv = new byte[16];
@@ -416,7 +421,7 @@ public class ReadableCEncryptedEncodingStream extends BasicReadableRandomAccessS
         /* The 160-bit MAC value is truncated to 16 bytes (128 bits) to be
          * used as the cipher's IV. */
         System.arraycopy(hmacSha1.doFinal(), 0, iv, 0, iv.length);
-        //Debug.print("  iv: 0x" + Util.byteArrayToHexString(iv));
+        //logger.log(Level.DEBUG, "  iv: 0x" + Util.byteArrayToHexString(iv));
 
         try {
             aesCipher.init(Cipher.DECRYPT_MODE, aesKey, new IvParameterSpec(iv));

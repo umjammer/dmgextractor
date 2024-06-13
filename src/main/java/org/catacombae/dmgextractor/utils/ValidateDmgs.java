@@ -18,11 +18,15 @@
 package org.catacombae.dmgextractor.utils;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.LinkedList;
+
+import static java.lang.System.getLogger;
+
 
 /**
  * Wrapper to allow processing of a list of dmg files. (I was too lazy
@@ -30,20 +34,22 @@ import java.util.LinkedList;
  */
 public class ValidateDmgs {
 
+    private static final Logger logger = getLogger(ValidateDmgs.class.getName());
+
     public static void main(String[] args) throws IOException {
         LinkedList<String> fileList = new LinkedList<>();
         for(String currentList : args) {
             try {
-                BufferedReader listIn = new BufferedReader(new InputStreamReader(new FileInputStream(new File(currentList))));
+                BufferedReader listIn = new BufferedReader(new InputStreamReader(new FileInputStream(currentList)));
                 String currentDmg = listIn.readLine();
                 while(currentDmg != null) {
                     fileList.add(currentDmg);
                     currentDmg = listIn.readLine();
                 }
-            } catch(IOException ioe) {
-                ioe.printStackTrace();
+            } catch(IOException e) {
+                logger.log(Level.ERROR, e.getMessage(), e);
             }
         }
-        ValidateDmg.main(fileList.toArray(new String[fileList.size()]));
+        ValidateDmg.main(fileList.toArray(String[]::new));
     }
 }

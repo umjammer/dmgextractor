@@ -35,20 +35,20 @@ public class Java6Util extends org.catacombae.util.Java6Util {
      */
     public static char[] readPassword() {
         try {
-            final Method systemConsoleMethod =
+            Method systemConsoleMethod =
                     java.lang.System.class.getMethod("console");
-            final Object consoleObject = systemConsoleMethod.invoke(null);
+            Object consoleObject = systemConsoleMethod.invoke(null);
             if(consoleObject == null) {
                 /* No console. */
                 return null;
             }
 
-            final Class<? extends Object> consoleClass =
+            Class<?> consoleClass =
                 Class.forName("java.io.Console");
-            final Method consoleReadPasswordMethod =
+            Method consoleReadPasswordMethod =
                     consoleClass.getMethod("readPassword");
 
-            final Object passwordObject =
+            Object passwordObject =
                     consoleReadPasswordMethod.invoke(consoleObject);
             if(passwordObject != null && !(passwordObject instanceof char[])) {
                 throw new RuntimeException("Unexpected type returned from " +
@@ -57,15 +57,8 @@ public class Java6Util extends org.catacombae.util.Java6Util {
             }
 
             return (char[]) passwordObject;
-        } catch(ClassNotFoundException ex) {
-            throw new RuntimeException(ex);
-        } catch(NoSuchMethodException ex) {
-            throw new RuntimeException(ex);
-        } catch (IllegalAccessException ex) {
-            throw new RuntimeException(ex);
-        } catch (IllegalArgumentException ex) {
-            throw new RuntimeException(ex);
-        } catch (InvocationTargetException ex) {
+        } catch(ClassNotFoundException | InvocationTargetException | IllegalArgumentException | IllegalAccessException |
+                NoSuchMethodException ex) {
             throw new RuntimeException(ex);
         }
     }

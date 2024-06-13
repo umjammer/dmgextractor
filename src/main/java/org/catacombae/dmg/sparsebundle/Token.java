@@ -33,7 +33,7 @@ class Token extends BundleMember {
         try {
             this.size = this.stream.length();
         } catch(RuntimeIOException ex) {
-            final IOException cause = ex.getIOCause();
+            IOException cause = ex.getIOCause();
 
             if(cause != null) {
                 throw new RuntimeIOException("Exception while getting size " +
@@ -48,8 +48,8 @@ class Token extends BundleMember {
         return this.size;
     }
 
-    public final int read(final long pos, final byte[] data, final int offset,
-            final int length) throws RuntimeIOException
+    public final int read(long pos, byte[] data, int offset,
+                          int length) throws RuntimeIOException
     {
         this.stream.seek(pos);
 

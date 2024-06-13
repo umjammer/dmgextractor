@@ -28,7 +28,7 @@ import java.io.*;
  * safe, so use external synchronization if needed.
  */
 public class UDIFInputStream extends InputStream {
-    private UDIFRandomAccessStream wrapped;
+    private final UDIFRandomAccessStream wrapped;
     private long filePointer;
     
     /** Constructs a new UDIF input stream from a RandomAccessFile. This is a convenience method, and

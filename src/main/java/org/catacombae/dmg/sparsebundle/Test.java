@@ -32,7 +32,7 @@ public class Test {
         ReadableSparseBundleStream stream = new ReadableSparseBundleStream(sb);
         byte[] buf = new byte[91673];
         long bytesRead = 0;
-        final long startTime = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
         long lastTime = startTime;
 
         while(true) {
@@ -45,19 +45,19 @@ public class Test {
 
             bytesRead += curBytesRead;
 
-            final long curTime = System.currentTimeMillis();
+            long curTime = System.currentTimeMillis();
             if(curTime - lastTime > 1000) {
                 System.err.println("Transferred " + bytesRead + " bytes in " +
-                        (curTime-startTime)/((double) 1000.0) + " seconds.");
+                        (curTime-startTime)/ 1000.0 + " seconds.");
                 lastTime = curTime;
             }
         }
 
         System.err.println("Transfer complete.");
 
-        final long curTime = System.currentTimeMillis();
+        long curTime = System.currentTimeMillis();
         System.err.println("Transferred " + bytesRead + " bytes in " +
-                (curTime-startTime)/((double) 1000.0) + " seconds.");
+                (curTime-startTime)/ 1000.0 + " seconds.");
 
     }
 }

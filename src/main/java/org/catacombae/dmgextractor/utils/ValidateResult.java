@@ -36,10 +36,10 @@ public class ValidateResult {
     }
 
     public String[] getErrors() {
-        return errors.toArray(new String[errors.size()]);
+        return errors.toArray(String[]::new);
     }
 
     public String[] getWarnings() {
-        return warnings.toArray(new String[warnings.size()]);
+        return warnings.toArray(String[]::new);
     }
 }

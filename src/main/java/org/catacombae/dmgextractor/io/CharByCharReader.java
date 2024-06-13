@@ -21,10 +21,10 @@ import java.nio.*;
 import java.nio.charset.*;
 
 public class CharByCharReader extends Reader {
-    private InputStream is;
-    private Charset cs;
-    private CharsetDecoder cdec;
-    private byte[] tempBuffer;
+    private final InputStream is;
+    private final Charset cs;
+    private final CharsetDecoder cdec;
+    private final byte[] tempBuffer;
     private int tempBufferPtr = 0;
     
     //private CharArrayBuilder cab = new CharArrayBuilder();
@@ -38,7 +38,9 @@ public class CharByCharReader extends Reader {
                 new byte[(int)Math.ceil(cs.newEncoder().maxBytesPerChar())];
     }
     
+    @Override
     public void close() throws IOException {}
+    @Override
     public int read(char[] cbuf, int off, int len) throws IOException {
 	int curByte;
 	int charsRead = 0;
@@ -57,7 +59,7 @@ public class CharByCharReader extends Reader {
 			break;
 		    }
 		    else if(tempBufferPtr == tempBuffer.length) {
-			System.err.println(res.toString());
+			System.err.println(res);
 			throw new RuntimeException("error while decoding");
 		    }
 		}

@@ -26,10 +26,12 @@ public class ConcatenatedReader extends Reader {
 	this.sources = sources;
 	this.currentSource = 0;
     }
+    @Override
     public void close() throws IOException {
 	for(Reader r : sources)
 	    r.close();
     }
+    @Override
     public int read(char[] cbuf, int off, int len) throws IOException {
 	int bytesRead = 0;
 	while(bytesRead < len) {

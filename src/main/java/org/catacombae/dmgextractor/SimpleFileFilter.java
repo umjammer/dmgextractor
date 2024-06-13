@@ -22,7 +22,7 @@ import java.io.*;
 
 public class SimpleFileFilter extends javax.swing.filechooser.FileFilter {
 
-    private Vector<String> extensions;
+    private final Vector<String> extensions;
     private String description;
     
     public SimpleFileFilter() {
@@ -37,15 +37,17 @@ public class SimpleFileFilter extends javax.swing.filechooser.FileFilter {
 		extensions.remove(i);
 	}
     }
+    @Override
     public boolean accept(File f) {
 
 	if(f.isDirectory()) return true;
 
-	for(int i = 0; i < extensions.size(); i++) {
-	    if(f.getName().endsWith(extensions.get(i)))
-		return true;
-	}
+        for (String extension : extensions) {
+            if (f.getName().endsWith(extension))
+                return true;
+        }
 	return false;
     }
+    @Override
     public String getDescription() { return description; }
 }

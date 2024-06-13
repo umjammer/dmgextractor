@@ -20,8 +20,8 @@ package org.catacombae.dmg.udif;
 import org.catacombae.io.ReadableRandomAccessStream;
 
 public class UDIFFile {
-    private ReadableRandomAccessStream stream;
-    private UDIFFileView dmgView;
+    private final ReadableRandomAccessStream stream;
+    private final UDIFFileView dmgView;
     
     public UDIFFile(ReadableRandomAccessStream stream) {
 	this.stream = stream;

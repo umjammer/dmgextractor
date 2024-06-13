@@ -26,7 +26,7 @@ import java.io.InputStream;
  */
 public class ByteCountInputStream extends InputStream {
     private long bytePos = 0;
-    private InputStream is;
+    private final InputStream is;
 
     /**
      * Creates a new ByteCountInputStream wrapping <code>is</code>.

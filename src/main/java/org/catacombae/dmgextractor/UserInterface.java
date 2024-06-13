@@ -21,24 +21,24 @@ import java.io.File;
 
 interface UserInterface {
 
-    public boolean cancelSignaled();
+    boolean cancelSignaled();
 
-    public void displayMessageVerbose(String... messageLines);
+    void displayMessageVerbose(String... messageLines);
 
-    public File getInputFileFromUser();
+    File getInputFileFromUser();
 
-    public boolean getOutputConfirmationFromUser();
+    boolean getOutputConfirmationFromUser();
 
-    public File getOutputFileFromUser(File inputFile);
+    File getOutputFileFromUser(File inputFile);
 
-    public char[] getPasswordFromUser();
+    char[] getPasswordFromUser();
 
     /**
      * If outputFilename is null, is would mean that a simulation is in progress.
      * @param inputFilename
      * @param outputFilename
      */
-    public void setProgressFilenames(String inputFilename, String outputFilename);
+    void setProgressFilenames(String inputFilename, String outputFilename);
 
     /**
      * Unconditionally displays a message to the user, to inform about certain
@@ -47,7 +47,7 @@ interface UserInterface {
      *
      * @param messageLines the message, line by line.
      */
-    public void displayMessage(String... messageLines);
+    void displayMessage(String... messageLines);
 
     /**
      * Issues a warning message to the user. Returns true if the process should
@@ -59,7 +59,7 @@ interface UserInterface {
      * @return true if the process should proceed despite the warning, and
      * false if the process should be aborted.
      */
-    public boolean warning(String... messageLines);
+    boolean warning(String... messageLines);
 
     /**
      * Issues an error message to the user.<br>
@@ -67,7 +67,7 @@ interface UserInterface {
      *
      * @param messageLines the message, line by line.
      */
-    public void error(String... messageLines);
+    void error(String... messageLines);
 
     /**
      * This method should be called to bring up a summary after a finished
@@ -82,7 +82,7 @@ interface UserInterface {
      * @param totalExtractedSize the outgoing data size, i.e. the data that was
      * written (or should have been written, in the case of a simulation).
      */
-    public void reportFinished(boolean simulation, int errorsReported, int warningsReported, long totalExtractedSize);
+    void reportFinished(boolean simulation, int errorsReported, int warningsReported, long totalExtractedSize);
 
     /**
      * Sets the current progress value to a specified percentage. This method
@@ -92,7 +92,7 @@ interface UserInterface {
      * @param progressPercentage the percentage to set the progress to (range
      * 0-100).
      */
-    public void reportProgress(int progressPercentage);
+    void reportProgress(int progressPercentage);
 
     /**
      * Used in conjunction with <code>addProgressRaw(...)</code>, and
@@ -101,7 +101,7 @@ interface UserInterface {
      * @param len the number of bytes of data that is the maximum value for
      * raw progress.
      */
-    public void setTotalProgressLength(long len);
+    void setTotalProgressLength(long len);
 
     /**
      * Adds progress as raw bytes, instead of setting it as percentage. The
@@ -110,50 +110,61 @@ interface UserInterface {
      *
      * @param value the byte value to add to the current progress.
      */
-    public void addProgressRaw(long value);
+    void addProgressRaw(long value);
 
-    static class NullUI extends BasicUI {
+    class NullUI extends BasicUI {
 
         public NullUI() {
             super(false);
         }
 
+        @Override
         public void reportProgress(int progressPercentage) {
         }
 
+        @Override
         public void displayMessage(String... messageLines) {
         }
 
+        @Override
         public boolean warning(String... messageLines) {
             return true;
         }
 
+        @Override
         public void error(String... messageLines) {
         }
 
+        @Override
         public void reportFinished(boolean simulation, int errorsReported, int warningsReported, long totalExtractedSize) {
         }
 
+        @Override
         public boolean cancelSignaled() {
             return false;
         }
 
+        @Override
         public File getInputFileFromUser() {
             return null;
         }
 
+        @Override
         public boolean getOutputConfirmationFromUser() {
             return false;
         }
 
+        @Override
         public File getOutputFileFromUser(File inputFile) {
             return null;
         }
 
+        @Override
         public char[] getPasswordFromUser() {
             return null;
         }
 
+        @Override
         public void setProgressFilenames(String inputFilename, String outputFilename) {
             throw new UnsupportedOperationException("Not supported yet.");
         }

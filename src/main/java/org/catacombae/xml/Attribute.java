@@ -25,17 +25,17 @@ public class Attribute {
 	public abstract String toString();
     }
     public static class StringComponent extends ValueComponent {
-	public String content;
+	public final String content;
 	public StringComponent(String content) { this.content = content; }
 	public String toString() { return content; }
     }
     public static class ReferenceComponent extends ValueComponent {
-	public String content;
+	public final String content;
 	public ReferenceComponent(String content) { this.content = content; }
 	public String toString() { return content; } // should resolve the reference here
     }
     public static class Value {
-	public List<ValueComponent> components;
+	public final List<ValueComponent> components;
 	public Value(List<ValueComponent> components) {
 	    this.components = components;
 	}
@@ -48,8 +48,8 @@ public class Attribute {
 	    return result.toString();
 	}
     }
-    public String identifier;
-    public Value value;
+    public final String identifier;
+    public final Value value;
 
     public Attribute(String identifier, Value value) {
 	this.identifier = identifier;

@@ -130,10 +130,11 @@ public class XMLText extends XMLElement {
 // 	    System.out.println("Terminating with beginOffset=" + beginOffset + " endOffset=" + endOffset);
     }
 
+    @Override
     protected void _printTree(PrintStream pw, int level) {
         for (int i = 0; i < level; ++i)
             pw.print(" ");
-        pw.println(text != null ? text.toString() : getTextAsString());
+        pw.println(text != null ? text : getTextAsString());
     }
 
     private String getTextAsString() {

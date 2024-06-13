@@ -54,13 +54,13 @@ class Band extends BundleMember {
         if(offset >= bandVirtualSize)
             return -1;
 
-        final int readLength;
+        int readLength;
         if(destLength > bandVirtualSize - offset)
             readLength = (int) (bandVirtualSize - offset);
         else
             readLength = destLength;
 
-        final int actualLength;
+        int actualLength;
         if(offset >= bandActualSize)
             actualLength = 0;
         else {

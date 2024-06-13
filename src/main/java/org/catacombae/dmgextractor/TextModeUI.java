@@ -22,6 +22,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+
+import static java.lang.System.getLogger;
+
 
 /**
  * User interface implementation using plain old System.in and System.out for a
@@ -31,12 +36,14 @@ import java.io.PrintStream;
  */
 class TextModeUI extends BasicUI implements UserInterface {
 
+    private static final Logger logger = getLogger(TextModeUI.class.getName());
+
     /** A string containing 79 backspace characters. */
     public static final String BACKSPACE79 =
             "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b" +
-            "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b" +
-            "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b" +
-            "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b";
+                    "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b" +
+                    "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b" +
+                    "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b";
     private final PrintStream ps = System.out;
     private final BufferedReader stdin =
             new BufferedReader(new InputStreamReader(System.in));
@@ -46,66 +53,73 @@ class TextModeUI extends BasicUI implements UserInterface {
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean warning(String... messageLines) {
-        if(messageLines.length > 0) {
+        if (messageLines.length > 0) {
             ps.println("WARNING: " + messageLines[0]);
-            for(int i = 1; i < messageLines.length; ++i)
+            for (int i = 1; i < messageLines.length; ++i)
                 ps.println("         " + messageLines[i]);
         }
         return true;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void error(String... messageLines) {
-        if(messageLines.length > 0) {
+        if (messageLines.length > 0) {
             ps.println("!------>ERROR: " + messageLines[0]);
-            for(int i = 1; i < messageLines.length; ++i)
+            for (int i = 1; i < messageLines.length; ++i)
                 ps.println("          " + messageLines[i]);
         }
     }
 
     /** {@inheritDoc} */
+    @Override
     public void reportProgress(int progressPercentage) {
-        if(progressPercentage != previousPercentage) {
+        if (progressPercentage != previousPercentage) {
             previousPercentage = progressPercentage;
             ps.println("--->Progress: " + progressPercentage + "%");
         }
     }
 
     /** {@inheritDoc} */
+    @Override
     public void reportFinished(boolean simulation, int errorsReported, int warningsReported, long totalExtractedSize) {
         StringBuilder summary = new StringBuilder();
-        if(errorsReported != 0)
+        if (errorsReported != 0)
             summary.append(errorsReported).append(" errors reported");
         else
             summary.append("No errors reported");
 
-        if(warningsReported != 0)
+        if (warningsReported != 0)
             summary.append(" (").append(warningsReported).append(" warnings emitted)");
 
         summary.append(".");
 
         ps.println();
-        ps.println(summary.toString());
-        if(verbose)
+        ps.println(summary);
+        if (verbose)
             ps.println("Size of extracted data: " + totalExtractedSize + " bytes");
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean cancelSignaled() {
         return false;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void displayMessage(String... messageLines) {
         //ps.print(BACKSPACE79);
-        for(String s : messageLines)
+        for (String s : messageLines)
             ps.println(s);
-        if(messageLines.length < 1)
+        if (messageLines.length < 1)
             ps.println();
     }
 
     /** {@inheritDoc} */
+    @Override
     public File getInputFileFromUser() {
         /*
         //String s = "";
@@ -126,6 +140,7 @@ class TextModeUI extends BasicUI implements UserInterface {
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean getOutputConfirmationFromUser() {
         /*
         String s = "";
@@ -144,6 +159,7 @@ class TextModeUI extends BasicUI implements UserInterface {
     }
 
     /** {@inheritDoc} */
+    @Override
     public File getOutputFileFromUser(File inputFile) {
         /*
         final String msg1 = "Please specify the path of the iso file to extract to: ";
@@ -172,16 +188,17 @@ class TextModeUI extends BasicUI implements UserInterface {
     }
 
     /** {@inheritDoc} */
+    @Override
     public char[] getPasswordFromUser() {
         displayMessage("The disk image you are trying to extract is encrypted.");
         try {
             char[] reply = prompt("Please enter password: ");
-            if(reply != null)
+            if (reply != null)
                 return reply;
             else
                 return null;
-        } catch(IOException ioe) {
-            ioe.printStackTrace();
+        } catch (IOException e) {
+            logger.log(Level.ERROR, e.getMessage(), e);
             return null;
         }
     }
@@ -191,16 +208,15 @@ class TextModeUI extends BasicUI implements UserInterface {
 
         ps.print(s);
 
-        if(Java6Util.isJava6OrHigher()) {
+        if (Java6Util.isJava6OrHigher()) {
             result = Java6Util.readPassword();
         }
 
-        if(result == null) {
+        if (result == null) {
             String line = stdin.readLine();
-            if(line != null) {
+            if (line != null) {
                 result = line.toCharArray();
-            }
-            else {
+            } else {
                 result = null;
             }
         }
@@ -208,9 +224,8 @@ class TextModeUI extends BasicUI implements UserInterface {
         return result;
     }
 
+    @Override
     public void setProgressFilenames(String inputFilename, String outputFilename) {
-        /*
-         * We currently don't act on this.
-         */
+        // We currently don't act on this.
     }
 }

@@ -19,7 +19,6 @@ package org.catacombae.dmgextractor.ui;
 
 import java.awt.Component;
 import java.awt.Frame;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -34,20 +33,8 @@ public class PasswordDialog extends JDialog {
     private PasswordDialog(Frame owner, boolean modal, String dialogTitle, String messageLine) {
         super(owner, dialogTitle, modal);
         
-        ActionListener okButtonListener = new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                actionOkButtonClicked();
-            }
-            
-        };
-        ActionListener cancelButtonListener = new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                actionCancelButtonClicked();
-            }
-            
-        };
+        ActionListener okButtonListener = e -> actionOkButtonClicked();
+        ActionListener cancelButtonListener = e -> actionCancelButtonClicked();
         this.passwordPanel = new PasswordPanel(messageLine, okButtonListener, cancelButtonListener);
         add(passwordPanel);
     }

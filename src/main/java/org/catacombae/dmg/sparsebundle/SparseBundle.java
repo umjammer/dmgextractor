@@ -42,15 +42,15 @@ class SparseBundle {
     private final Token token;
     private final FileAccessor bandsDir;
 
-    private long size;
-    private long bandSize;
-    private long bandCount;
+    private final long size;
+    private final long bandSize;
+    private final long bandCount;
 
-    public SparseBundle(final File sparseBundleDir) throws RuntimeIOException {
+    public SparseBundle(File sparseBundleDir) throws RuntimeIOException {
         this(new JavaFileAccessor(sparseBundleDir));
     }
 
-    public SparseBundle(final FileAccessor sparseBundleDir) {
+    public SparseBundle(FileAccessor sparseBundleDir) {
         FileAccessor[] files = sparseBundleDir.listFiles();
         FileAccessor mainInfoFile = null;
         FileAccessor backupInfoFile = null;
@@ -114,7 +114,7 @@ class SparseBundle {
             this.mainInfo = new Info(mainInfoFile, mainInfoFileLocked);
         }
         catch(RuntimeIOException ex) {
-            final IOException cause = ex.getIOCause();
+            IOException cause = ex.getIOCause();
 
             if(cause != null) {
                 throw new RuntimeIOException("Exception while parsing '" +
@@ -128,7 +128,7 @@ class SparseBundle {
             this.backupInfo = new Info(backupInfoFile, backupInfoFileLocked);
         }
         catch(RuntimeIOException ex) {
-            final IOException cause = ex.getIOCause();
+            IOException cause = ex.getIOCause();
 
             if(cause != null) {
                 throw new RuntimeIOException("Exception while parsing '" +
@@ -158,8 +158,8 @@ class SparseBundle {
                 throw new RuntimeIOException("Encountered non-file content " +
                         "inside bands directory.");
 
-            final String curName = f.getName();
-            final long bandNumber;
+            String curName = f.getName();
+            long bandNumber;
             try {
                 bandNumber = Long.parseLong(curName, 16);
             } catch(NumberFormatException nfe) {
@@ -216,8 +216,8 @@ class SparseBundle {
      * @return the {@link Band} with the specified band number.
      */
     Band lookupBand(long bandNumber) throws RuntimeIOException {
-        final String bandFilename = Long.toHexString(bandNumber);
-        final FileAccessor bandFile = bandsDir.lookupChild(bandFilename);
+        String bandFilename = Long.toHexString(bandNumber);
+        FileAccessor bandFile = bandsDir.lookupChild(bandFilename);
         boolean bandFileLocked = false;
         if(!bandFile.exists())
             return null;
@@ -230,10 +230,10 @@ class SparseBundle {
                     "'" + bandFilename + "'.");
         }
 
-        final long curBandSize;
+        long curBandSize;
         try { curBandSize = bandFile.length(); }
         catch(RuntimeIOException ex) {
-            final IOException cause = ex.getIOCause();
+            IOException cause = ex.getIOCause();
 
             if(cause != null) {
                 throw new RuntimeIOException("Exception while querying band " +
@@ -249,7 +249,7 @@ class SparseBundle {
 
         try { return new Band(bandFile, bandFileLocked, bandSize); }
         catch(RuntimeIOException ex) {
-            final IOException cause = ex.getIOCause();
+            IOException cause = ex.getIOCause();
 
             if(cause != null) {
                 throw new RuntimeIOException("Exception while creating Band " +
@@ -272,13 +272,14 @@ class SparseBundle {
         private SynchronizedReadableRandomAccessStream rafSyncStream = null;
         private FileLock lock = null;
 
-        public JavaFileAccessor(final File f) {
+        public JavaFileAccessor(File f) {
             this.f = f;
         }
 
+        @Override
         public FileAccessor[] listFiles() {
-            final File[] childFiles = f.listFiles();
-            final FileAccessor[] childAccessors =
+            File[] childFiles = f.listFiles();
+            FileAccessor[] childAccessors =
                     new FileAccessor[childFiles.length];
 
             for(int i = 0; i < childFiles.length; ++i) {
@@ -288,27 +289,33 @@ class SparseBundle {
             return childAccessors;
         }
 
+        @Override
         public boolean isFile() {
             return f.isFile();
         }
 
+        @Override
         public boolean isDirectory() {
             return f.isDirectory();
         }
 
+        @Override
         public String getName() {
             return f.getName();
         }
 
+        @Override
         public String getAbsolutePath() {
             return f.getAbsolutePath();
         }
 
+        @Override
         public boolean exists() {
             return f.exists();
         }
 
-        public FileAccessor lookupChild(final String name) {
+        @Override
+        public FileAccessor lookupChild(String name) {
             return new JavaFileAccessor(new File(f, name));
         }
 
@@ -341,6 +348,7 @@ class SparseBundle {
             }
         }
 
+        @Override
         public synchronized long length() {
             initRaf();
 
@@ -351,12 +359,14 @@ class SparseBundle {
             }
         }
 
+        @Override
         public synchronized ReadableRandomAccessStream createReadableStream() {
             initRaf();
 
             return new ReadableRandomAccessSubstream(rafSyncStream);
         }
 
+        @Override
         public synchronized void lock() {
             initRaf();
 
@@ -371,6 +381,7 @@ class SparseBundle {
             }
         }
 
+        @Override
         public synchronized void unlock() {
             if(lock == null) {
                 throw new RuntimeException("Not locked!");
@@ -384,6 +395,7 @@ class SparseBundle {
             }
         }
 
+        @Override
         public synchronized void close() {
             try {
                 rafSyncStream.close();

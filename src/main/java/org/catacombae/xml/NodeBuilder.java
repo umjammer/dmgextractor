@@ -28,7 +28,7 @@ import java.nio.charset.Charset;
  */
 public class NodeBuilder extends DefaultHandler {
     /** NEVER try to obtain anything from this except its children. */
-    private XMLNode artificialRoot;
+    private final XMLNode artificialRoot;
 
     private XMLNode currentNode;
     
@@ -74,7 +74,7 @@ public class NodeBuilder extends DefaultHandler {
         throws SAXException {
 	//System.out.println("CH");
 	String s = new String(buf, offset, len).trim();
-	if(s.length() != 0)
+	if(!s.isEmpty())
 	    currentNode.addChild(new XMLText(s));
     }
     

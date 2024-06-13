@@ -18,6 +18,7 @@ package org.catacombae.dmgextractor.utils;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -31,7 +32,7 @@ public class DMGInfo {
         inRaf.seek(inRaf.length() - 512);
         byte[] koly = new byte[4];
         inRaf.readFully(koly);
-        String kolySignature = new String(koly, "US-ASCII");
+        String kolySignature = new String(koly, StandardCharsets.US_ASCII);
         if(!kolySignature.equals("koly"))
             System.out.println("ERROR: Signature incorrect. Found \"" + kolySignature + "\" instead of \"koly\".");
         else
@@ -142,7 +143,7 @@ public class DMGInfo {
 
 class DMGInfoFrame extends JFrame {
 
-    private JTabbedPane mainPane;
+    private final JTabbedPane mainPane;
 
     public DMGInfoFrame() {
         super("DMGInfo");

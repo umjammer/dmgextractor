@@ -24,7 +24,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.RandomAccessFile;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 
 public class DMGMetadata {
@@ -63,16 +63,16 @@ public class DMGMetadata {
         int length = dmgFile.readInt();
         byte[] fourcc = new byte[4];
         dmgFile.readFully(fourcc);
-        String fourccString = new String(fourcc, "US-ASCII");
+        String fourccString = new String(fourcc, StandardCharsets.US_ASCII);
         dmgFile.seek(dmgFile.getFilePointer() - 4);
         while(fourccString.equals("mish")) {
             blockListList.add(new PartitionBlockList(dmgFile, length));
             length = dmgFile.readInt();
             dmgFile.readFully(fourcc);
-            fourccString = new String(fourcc, "US-ASCII");
+            fourccString = new String(fourcc, StandardCharsets.US_ASCII);
             dmgFile.seek(dmgFile.getFilePointer() - 4);
         }
-        blockLists = blockListList.toArray(new PartitionBlockList[blockListList.size()]);
+        blockLists = blockListList.toArray(PartitionBlockList[]::new);
 
         unknown2_12 = new byte[12];
         dmgFile.readFully(unknown2_12);
@@ -83,7 +83,7 @@ public class DMGMetadata {
         byte[] pmSig = new byte[2];
         pmSig[0] = currentPartitionEntry[0];
         pmSig[1] = currentPartitionEntry[1];
-        while(new String(pmSig, "US-ASCII").equals("PM")) {
+        while(new String(pmSig, StandardCharsets.US_ASCII).equals("PM")) {
             partitionList.addLast(new APMPartition(currentPartitionEntry));
             dmgFile.readFully(currentPartitionEntry);
             pmSig[0] = currentPartitionEntry[0];
@@ -91,7 +91,7 @@ public class DMGMetadata {
         }
         while(onlyZeros(currentPartitionEntry))
             dmgFile.readFully(currentPartitionEntry);
-        partitions = partitionList.toArray(new APMPartition[partitionList.size()]);
+        partitions = partitionList.toArray(APMPartition[]::new);
 
         unknown3_unknown = new byte[(int) (dmgFile.length() - dmgFile.getFilePointer() - 512)];
         dmgFile.readFully(unknown3_unknown);
@@ -114,8 +114,8 @@ public class DMGMetadata {
     }
 
     private static boolean onlyZeros(byte[] array) {
-        for(int i = 0; i < array.length; ++i) {
-            if(array[i] != 0)
+        for (byte b : array) {
+            if (b != 0)
                 return false;
         }
         return true;
@@ -139,7 +139,7 @@ public class DMGMetadata {
                 descs.addLast(new BlockDescriptor(di));
                 position += 0x28;
             }
-            descriptors = descs.toArray(new BlockDescriptor[descs.size()]);
+            descriptors = descs.toArray(BlockDescriptor[]::new);
         }
 
         public void printInfo(PrintStream ps) {
@@ -223,7 +223,7 @@ public class DMGMetadata {
             DataOutputStream dos = new DataOutputStream(baos);
             dos.write(unknown);
             dos.close();
-            return new String(baos.toByteArray(), "US-ASCII");
+            return baos.toString(StandardCharsets.US_ASCII);
         }
 
         public long getOutOffset() {
@@ -295,12 +295,12 @@ public class DMGMetadata {
             if(blockTypeString == null)
                 blockTypeString = "0x" + Integer.toHexString(blockType) + " (unknown type)";
 
-            result.append(" blockType=" + blockTypeString);
-            result.append(" unknown=" + Integer.toHexString(unknown));
-            result.append(" outOffset=" + outOffset);
-            result.append(" outSize=" + outSize);
-            result.append(" inOffset=" + inOffset);
-            result.append(" inSize=" + inSize);
+            result.append(" blockType=").append(blockTypeString);
+            result.append(" unknown=").append(Integer.toHexString(unknown));
+            result.append(" outOffset=").append(outOffset);
+            result.append(" outSize=").append(outSize);
+            result.append(" inOffset=").append(inOffset);
+            result.append(" inSize=").append(inSize);
             result.append("]");
 
             return result.toString();
@@ -338,55 +338,51 @@ public class DMGMetadata {
             // 2*2 + 4*3 + 32*2 + 10*4 + 16 + 188*2 = 512
             pmSig = di.readShort() & 0xffff;
             pmSigPad = di.readShort() & 0xffff;
-            pmMapBlkCnt = di.readInt() & 0xffffffffL;
-            pmPyPartStart = di.readInt() & 0xffffffffL;
-            pmPartBlkCnt = di.readInt() & 0xffffffffL;
+            pmMapBlkCnt = di.readInt() & 0xffff_ffffL;
+            pmPyPartStart = di.readInt() & 0xfff_fffffL;
+            pmPartBlkCnt = di.readInt() & 0xffff_ffffL;
             di.readFully(pmPartName);
             di.readFully(pmParType);
-            pmLgDataStart = di.readInt() & 0xffffffffL;
-            pmDataCnt = di.readInt() & 0xffffffffL;
-            pmPartStatus = di.readInt() & 0xffffffffL;
-            pmLgBootStart = di.readInt() & 0xffffffffL;
-            pmBootSize = di.readInt() & 0xffffffffL;
-            pmBootAddr = di.readInt() & 0xffffffffL;
-            pmBootAddr2 = di.readInt() & 0xffffffffL;
-            pmBootEntry = di.readInt() & 0xffffffffL;
-            pmBootEntry2 = di.readInt() & 0xffffffffL;
-            pmBootCksum = di.readInt() & 0xffffffffL;
+            pmLgDataStart = di.readInt() & 0xffff_ffffL;
+            pmDataCnt = di.readInt() & 0xffff_ffffL;
+            pmPartStatus = di.readInt() & 0xffff_ffffL;
+            pmLgBootStart = di.readInt() & 0xffff_ffffL;
+            pmBootSize = di.readInt() & 0xffff_ffffL;
+            pmBootAddr = di.readInt() & 0xffff_ffffL;
+            pmBootAddr2 = di.readInt() & 0xffff_ffffL;
+            pmBootEntry = di.readInt() & 0xffff_ffffL;
+            pmBootEntry2 = di.readInt() & 0xffff_ffffL;
+            pmBootCksum = di.readInt() & 0xffff_ffffL;
             di.readFully(pmProcessor);
             for(int i = 0; i < pmPad.length; ++i)
                 pmPad[i] = di.readShort() & 0xffff;
         }
 
         public void printPartitionInfo(PrintStream ps) {
-// 	    String result = "";
-// 	    result += "Partition name: \"" + new String(pmPartName) + "\"\n";
-// 	    result += "Partition type: \"" + new String(pmParType) + "\"\n";
-// 	    result += "Processor type: \"" + new String(pmProcessor) + "\"\n";
-// 	    return result;
-            try {
-                ps.println("pmSig: " + pmSig);
-                ps.println("pmSigPad: " + pmSigPad);
-                ps.println("pmMapBlkCnt: " + pmMapBlkCnt);
-                ps.println("pmPyPartStart: " + pmPyPartStart);
-                ps.println("pmPartBlkCnt: " + pmPartBlkCnt);
-                ps.println("pmPartName: \"" + new String(pmPartName, "US-ASCII") + "\"");
-                ps.println("pmParType: \"" + new String(pmParType, "US-ASCII") + "\"");
-                ps.println("pmLgDataStart: " + pmLgDataStart);
-                ps.println("pmDataCnt: " + pmDataCnt);
-                ps.println("pmPartStatus: " + pmPartStatus);
-                ps.println("pmLgBootStart: " + pmLgBootStart);
-                ps.println("pmBootSize: " + pmBootSize);
-                ps.println("pmBootAddr: " + pmBootAddr);
-                ps.println("pmBootAddr2: " + pmBootAddr2);
-                ps.println("pmBootEntry: " + pmBootEntry);
-                ps.println("pmBootEntry2: " + pmBootEntry2);
-                ps.println("pmBootCksum: " + pmBootCksum);
-                ps.println("pmProcessor: \"" + new String(pmProcessor, "US-ASCII") + "\"");
-                ps.println("pmPad: " + pmPad);
-            } catch(UnsupportedEncodingException uee) {
-                uee.printStackTrace();
-            } // Will never happen. Ever. Period.
+//            String result = "";
+//            result += "Partition name: \"" + new String(pmPartName) + "\"\n";
+//            result += "Partition type: \"" + new String(pmParType) + "\"\n";
+//            result += "Processor type: \"" + new String(pmProcessor) + "\"\n";
+//            return result;
+            ps.println("pmSig: " + pmSig);
+            ps.println("pmSigPad: " + pmSigPad);
+            ps.println("pmMapBlkCnt: " + pmMapBlkCnt);
+            ps.println("pmPyPartStart: " + pmPyPartStart);
+            ps.println("pmPartBlkCnt: " + pmPartBlkCnt);
+            ps.println("pmPartName: \"" + new String(pmPartName, StandardCharsets.US_ASCII) + "\"");
+            ps.println("pmParType: \"" + new String(pmParType, StandardCharsets.US_ASCII) + "\"");
+            ps.println("pmLgDataStart: " + pmLgDataStart);
+            ps.println("pmDataCnt: " + pmDataCnt);
+            ps.println("pmPartStatus: " + pmPartStatus);
+            ps.println("pmLgBootStart: " + pmLgBootStart);
+            ps.println("pmBootSize: " + pmBootSize);
+            ps.println("pmBootAddr: " + pmBootAddr);
+            ps.println("pmBootAddr2: " + pmBootAddr2);
+            ps.println("pmBootEntry: " + pmBootEntry);
+            ps.println("pmBootEntry2: " + pmBootEntry2);
+            ps.println("pmBootCksum: " + pmBootCksum);
+            ps.println("pmProcessor: \"" + new String(pmProcessor, StandardCharsets.US_ASCII) + "\"");
+            ps.println("pmPad: " + pmPad);
         }
     }
 

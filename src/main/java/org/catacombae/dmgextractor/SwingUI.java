@@ -48,6 +48,7 @@ class SwingUI extends BasicUI implements UserInterface {
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean warning(String... messageLines) {
         StringBuilder sb = new StringBuilder();
 
@@ -69,6 +70,7 @@ class SwingUI extends BasicUI implements UserInterface {
     }
 
     /** {@inheritDoc} */
+    @Override
     public void error(String... messageLines) {
         StringBuilder sb = new StringBuilder();
 
@@ -86,10 +88,11 @@ class SwingUI extends BasicUI implements UserInterface {
     }
 
     /** {@inheritDoc} */
+    @Override
     public void reportProgress(int progressPercentage) {
         if(progressPercentage != previousPercentage) {
             if(progmon == null) {
-                final String progmonText;
+                String progmonText;
                 if(outputFilename != null) {
                     progmonText = "Extracting \"" +
                             inputFilename + "\" to\n    \"" + outputFilename + "\"...";
@@ -102,12 +105,13 @@ class SwingUI extends BasicUI implements UserInterface {
                 progmon.setProgress(0);
                 progmon.setMillisToPopup(0);
             }
-            progmon.setProgress((int) progressPercentage);
+            progmon.setProgress(progressPercentage);
             progmon.setNote(progressPercentage + "%");
         }
     }
 
     /** {@inheritDoc} */
+    @Override
     public void reportFinished(boolean simulation, int errorsReported, int warningsReported, long totalExtractedSize) {
         StringBuilder message = new StringBuilder();
         if(simulation)
@@ -133,11 +137,13 @@ class SwingUI extends BasicUI implements UserInterface {
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean cancelSignaled() {
         return progmon != null && progmon.isCanceled();
     }
 
     /** {@inheritDoc} */
+    @Override
     public void displayMessage(String... messageLines) {
         StringBuilder resultString = new StringBuilder();
         boolean firstIteration = true;
@@ -155,6 +161,7 @@ class SwingUI extends BasicUI implements UserInterface {
     }
 
     /** {@inheritDoc} */
+    @Override
     public File getInputFileFromUser() {
         SimpleFileFilter sff = new SimpleFileFilter();
         sff.addExtension("dmg");
@@ -181,15 +188,18 @@ class SwingUI extends BasicUI implements UserInterface {
     }
 
     /** {@inheritDoc} */
+    @Override
     public boolean getOutputConfirmationFromUser() {
-        return JOptionPane.showConfirmDialog(null, "Do you want to specify an output file?\n" +
-                "(Choosing \"No\" means the extraction will only be simulated,\n" +
-                "which can be useful for detecting errors in .dmg files...)",
+        return JOptionPane.showConfirmDialog(null, """
+                        Do you want to specify an output file?
+                        (Choosing "No" means the extraction will only be simulated,
+                        which can be useful for detecting errors in .dmg files...)""",
                 "Confirmation", JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
     }
 
     /** {@inheritDoc} */
+    @Override
     public File getOutputFileFromUser(File inputFile) {
         final String msgFileExists = "The file already exists. Do you want to overwrite?";
 
@@ -219,10 +229,9 @@ class SwingUI extends BasicUI implements UserInterface {
         while(true) {
             if(jfc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = jfc.getSelectedFile();
-                final File saveFile;
+                File saveFile;
                 FileFilter selectedFileFilter = jfc.getFileFilter();
-                if(selectedFileFilter instanceof SimplerFileFilter) {
-                    SimplerFileFilter sff = (SimplerFileFilter) selectedFileFilter;
+                if(selectedFileFilter instanceof SimplerFileFilter sff) {
                     if(!selectedFile.getName().endsWith(sff.getExtension()))
                         saveFile = new File(selectedFile.getParentFile(), selectedFile.getName() + sff.getExtension());
                     else
@@ -246,11 +255,13 @@ class SwingUI extends BasicUI implements UserInterface {
     }
 
     /** {@inheritDoc} */
+    @Override
     public char[] getPasswordFromUser() {
         return PasswordDialog.showDialog(null, "Reading encrypted disk image...",
                 "You need to enter a password to unlock this disk image:");
     }
 
+    @Override
     public void setProgressFilenames(String inputFilename, String outputFilename) {
         this.inputFilename = inputFilename;
         this.outputFilename = outputFilename;

@@ -26,22 +26,23 @@ import java.nio.charset.*;
  * can be changed on the fly.
  */
 public class UTF16BEInputStream extends InputStream {
-    private InputStream underlyingStream;
+    private final InputStream underlyingStream;
     private Reader inReader;
-    private CharsetEncoder utf16beEncoder;
+    private final CharsetEncoder utf16beEncoder;
     private int overflow = -1;
-    private char[] tempArray = new char[4096];
+    private final char[] tempArray = new char[4096];
 
     public UTF16BEInputStream(InputStream underlyingStream, String encodingName) throws UnsupportedEncodingException {
 	this.underlyingStream = underlyingStream;
 	this.inReader = new InputStreamReader(underlyingStream, encodingName);
-	this.utf16beEncoder = Charset.forName("UTF-16BE").newEncoder();
+	this.utf16beEncoder = StandardCharsets.UTF_16BE.newEncoder();
     }
     
     public void changeEncoding(String encodingName) throws UnsupportedEncodingException {
 	this.inReader = new InputStreamReader(underlyingStream, encodingName);
     }
 
+    @Override
     public int read() throws IOException {
 	if(overflow != -1) {
 	    int result = overflow;

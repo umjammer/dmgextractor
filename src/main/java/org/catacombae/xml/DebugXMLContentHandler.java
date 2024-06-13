@@ -25,6 +25,7 @@ public class DebugXMLContentHandler extends XMLContentHandler {
 	super(encoding);
     }
     //public void doctype(String
+    @Override
     public void xmlDecl(String version, String encoding, Boolean standalone) {
 	print("xmlDecl: <?xml version=\"" + version + "\"");
 	if(encoding != null)
@@ -39,6 +40,7 @@ public class DebugXMLContentHandler extends XMLContentHandler {
 	}
 	println("?>");
     }
+    @Override
     public void pi(String id, String content) {
 	print("pi: <?" + id);
 	if(content != null)
@@ -46,10 +48,12 @@ public class DebugXMLContentHandler extends XMLContentHandler {
 	println("?>");
     }
     
+    @Override
     public void comment(String content) {
 	println("comment: <!--" + content + "-->");
     }
 
+    @Override
     public void doctype(String name, ExternalID eid) {
 	print("doctype: <!DOCTYPE " + name);
 	if(eid != null) {
@@ -61,10 +65,12 @@ public class DebugXMLContentHandler extends XMLContentHandler {
 	println(">");
     }
 
+    @Override
     public void cdata(String cdata) {
 	println("cdata: <![CDATA[" + cdata + "]]>");
     }
 
+    @Override
     public void emptyElement(String name, List<Attribute> attributes) {
 	print("emptyElement: <" + name);
 	for(Attribute attr : attributes)
@@ -72,6 +78,7 @@ public class DebugXMLContentHandler extends XMLContentHandler {
 	println("/>");
     }
     
+    @Override
     public void startElement(String name, List<Attribute> attributes) {
 	print("startElement: <" + name);
 	for(Attribute attr : attributes)
@@ -79,6 +86,7 @@ public class DebugXMLContentHandler extends XMLContentHandler {
 	println(">");
     }
     
+    @Override
     public void endElement(String name) {
 	println("endElement: </" + name + ">");
     }
@@ -90,10 +98,12 @@ public class DebugXMLContentHandler extends XMLContentHandler {
 // 	println("\"");
 	   
 //     }
+    @Override
     public void chardata(int beginLine, int beginColumn, int endLine, int endColumn) {
 	println("chardata: starting at (" + beginLine + "," + beginColumn + ") and ending at (" + endLine + "," + endColumn + ")");
     }
 
+    @Override
     public void reference(String ref) {
 	println("reference: \"" + ref + "\"");
     }

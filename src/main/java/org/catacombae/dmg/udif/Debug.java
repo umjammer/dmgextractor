@@ -18,7 +18,7 @@
 package org.catacombae.dmg.udif;
 
 public class Debug {
-    public static boolean debug = false;
+    public static final boolean debug = false;
     
     public static void warning(String message) {
 	if(debug)

@@ -17,7 +17,6 @@
 
 package org.catacombae.dmgextractor.io;
 
-import java.io.*;
 import org.catacombae.io.BasicReadableRandomAccessStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.RuntimeIOException;
@@ -28,7 +27,7 @@ import org.catacombae.io.RuntimeIOException;
  */
 public class SynchronizedRandomAccessStream extends BasicReadableRandomAccessStream {
     /** The underlying stream. */
-    private ReadableRandomAccessStream ras;
+    private final ReadableRandomAccessStream ras;
     
     public SynchronizedRandomAccessStream(ReadableRandomAccessStream ras) {
 	this.ras = ras;
@@ -42,7 +41,7 @@ public class SynchronizedRandomAccessStream extends BasicReadableRandomAccessStr
     }
     
     /** Atomic seek+skip. */
-    public synchronized long skipFrom(final long pos, final long length) throws RuntimeIOException {
+    public synchronized long skipFrom(long pos, long length) throws RuntimeIOException {
 	long streamLength = length();
 	long newPos = pos+length;
 
@@ -62,16 +61,19 @@ public class SynchronizedRandomAccessStream extends BasicReadableRandomAccessStr
     }
     
     /** @see java.io.RandomAccessFile */
+    @Override
     public synchronized void close() throws RuntimeIOException {
 	ras.close();
     }
 
     /** @see java.io.RandomAccessFile */
+    @Override
     public synchronized long getFilePointer() throws RuntimeIOException {
 	return ras.getFilePointer();
     }
 
     /** @see java.io.RandomAccessFile */
+    @Override
     public synchronized long length() throws RuntimeIOException {
 	return ras.length();
     }
@@ -89,11 +91,13 @@ public class SynchronizedRandomAccessStream extends BasicReadableRandomAccessStr
     }
 
     /** @see java.io.RandomAccessFile */
+    @Override
     public synchronized int read(byte[] b, int off, int len) throws RuntimeIOException {
 	return ras.read(b, off, len);
     }
 
     /** @see java.io.RandomAccessFile */
+    @Override
     public synchronized void seek(long pos) throws RuntimeIOException {
 	ras.seek(pos);
     }

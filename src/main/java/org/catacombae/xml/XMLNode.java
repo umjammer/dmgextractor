@@ -46,6 +46,7 @@ public class XMLNode extends XMLElement {
 	_printTree(pw, 0);
     }
 
+    @Override
     protected void _printTree(PrintStream pw, int level) {
 	for(int i = 0; i < level; ++i)
 	    pw.print(" ");
@@ -62,7 +63,7 @@ public class XMLNode extends XMLElement {
 	pw.println("</" + qName + ">");
     }
     public XMLElement[] getChildren() {
-	return children.toArray(new XMLElement[children.size()]);
+	return children.toArray(XMLElement[]::new);
     }
     
 }

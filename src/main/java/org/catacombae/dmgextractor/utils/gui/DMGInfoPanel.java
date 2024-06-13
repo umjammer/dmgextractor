@@ -25,10 +25,12 @@ package org.catacombae.dmgextractor.utils.gui;
 
 import java.awt.CardLayout;
 import java.awt.Component;
+import javax.swing.AbstractListModel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.ListModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+
 import org.catacombae.dmg.udif.Koly;
 import org.catacombae.util.Util.Pair;
 
@@ -42,7 +44,7 @@ public class DMGInfoPanel extends javax.swing.JPanel {
 
     private final GeneralInfoPanel generalInfoPanel = new GeneralInfoPanel();
     private final KolyPanel kolyPanel = new KolyPanel();
-    private final ContentPair contents[] = {
+    private final ContentPair[] contents = {
         new ContentPair("General info", generalInfoPanel),
         new ContentPair("plist", new PlistPanel()),
         new ContentPair("Unknown (256 bytes)", new UnknownDataViewPanel()),
@@ -53,14 +55,16 @@ public class DMGInfoPanel extends javax.swing.JPanel {
         new ContentPair("koly", kolyPanel),
     };
 
-    private CardLayout contentsCardLayout;
+    private final CardLayout contentsCardLayout;
 
     /** Creates new form DMGInfoPanel */
     public DMGInfoPanel() {
         initComponents();
         
-        ListModel listModel = new javax.swing.AbstractListModel() {
+        ListModel<Object> listModel = new AbstractListModel<>() {
+            @Override
             public int getSize() { return contents.length; }
+            @Override
             public Object getElementAt(int i) { return contents[i].getA(); }
         };
         
@@ -71,31 +75,28 @@ public class DMGInfoPanel extends javax.swing.JPanel {
         
         
         // Now, let's add all components to contentsPane
-        for(int i = 0; i < contents.length; ++i)
-            contentsPane.add(contents[i].getB(), contents[i].getA());
+        for (ContentPair content : contents) contentsPane.add(content.getB(), content.getA());
         
-	contentsList.addListSelectionListener(new ListSelectionListener() {
-		public void valueChanged(ListSelectionEvent lse) {
-		    //System.out.println(lse);
-                    if(!lse.getValueIsAdjusting()) {
-                        int index = contentsList.getSelectedIndex();
-                        //System.out.println("Switching to " + index + "...");
-                        contentsCardLayout.show(contentsPane,
-                                contents[index].getA());
-                    }
-		}
-	    });
+	contentsList.addListSelectionListener(lse -> {
+        //System.out.println(lse);
+if(!lse.getValueIsAdjusting()) {
+int index = contentsList.getSelectedIndex();
+//System.out.println("Switching to " + index + "...");
+contentsCardLayout.show(contentsPane,
+contents[index].getA());
+}
+    });
 
         contentsList.setSelectedIndex(0);
     }
 
-    public void setGeneralInfo(final String filename, long size,
-            long numberOfPartitions)
+    public void setGeneralInfo(String filename, long size,
+                               long numberOfPartitions)
     {
         generalInfoPanel.setFields(filename, size, numberOfPartitions);
     }
 
-    public void setKoly(final Koly koly) {
+    public void setKoly(Koly koly) {
         kolyPanel.setFields(koly);
     }
     
@@ -106,14 +107,16 @@ public class DMGInfoPanel extends javax.swing.JPanel {
      */
     // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
     private void initComponents() {
-        listContentsSplitter = new javax.swing.JSplitPane();
-        contentsListScroller = new javax.swing.JScrollPane();
-        contentsList = new javax.swing.JList();
+        listContentsSplitter = new JSplitPane();
+        contentsListScroller = new JScrollPane();
+        contentsList = new javax.swing.JList<>();
         contentsPane = new javax.swing.JPanel();
 
-        contentsList.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "General info", "plist", "Unknown (256 bytes)", "Block map", "Unknown (12 bytes)", "Apple Partition Map", "Unknown (X bytes)", "koly" };
+        contentsList.setModel(new AbstractListModel<>() {
+            final String[] strings = { "General info", "plist", "Unknown (256 bytes)", "Block map", "Unknown (12 bytes)", "Apple Partition Map", "Unknown (X bytes)", "koly" };
+            @Override
             public int getSize() { return strings.length; }
+            @Override
             public Object getElementAt(int i) { return strings[i]; }
         });
         contentsList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -139,10 +142,9 @@ public class DMGInfoPanel extends javax.swing.JPanel {
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JList contentsList;
+    private javax.swing.JList<Object> contentsList;
     private javax.swing.JScrollPane contentsListScroller;
     private javax.swing.JPanel contentsPane;
     private javax.swing.JSplitPane listContentsSplitter;
     // End of variables declaration//GEN-END:variables
-    
 }

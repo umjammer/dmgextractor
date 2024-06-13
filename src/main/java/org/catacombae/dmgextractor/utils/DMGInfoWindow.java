@@ -21,28 +21,35 @@ import java.awt.BorderLayout;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import java.nio.charset.StandardCharsets;
 import javax.swing.JFrame;
+
 import net.iharder.dnd.FileDrop;
 import org.catacombae.dmg.udif.Koly;
 import org.catacombae.dmgextractor.utils.gui.DMGInfoPanel;
 
+import static java.lang.System.getLogger;
+
+
 public class DMGInfoWindow extends JFrame {
-    private DMGInfoPanel infoPanel;
-    
+
+    private static final Logger logger = getLogger(DMGInfoWindow.class.getName());
+
+    private final DMGInfoPanel infoPanel;
+
     public DMGInfoWindow() {
         infoPanel = new DMGInfoPanel();
         add(infoPanel, BorderLayout.CENTER);
 
         // Register handler for file drag&drop events
-        new FileDrop(this, new FileDrop.Listener() {
-
-            public void filesDropped(java.io.File[] files) {
-                if(files.length > 0) {
-                    try {
-                        loadFile(files[0]);
-                    } catch(IOException ioe) {
-                        ioe.printStackTrace();
-                    }
+        new FileDrop(this, files -> {
+            if (files.length > 0) {
+                try {
+                    loadFile(files[0]);
+                } catch (IOException e) {
+                    logger.log(Level.ERROR, e.getMessage(), e);
                 }
             }
         });
@@ -61,8 +68,8 @@ public class DMGInfoWindow extends JFrame {
 
         inputFile.seek(inputFile.length() - 512);
         inputFile.readFully(kolyData);
-        kolySignature = new String(kolyData, 0, 4, "US-ASCII");
-        if(!kolySignature.equals("koly")) {
+        kolySignature = new String(kolyData, 0, 4, StandardCharsets.US_ASCII);
+        if (!kolySignature.equals("koly")) {
             System.out.println("ERROR: Invalid signature. Found " +
                     "\"" + kolySignature + "\" instead of \"koly\".");
             return;
@@ -76,11 +83,11 @@ public class DMGInfoWindow extends JFrame {
     public static void main(String[] args) {
         DMGInfoWindow window = new DMGInfoWindow();
 
-        if(args.length > 0) {
+        if (args.length > 0) {
             try {
                 window.loadFile(new File(args[0]));
-            } catch(IOException ioe) {
-                ioe.printStackTrace();
+            } catch (IOException e) {
+                logger.log(Level.ERROR, e.getMessage(), e);
             }
         }
 

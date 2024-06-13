@@ -18,15 +18,23 @@
 package org.catacombae.dmg.sparsebundle;
 
 import java.io.IOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.RuntimeIOException;
+
+import static java.lang.System.getLogger;
+
 
 /**
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 abstract class BundleMember {
 
-    /* Backing store. */
+    private static final Logger logger = getLogger(BundleMember.class.getName());
+
+    // Backing store.
     private final FileAccessor file;
     private final boolean fileLocked;
     protected final ReadableRandomAccessStream stream;
@@ -45,10 +53,10 @@ abstract class BundleMember {
                 file.unlock();
             }
         } catch(RuntimeIOException ex) {
-            final IOException cause = ex.getIOCause();
+            IOException cause = ex.getIOCause();
 
             if(cause != null) {
-                ex.printStackTrace();
+                logger.log(Level.ERROR, ex.getMessage(), ex);
             }
             else {
                 throw ex;
@@ -58,9 +66,9 @@ abstract class BundleMember {
         try {
             file.close();
         } catch(RuntimeIOException ex) {
-            final IOException cause = ex.getIOCause();
+            IOException cause = ex.getIOCause();
             if(cause != null) {
-                ex.printStackTrace();
+                logger.log(Level.ERROR, ex.getMessage(), ex);
             }
             else {
                 throw ex;

@@ -113,26 +113,17 @@ public class UDIFBlock implements Comparable<UDIFBlock>{
     public long getInSize() { return inSize; }
     
     public String getBlockTypeAsString() {
-        switch(blockType) {
-            case BT_ADC:
-                return BT_ADC_STRING;
-            case BT_ZLIB:
-                return BT_ZLIB_STRING;
-            case BT_BZIP2:
-                return BT_BZIP2_STRING;
-            case BT_COPY:
-                return BT_COPY_STRING;
-            case BT_ZERO:
-                return BT_ZERO_STRING;
-            case BT_ZERO2:
-                return BT_ZERO2_STRING;
-            case BT_END:
-                return BT_END_STRING;
-            case BT_UNKNOWN:
-                return BT_UNKNOWN_STRING;
-            default:
-                return "[Unknown block type! ID=0x" + Integer.toHexString(blockType) + "]";
-        }
+        return switch (blockType) {
+            case BT_ADC -> BT_ADC_STRING;
+            case BT_ZLIB -> BT_ZLIB_STRING;
+            case BT_BZIP2 -> BT_BZIP2_STRING;
+            case BT_COPY -> BT_COPY_STRING;
+            case BT_ZERO -> BT_ZERO_STRING;
+            case BT_ZERO2 -> BT_ZERO2_STRING;
+            case BT_END -> BT_END_STRING;
+            case BT_UNKNOWN -> BT_UNKNOWN_STRING;
+            default -> "[Unknown block type! ID=0x" + Integer.toHexString(blockType) + "]";
+        };
     }
     
     /**
@@ -196,6 +187,7 @@ public class UDIFBlock implements Comparable<UDIFBlock>{
     }
 
     /** Orders blocks according to the "true" InOffset. */
+    @Override
     public int compareTo(UDIFBlock db) {
         long res = getTrueInOffset() - db.getTrueInOffset();
         if(res > Integer.MAX_VALUE)

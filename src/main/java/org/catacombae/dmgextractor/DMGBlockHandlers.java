@@ -29,7 +29,7 @@ import org.catacombae.io.ReadableRandomAccessStream;
  */
 class DMGBlockHandlers {
 
-    private static byte[] inBuffer = new byte[0x40000];
+    private static final byte[] inBuffer = new byte[0x40000];
 
     /**
      * Extracts an UDIFBlock describing a region of the file <code>dmgRaf</code>

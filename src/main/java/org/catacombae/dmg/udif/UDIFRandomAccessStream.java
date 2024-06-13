@@ -31,8 +31,8 @@ public class UDIFRandomAccessStream extends BasicReadableRandomAccessStream {
       We have a string of data divided into blocks. Different algorithms must be applied to
       different types of blocks in order to extract the data.
      */
-    private UDIFFile dmgFile;
-    private UDIFBlock[] allBlocks;
+    private final UDIFFile dmgFile;
+    private final UDIFBlock[] allBlocks;
     private UDIFBlock currentBlock;
     private UDIFBlockInputStream currentBlockStream;
     
@@ -93,15 +93,19 @@ public class UDIFRandomAccessStream extends BasicReadableRandomAccessStream {
     }
     
     /** @see java.io.RandomAccessFile */
+    @Override
     public void close() throws RuntimeIOException {}
 
     /** @see java.io.RandomAccessFile */
+    @Override
     public long getFilePointer() throws RuntimeIOException { return logicalFilePointer; }
 
     /** @see java.io.RandomAccessFile */
+    @Override
     public long length() throws RuntimeIOException { return length; }
 
     /** @see java.io.RandomAccessFile */
+    @Override
     public int read() throws RuntimeIOException {
 	byte[] b = new byte[1];
 	if(read(b, 0, 1) != 1)
@@ -111,9 +115,11 @@ public class UDIFRandomAccessStream extends BasicReadableRandomAccessStream {
     }
 
     /** @see java.io.RandomAccessFile */
+    @Override
     public int read(byte[] b) throws RuntimeIOException { return read(b, 0, b.length); }
 
     /** @see java.io.RandomAccessFile */
+    @Override
     public int read(byte[] b, int off, int len) throws RuntimeIOException {
         try {
  	//System.out.println("UDIFRandomAccessStream.read(b.length=" + b.length + ", " + off + ", " + len + ") {");
@@ -164,6 +170,7 @@ public class UDIFRandomAccessStream extends BasicReadableRandomAccessStream {
     }
 
     /** @see java.io.RandomAccessFile */
+    @Override
     public void seek(long pos) throws RuntimeIOException {
 	if(logicalFilePointer != pos) {
 	    seekCalled = true;

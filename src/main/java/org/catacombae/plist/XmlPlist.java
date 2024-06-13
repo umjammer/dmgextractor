@@ -22,8 +22,10 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import org.catacombae.dmgextractor.io.RandomAccessInputStream;
@@ -38,10 +40,15 @@ import org.catacombae.xml.apx.APXParser;
 import org.catacombae.xml.apx.ParseException;
 import org.xml.sax.SAXException;
 
+import static java.lang.System.getLogger;
+
+
 /**
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class XmlPlist {
+
+    private static final Logger logger = getLogger(XmlPlist.class.getName());
 
     private final XMLNode rootNode;
 
@@ -58,8 +65,8 @@ public class XmlPlist {
     }
 
     public XmlPlist(byte[] data, int offset, int length, boolean useSAXParser) {
-        //plistData = new byte[length];
-        //System.arraycopy(data, offset, plistData, 0, length);
+//        plistData = new byte[length];
+//        System.arraycopy(data, offset, plistData, 0, length);
         rootNode = parseXMLData(data, useSAXParser);
     }
 
@@ -68,7 +75,7 @@ public class XmlPlist {
     }
 
     private XMLNode parseXMLData(byte[] plistData, boolean defaultToSAX) {
-        //InputStream is = new ByteArrayInputStream(plistData);
+//        InputStream is = new ByteArrayInputStream(plistData);
         NodeBuilder handler = new NodeBuilder();
 
         if(defaultToSAX) {
@@ -77,12 +84,12 @@ public class XmlPlist {
         else {
             /* First try to parse with the internal homebrew parser, and if it
              * doesn't succeed, go for the SAX parser. */
-            //System.err.println("Trying to parse xml data...");
+//            System.err.println("Trying to parse xml data...");
             try {
                 parseXMLDataAPX(plistData, handler);
-                //System.err.println("xml data parsed...");
+//                System.err.println("xml data parsed...");
             } catch(Exception e) {
-                e.printStackTrace();
+                logger.log(Level.ERROR, e.getMessage(), e);
                 System.err.println("APX parser threw exception... falling back to SAX parser. Report this error!");
                 handler = new NodeBuilder();
                 parseXMLDataSAX(plistData, handler);
@@ -105,8 +112,8 @@ public class XmlPlist {
             // First we parse the xml declaration using a US-ASCII charset just to extract the charset description
             //System.err.println("parsing encoding");
             InputStream is = new RandomAccessInputStream(bufferStream);
-            APXParser encodingParser = APXParser.create(new InputStreamReader(is, "US-ASCII"),
-                                            new NullXMLContentHandler(Charset.forName("US-ASCII")));
+            APXParser encodingParser = APXParser.create(new InputStreamReader(is, StandardCharsets.US_ASCII),
+                                            new NullXMLContentHandler(StandardCharsets.US_ASCII));
             String encodingName = encodingParser.xmlDecl();
             //System.err.println("encodingName=" + encodingName);
             if(encodingName == null)
@@ -117,9 +124,9 @@ public class XmlPlist {
             // Then we proceed to parse the entire document
             is = new RandomAccessInputStream(bufferStream);
             Reader usedReader = new BufferedReader(new InputStreamReader(is, encoding));
-            //System.err.println("parsing document");
-            //try { FileOutputStream dump = new FileOutputStream("dump.xml"); dump.write(buffer); dump.close(); }
-            //catch(Exception e) { e.printStackTrace(); }
+//            System.err.println("parsing document");
+//            try { FileOutputStream dump = new FileOutputStream("dump.xml"); dump.write(buffer); dump.close(); }
+//            catch(Exception e) { e.printStackTrace(); }
 
             if(false) { //
                 APXParser documentParser = APXParser.create(usedReader, new DebugXMLContentHandler(encoding));
@@ -132,10 +139,8 @@ public class XmlPlist {
             }
 
         } catch(ParseException pe) {
-            //System.err.println("Could not read the partition list...");
+//            System.err.println("Could not read the partition list...");
             throw new RuntimeException(pe);
-        } catch(UnsupportedEncodingException uee) {
-            throw new RuntimeException(uee);
         }
     }
 
@@ -164,11 +169,11 @@ public class XmlPlist {
 //          System.out.println("" + saxParser.getProperty(""));
 //          System.out.println("" + saxParser.getProperty(""));
 
-            //System.out.println("isValidating: " + saxParser.isValidating());
+//            System.out.println("isValidating: " + saxParser.isValidating());
             saxParser.parse(is, handler);
         } catch(SAXException se) {
-            se.printStackTrace();
-            //System.err.println("Could not read the partition list... exiting.");
+            logger.log(Level.ERROR, se.getMessage(), se);
+//            System.err.println("Could not read the partition list... exiting.");
             throw new RuntimeException(se);
         } catch(Exception e) {
             throw new RuntimeException(e);

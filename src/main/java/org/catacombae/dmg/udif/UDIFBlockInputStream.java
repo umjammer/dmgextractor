@@ -33,8 +33,8 @@ import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.RuntimeIOException;
 
 public abstract class UDIFBlockInputStream extends InputStream {
-    protected ReadableRandomAccessStream raf;
-    protected UDIFBlock block;
+    protected final ReadableRandomAccessStream raf;
+    protected final UDIFBlock block;
     protected final int addInOffset;
     private long globalBytesRead;
     // 16 KiB buffer... is it reasonable?
@@ -76,25 +76,16 @@ public abstract class UDIFBlockInputStream extends InputStream {
     public static UDIFBlockInputStream getStream(ReadableRandomAccessStream raf,
             UDIFBlock block) throws IOException, RuntimeIOException {
 
-        switch(block.getBlockType()) {
-            case UDIFBlock.BT_ZLIB:
-                return new ZlibBlockInputStream(raf, block, 0);
-            case UDIFBlock.BT_BZIP2:
-                return new Bzip2BlockInputStream(raf, block, 0);
-            case UDIFBlock.BT_COPY:
-                return new CopyBlockInputStream(raf, block, 0);
-            case UDIFBlock.BT_ZERO:
-            case UDIFBlock.BT_ZERO2:
-                return new ZeroBlockInputStream(raf, block, 0);
-            case UDIFBlock.BT_END:
-            case UDIFBlock.BT_UNKNOWN:
-                throw new RuntimeException("Block type is a marker and " +
-                        "contains no data.");
-            case UDIFBlock.BT_ADC:
-            default:
-                throw new RuntimeException("No handler for block type " +
-                        block.getBlockTypeAsString());
-        }
+        return switch (block.getBlockType()) {
+            case UDIFBlock.BT_ZLIB -> new ZlibBlockInputStream(raf, block, 0);
+            case UDIFBlock.BT_BZIP2 -> new Bzip2BlockInputStream(raf, block, 0);
+            case UDIFBlock.BT_COPY -> new CopyBlockInputStream(raf, block, 0);
+            case UDIFBlock.BT_ZERO, UDIFBlock.BT_ZERO2 -> new ZeroBlockInputStream(raf, block, 0);
+            case UDIFBlock.BT_END, UDIFBlock.BT_UNKNOWN -> throw new RuntimeException("Block type is a marker and " +
+                    "contains no data.");
+            default -> throw new RuntimeException("No handler for block type " +
+                    block.getBlockTypeAsString());
+        };
     }
     
     /**
@@ -145,7 +136,7 @@ public abstract class UDIFBlockInputStream extends InputStream {
     public int read(byte[] b, int off, int len) throws IOException {
 // 	System.out.println("UDIFBlockInputStream.read(b, " + off + ", " + len + ") {");
 
-        final int bytesToRead = len;
+        int bytesToRead = len;
 
         int bytesRead = 0;
         int outPos = off;
@@ -249,6 +240,7 @@ public abstract class UDIFBlockInputStream extends InputStream {
             //System.out.println("}");
         }
 
+        @Override
         protected void fillBuffer() throws RuntimeIOException, IOException {
             //System.err.println("ZlibBlockInputStream.fillBuffer() {");
             //if(inflater == null)
@@ -296,10 +288,11 @@ public abstract class UDIFBlockInputStream extends InputStream {
             super(raf, block, addInOffset);
         }
 
+        @Override
         protected void fillBuffer() throws IOException {
             raf.seek(addInOffset + inPos + block.getTrueInOffset());
 
-            final int bytesToRead = (int) Math.min(block.getInSize() - inPos,
+            int bytesToRead = (int) Math.min(block.getInSize() - inPos,
                     buffer.length);
             int totalBytesRead = 0;
             while(totalBytesRead < bytesToRead) {
@@ -322,7 +315,7 @@ public abstract class UDIFBlockInputStream extends InputStream {
         /** Extremely more efficient skip method! */
         @Override
         public long skip(long n) throws IOException {
-            final long bytesToSkip =
+            long bytesToSkip =
                     Math.min(block.getInSize() - inPos, n);
             if(bytesToSkip < 0) {
                 throw new RuntimeException("Internal error: bytesToSkip is " +
@@ -348,8 +341,9 @@ public abstract class UDIFBlockInputStream extends InputStream {
             super(raf, block, addInOffset);
         }
 
+        @Override
         protected void fillBuffer() throws IOException {
-            final int bytesToWrite =
+            int bytesToWrite =
                     (int) Math.min(block.getOutSize() - outPos, buffer.length);
             Util.zero(buffer, 0, bytesToWrite);
             outPos += bytesToWrite;
@@ -363,7 +357,7 @@ public abstract class UDIFBlockInputStream extends InputStream {
         /** Extremely more efficient skip method! */
         @Override
         public long skip(long n) throws IOException {
-            final long bytesToSkip =
+            long bytesToSkip =
                     Math.min(block.getOutSize() - outPos, n);
             if(bytesToSkip < 0) {
                 throw new RuntimeException("Internal error: bytesToSkip is " +
@@ -383,8 +377,8 @@ public abstract class UDIFBlockInputStream extends InputStream {
     public static class Bzip2BlockInputStream extends UDIFBlockInputStream {
 
         private final byte[] BZIP2_SIGNATURE = { 0x42, 0x5A }; // 'BZ'
-        private InputStream bzip2DataStream;
-        private CBZip2InputStream decompressingStream;
+        private final InputStream bzip2DataStream;
+        private final CBZip2InputStream decompressingStream;
         private long outPos = 0;
 
         public Bzip2BlockInputStream(ReadableRandomAccessStream raf,
@@ -435,9 +429,10 @@ public abstract class UDIFBlockInputStream extends InputStream {
                     new BufferedInputStream(bzip2DataStream));
         }
 
+        @Override
         protected void fillBuffer() throws IOException {
 
-            final int bytesToRead = (int) Math.min(block.getOutSize() - outPos,
+            int bytesToRead = (int) Math.min(block.getOutSize() - outPos,
                     buffer.length);
             int totalBytesRead = 0;
             while(totalBytesRead < bytesToRead) {

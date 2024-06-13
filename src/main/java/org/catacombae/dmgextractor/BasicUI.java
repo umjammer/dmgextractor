@@ -33,11 +33,13 @@ abstract class BasicUI implements UserInterface {
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setTotalProgressLength(long len) {
         totalProgressLength = len;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void addProgressRaw(long value) {
         currentProgress += value;
         if(totalProgressLength > 0) {
@@ -49,6 +51,7 @@ abstract class BasicUI implements UserInterface {
     }
 
     /** {@inheritDoc} */
+    @Override
     public void displayMessageVerbose(String... messageLines) {
         if(verbose)
             displayMessage(messageLines);

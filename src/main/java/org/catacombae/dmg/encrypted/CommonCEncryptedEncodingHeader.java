@@ -39,6 +39,8 @@
 
 package org.catacombae.dmg.encrypted;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -46,12 +48,19 @@ import java.security.Key;
 import java.util.LinkedList;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
+
 import org.catacombae.dmgextractor.Util;
+
+import static java.lang.System.getLogger;
+
 
 /**
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class CommonCEncryptedEncodingHeader {
+
+    private static final Logger logger = getLogger(CommonCEncryptedEncodingHeader.class.getName());
+
     public static CommonCEncryptedEncodingHeader create(V1Header header) {
         return new V1Implementation(header);
     }
@@ -160,7 +169,7 @@ public abstract class CommonCEncryptedEncodingHeader {
     }
 
     private static class V1KeyDataImplementation extends KeyData {
-        private V1Header header;
+        private final V1Header header;
 
         private V1KeyDataImplementation(V1Header header) {
             this.header = header;
@@ -196,10 +205,10 @@ public abstract class CommonCEncryptedEncodingHeader {
         public byte[] unwrapIndividualKey(Key key, Cipher cph, byte[] wrappedKey)
                 throws InvalidKeyException, InvalidAlgorithmParameterException,
                 GeneralSecurityException {
-            Debug.print("unwrapIndividualKey(" + key + ", " + cph + ", byte[" + wrappedKey.length + "]);");
-            Debug.print("  wrappedKey: 0x" + Util.byteArrayToHexString(wrappedKey));
+            logger.log(Level.DEBUG, "unwrapIndividualKey(" + key + ", " + cph + ", byte[" + wrappedKey.length + "]);");
+            logger.log(Level.DEBUG, "  wrappedKey: 0x" + Util.byteArrayToHexString(wrappedKey));
 
-            final byte[] initialIv = new byte[] {
+            byte[] initialIv = new byte[] {
                 (byte) 0x4a, (byte) 0xdd, (byte) 0xa2, (byte) 0x2c,
                 (byte) 0x79, (byte) 0xe8, (byte) 0x21, (byte) 0x05
             };
@@ -208,20 +217,20 @@ public abstract class CommonCEncryptedEncodingHeader {
             byte[] ir1 = new byte[wrappedKey.length];
             cph.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(initialIv));
             int ir1Len = cph.doFinal(wrappedKey, 0, wrappedKey.length, ir1, 0);
-            Debug.print("  ir1: 0x" + Util.byteArrayToHexString(ir1, 0, ir1Len));
-            Debug.print("  ir1Len: " + ir1Len);
+            logger.log(Level.DEBUG, "  ir1: 0x" + Util.byteArrayToHexString(ir1, 0, ir1Len));
+            logger.log(Level.DEBUG, "  ir1Len: " + ir1Len);
 
             byte[] ir2 = new byte[ir1Len];
             for(int i = 0; i < ir1Len; ++i)
                 ir2[i] = ir1[ir1Len-1-i];
-            Debug.print("  ir2: 0x" + Util.byteArrayToHexString(ir2));
-            Debug.print("  ir2.length: " + ir2.length);
+            logger.log(Level.DEBUG, "  ir2: 0x" + Util.byteArrayToHexString(ir2));
+            logger.log(Level.DEBUG, "  ir2.length: " + ir2.length);
 
             byte[] ir3 = new byte[ir2.length-8];
             cph.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(ir2, 0, 8));
             int ir3Len = cph.doFinal(ir2, 8, ir2.length-8, ir3, 0);
-            Debug.print("  ir3: 0x" + Util.byteArrayToHexString(ir3, 0, ir3Len));
-            Debug.print("  ir3Len: " + ir3Len);
+            logger.log(Level.DEBUG, "  ir3: 0x" + Util.byteArrayToHexString(ir3, 0, ir3Len));
+            logger.log(Level.DEBUG, "  ir3Len: " + ir3Len);
 
             byte[] result = Util.createCopy(ir3, 4, ir3Len-4);
             Util.zero(ir1, ir2, ir3);
@@ -244,8 +253,7 @@ public abstract class CommonCEncryptedEncodingHeader {
                             (V2Header.UserKeyData) kd));
                 }
             }
-            this.keys = keyList.toArray(
-                    new V2KeyDataImplementation[keyList.size()]);
+            this.keys = keyList.toArray(V2KeyDataImplementation[]::new);
         }
 
         @Override
@@ -312,33 +320,33 @@ public abstract class CommonCEncryptedEncodingHeader {
         public KeySet unwrapKeys(Key derivedKey, Cipher cph)
                 throws InvalidKeyException, InvalidAlgorithmParameterException, GeneralSecurityException {
 
-            final int keyBytes = (header.getKeyBits() + 7) / 8;
+            int keyBytes = (header.getKeyBits() + 7) / 8;
 
-            Debug.print("V2Implementation.unwrapKeys(" + derivedKey + ", " + cph + ");");
+            logger.log(Level.DEBUG, "V2Implementation.unwrapKeys(" + derivedKey + ", " + cph + ");");
             cph.init(Cipher.DECRYPT_MODE, derivedKey, new IvParameterSpec(getUnwrapInitializationVector()));
 
             byte[] encryptedKeyBlob = getEncryptedKeyBlob();
-            Debug.print("  encryptedKeyBlob.length=" + encryptedKeyBlob.length);
+            logger.log(Level.DEBUG, "  encryptedKeyBlob.length=" + encryptedKeyBlob.length);
             byte[] decryptedKeyBlob = new byte[encryptedKeyBlob.length];
-            Debug.print("  doing update....");
+            logger.log(Level.DEBUG, "  doing update....");
             int bp = cph.update(encryptedKeyBlob, 0, encryptedKeyBlob.length, decryptedKeyBlob);
-            Debug.print("    bp == " + bp);
-            Debug.print("  doing final....");
+            logger.log(Level.DEBUG, "    bp == " + bp);
+            logger.log(Level.DEBUG, "  doing final....");
             bp += cph.doFinal(decryptedKeyBlob, bp);
-            Debug.print("    bp == " + bp);
+            logger.log(Level.DEBUG, "    bp == " + bp);
 
-            Debug.print("  decryptedKeyBlob: 0x" + Util.byteArrayToHexString(decryptedKeyBlob));
+            logger.log(Level.DEBUG, "  decryptedKeyBlob: 0x" + Util.byteArrayToHexString(decryptedKeyBlob));
             byte[] aesKey = new byte[keyBytes];
             byte[] hmacSha1Key = new byte[20];
             System.arraycopy(decryptedKeyBlob, 0, aesKey, 0, keyBytes);
-            Debug.print("  aesKey: 0x" + Util.byteArrayToHexString(aesKey));
+            logger.log(Level.DEBUG, "  aesKey: 0x" + Util.byteArrayToHexString(aesKey));
             System.arraycopy(decryptedKeyBlob, keyBytes, hmacSha1Key, 0, 20);
-            Debug.print("  hmacSha1Key: 0x" + Util.byteArrayToHexString(hmacSha1Key));
+            logger.log(Level.DEBUG, "  hmacSha1Key: 0x" + Util.byteArrayToHexString(hmacSha1Key));
 
             Util.zero(decryptedKeyBlob); // No unused secret data in memory.
-            Debug.print("  decryptedKeyBlob: 0x" + Util.byteArrayToHexString(decryptedKeyBlob));
+            logger.log(Level.DEBUG, "  decryptedKeyBlob: 0x" + Util.byteArrayToHexString(decryptedKeyBlob));
 
-            Debug.print("returning from V2Implementation.unwrapKeys...");
+            logger.log(Level.DEBUG, "returning from V2Implementation.unwrapKeys...");
             return new KeySet(aesKey, hmacSha1Key);
         }
     }

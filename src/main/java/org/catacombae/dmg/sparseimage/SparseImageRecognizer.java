@@ -24,7 +24,7 @@ import org.catacombae.util.Util;
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class SparseImageRecognizer {
-    public static boolean isSparseImage(final ReadableRandomAccessStream s) {
+    public static boolean isSparseImage(ReadableRandomAccessStream s) {
         byte[] headerData = new byte[4096];
         s.seek(0);
         if(s.read(headerData) != 4096) {

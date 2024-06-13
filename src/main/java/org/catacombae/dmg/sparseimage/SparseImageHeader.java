@@ -60,15 +60,15 @@ public class SparseImageHeader {
 
     public static final int STRUCTSIZE = 4096;
 
-    private int signature;
-    private int reservedAt4;
-    private int sectorsPerBlock;
-    private int reservedAt12;
-    private int sectorCount;
+    private final int signature;
+    private final int reservedAt4;
+    private final int sectorsPerBlock;
+    private final int reservedAt12;
+    private final int sectorCount;
     private final byte[] reservedAt20 = new byte[1 * 12];
-    private int sectorCount2;
+    private final int sectorCount2;
     private final byte[] reservedAt36 = new byte[1 * 28];
-    private int[] blockMap;
+    private final int[] blockMap;
 
     public SparseImageHeader(byte[] data, int offset) {
         this.signature = Util.readIntBE(data, offset+0);
@@ -250,7 +250,7 @@ public class SparseImageHeader {
     }
 
     public int getBytes(byte[] result, int offset) {
-        final int startOffset = offset;
+        int startOffset = offset;
 
         Util.arrayPutBE(result, offset, this.signature);
         offset += 4;

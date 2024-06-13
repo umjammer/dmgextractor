@@ -75,8 +75,7 @@ public class APXParser implements APXParserConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case STARTPI:
       case STARTCOMMENT:
-        ;
-        break;
+          break;
       default:
         jj_la1[0] = jj_gen;
         break label_1;
@@ -93,15 +92,13 @@ public class APXParser implements APXParserConstants {
       break;
     default:
       jj_la1[1] = jj_gen;
-      ;
     }
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case STARTPI:
       case STARTCOMMENT:
-        ;
-        break;
+          break;
       default:
         jj_la1[2] = jj_gen;
         break label_2;
@@ -116,8 +113,7 @@ public class APXParser implements APXParserConstants {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case STARTPI:
         case STARTCOMMENT:
-          ;
-          break;
+            break;
         default:
           jj_la1[3] = jj_gen;
           break label_3;
@@ -127,7 +123,6 @@ public class APXParser implements APXParserConstants {
       break;
     default:
       jj_la1[4] = jj_gen;
-      ;
     }
   }
 
@@ -144,7 +139,6 @@ public class APXParser implements APXParserConstants {
       break;
     default:
       jj_la1[5] = jj_gen;
-      ;
     }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case STANDALONE:
@@ -152,7 +146,6 @@ public class APXParser implements APXParserConstants {
       break;
     default:
       jj_la1[6] = jj_gen;
-      ;
     }
     jj_consume_token(ENDXMLDECL);
           contentHandler.xmlDecl(version, encoding, standalone); {if (true) return encoding;}
@@ -269,7 +262,6 @@ public class APXParser implements APXParserConstants {
       break;
     default:
       jj_la1[12] = jj_gen;
-      ;
     }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case BEGIN_INTSUBSET:
@@ -278,7 +270,6 @@ public class APXParser implements APXParserConstants {
       break;
     default:
       jj_la1[13] = jj_gen;
-      ;
     }
     jj_consume_token(ENDDOCTYPEDECL);
           contentHandler.doctype(name.image, null);
@@ -291,7 +282,6 @@ public class APXParser implements APXParserConstants {
       break;
     default:
       jj_la1[14] = jj_gen;
-      ;
     }
     jj_consume_token(END_INTSUBSET);
   }
@@ -324,8 +314,7 @@ public class APXParser implements APXParserConstants {
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case COMMENT_CHAR:
-        ;
-        break;
+          break;
       default:
         jj_la1[16] = jj_gen;
         break label_4;
@@ -380,8 +369,7 @@ public class APXParser implements APXParserConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case ENDPI:
       case PC_CHAR:
-        ;
-        break;
+          break;
       default:
         jj_la1[19] = jj_gen;
         break label_5;
@@ -402,8 +390,7 @@ public class APXParser implements APXParserConstants {
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case WT_NAME:
-        ;
-        break;
+          break;
       default:
         jj_la1[20] = jj_gen;
         break label_6;
@@ -450,8 +437,7 @@ public class APXParser implements APXParserConstants {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case ATTR_DQUOTE_STRING:
         case ATTR_REFERENCE:
-          ;
-          break;
+            break;
         default:
           jj_la1[22] = jj_gen;
           break label_7;
@@ -480,8 +466,7 @@ public class APXParser implements APXParserConstants {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case ATTR_SQUOTE_STRING:
         case ATTR_REFERENCE:
-          ;
-          break;
+            break;
         default:
           jj_la1[24] = jj_gen;
           break label_8;
@@ -533,7 +518,6 @@ public class APXParser implements APXParserConstants {
       break;
     default:
       jj_la1[27] = jj_gen;
-      ;
     }
     label_9:
     while (true) {
@@ -543,8 +527,7 @@ public class APXParser implements APXParserConstants {
       case STARTCOMMENT:
       case STARTCDATA:
       case DEFAULT_REFERENCE:
-        ;
-        break;
+          break;
       default:
         jj_la1[28] = jj_gen;
         break label_9;
@@ -576,7 +559,6 @@ public class APXParser implements APXParserConstants {
         break;
       default:
         jj_la1[30] = jj_gen;
-        ;
       }
     }
   }
@@ -590,8 +572,7 @@ public class APXParser implements APXParserConstants {
            if(beginLine == -1) { beginLine = t.beginLine; beginColumn = t.beginColumn; }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case CHARDATA:
-        ;
-        break;
+          break;
       default:
         jj_la1[31] = jj_gen;
         break label_10;
@@ -609,8 +590,7 @@ public class APXParser implements APXParserConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case ENDCDATA:
       case WCD_CHAR:
-        ;
-        break;
+          break;
       default:
         jj_la1[32] = jj_gen;
         break label_11;
@@ -714,7 +694,7 @@ public class APXParser implements APXParserConstants {
     for (int i = 0; i < 34; i++) jj_la1[i] = -1;
   }
 
-  final private Token jj_consume_token(int kind) throws ParseException {
+  private Token jj_consume_token(int kind) throws ParseException {
     Token oldToken;
     if ((oldToken = token).next != null) token = token.next;
     else token = token.next = token_source.getNextToken();
@@ -745,14 +725,14 @@ public class APXParser implements APXParserConstants {
     return t;
   }
 
-  final private int jj_ntk() {
+  private int jj_ntk() {
     if ((jj_nt=token.next) == null)
       return (jj_ntk = (token.next=token_source.getNextToken()).kind);
     else
       return (jj_ntk = jj_nt.kind);
   }
 
-  private java.util.Vector<int[]> jj_expentries = new java.util.Vector<>();
+  private final java.util.Vector<int[]> jj_expentries = new java.util.Vector<>();
   private int[] jj_expentry;
   private int jj_kind = -1;
 
@@ -790,7 +770,7 @@ public class APXParser implements APXParserConstants {
     }
     int[][] exptokseq = new int[jj_expentries.size()][];
     for (int i = 0; i < jj_expentries.size(); i++) {
-      exptokseq[i] = (int[])jj_expentries.elementAt(i);
+      exptokseq[i] = jj_expentries.elementAt(i);
     }
     return new ParseException(token, exptokseq, tokenImage);
   }

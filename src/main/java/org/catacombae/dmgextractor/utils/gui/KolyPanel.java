@@ -47,7 +47,7 @@ public class KolyPanel extends javax.swing.JPanel {
         checksumDataField.setOpaque(false);
     }
 
-    public void setFields(final Koly koly) {
+    public void setFields(Koly koly) {
         fourCCField.setText(Util.toASCIIString(koly.getFourCC()) + " " +
                 "(0x" + Util.toHexStringBE(koly.getFourCC()).toUpperCase() +
                 ")");

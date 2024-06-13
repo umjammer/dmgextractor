@@ -136,7 +136,7 @@ class Info extends BundleMember {
 
         }
 
-        final long bandSizeLong;
+        long bandSizeLong;
         try {
             bandSizeLong = Long.parseLong(bandSizeString);
         } catch(NumberFormatException nfe) {
@@ -144,7 +144,7 @@ class Info extends BundleMember {
                     bandSizeKey + ": " + bandSizeString);
         }
 
-        final long sizeLong;
+        long sizeLong;
         try {
             sizeLong = Long.parseLong(sizeString);
         } catch(NumberFormatException nfe) {

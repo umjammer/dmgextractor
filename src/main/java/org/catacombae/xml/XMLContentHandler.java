@@ -21,7 +21,7 @@ import java.util.List;
 import java.nio.charset.Charset;
 
 public abstract class XMLContentHandler {
-    protected Charset encoding;
+    protected final Charset encoding;
     public XMLContentHandler(Charset encoding) {
 	this.encoding = encoding;
     }

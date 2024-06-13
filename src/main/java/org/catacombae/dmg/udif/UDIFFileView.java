@@ -25,7 +25,7 @@ import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.RuntimeIOException;
 
 public class UDIFFileView {
-    private ReadableRandomAccessStream dmgRaf;
+    private final ReadableRandomAccessStream dmgRaf;
     
     public UDIFFileView(File file) {
 	try {

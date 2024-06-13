@@ -20,10 +20,11 @@ package org.catacombae.dmgextractor;
 import java.util.*;
 
 public class ConcatenatedIterator<E> implements Iterator<E> {
-    private ArrayList<Iterator<E>> sequence = new ArrayList<>();
+    private final ArrayList<Iterator<E>> sequence = new ArrayList<>();
     private int index = 0;
     public void add(Iterator<E> next) { sequence.add(next); }
 
+    @Override
     public boolean hasNext() {
 	if(index < sequence.size()) {
 	    Iterator<E> curIt = sequence.get(index);
@@ -34,6 +35,7 @@ public class ConcatenatedIterator<E> implements Iterator<E> {
 	else
 	    return false;
     }
+    @Override
     public E next() {
 	if(index < sequence.size()) {
 	    Iterator<E> curIt = sequence.get(index);
@@ -45,6 +47,7 @@ public class ConcatenatedIterator<E> implements Iterator<E> {
 	    throw new NoSuchElementException();
 	
     }
+    @Override
     public void remove() {
 	throw new UnsupportedOperationException();
     }
