@@ -82,6 +82,7 @@ public abstract class UDIFBlockInputStream extends InputStream {
         return switch (block.getBlockType()) {
             case UDIFBlock.BT_ZLIB -> new ZlibBlockInputStream(raf, block, 0);
             case UDIFBlock.BT_BZIP2 -> new Bzip2BlockInputStream(raf, block, 0);
+            case UDIFBlock.BT_LZFSE -> new LzfseBlockInputStream(raf, block, 0);
             case UDIFBlock.BT_COPY -> new CopyBlockInputStream(raf, block, 0);
             case UDIFBlock.BT_ZERO, UDIFBlock.BT_ZERO2 -> new ZeroBlockInputStream(raf, block, 0);
             case UDIFBlock.BT_END, UDIFBlock.BT_UNKNOWN -> throw new RuntimeException("Block type is a marker and " +

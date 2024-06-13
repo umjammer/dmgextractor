@@ -34,6 +34,9 @@ public class UDIFBlock implements Comparable<UDIFBlock> {
      */
     public static final int BT_BZIP2 = 0x80000006;
 
+    /** This blocktype means the data is compressed with the LZFSE compression algorithm. */
+    public static final int BT_LZFSE = 0x80000007;
+    
     /** This blocktype means the data is uncompressed and can simply be copied. */
     public static final int BT_COPY = 0x00000001;
 
@@ -58,6 +61,7 @@ public class UDIFBlock implements Comparable<UDIFBlock> {
 
     private static final String BT_ADC_STRING = "BT_ADC";
     private static final String BT_ZLIB_STRING = "BT_ZLIB";
+    private static final String BT_LZFSE_STRING = "BT_LZFSE";
     private static final String BT_BZIP2_STRING = "BT_BZIP2";
     private static final String BT_COPY_STRING = "BT_COPY";
     private static final String BT_ZERO_STRING = "BT_ZERO";
@@ -144,6 +148,7 @@ public class UDIFBlock implements Comparable<UDIFBlock> {
             case BT_ADC -> BT_ADC_STRING;
             case BT_ZLIB -> BT_ZLIB_STRING;
             case BT_BZIP2 -> BT_BZIP2_STRING;
+            case BT_LZFSE -> BT_LZFSE_STRING;
             case BT_COPY -> BT_COPY_STRING;
             case BT_ZERO -> BT_ZERO_STRING;
             case BT_ZERO2 -> BT_ZERO2_STRING;
