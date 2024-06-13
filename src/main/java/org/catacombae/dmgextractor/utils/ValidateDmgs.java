@@ -38,15 +38,15 @@ public class ValidateDmgs {
 
     public static void main(String[] args) throws IOException {
         LinkedList<String> fileList = new LinkedList<>();
-        for(String currentList : args) {
+        for (String currentList : args) {
             try {
                 BufferedReader listIn = new BufferedReader(new InputStreamReader(new FileInputStream(currentList)));
                 String currentDmg = listIn.readLine();
-                while(currentDmg != null) {
+                while (currentDmg != null) {
                     fileList.add(currentDmg);
                     currentDmg = listIn.readLine();
                 }
-            } catch(IOException e) {
+            } catch (IOException e) {
                 logger.log(Level.ERROR, e.getMessage(), e);
             }
         }

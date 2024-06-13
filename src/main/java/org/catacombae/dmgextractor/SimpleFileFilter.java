@@ -17,37 +17,49 @@
 
 package org.catacombae.dmgextractor;
 
-import java.util.*;
-import java.io.*;
+import java.io.File;
+import java.util.Vector;
+
 
 public class SimpleFileFilter extends javax.swing.filechooser.FileFilter {
 
     private final Vector<String> extensions;
     private String description;
-    
+
     public SimpleFileFilter() {
-	extensions = new Vector<>();
-	description = "";
+        extensions = new Vector<>();
+        description = "";
     }
-    public void addExtension(String extension) { extensions.add(extension); }
-    public void setDescription(String idescription) { description = idescription; }
+
+    public void addExtension(String extension) {
+        extensions.add(extension);
+    }
+
+    public void setDescription(String idescription) {
+        description = idescription;
+    }
+
     public void removeExtension(String iextension) {
-	for(int i = 0; i < extensions.size(); i++) {
-	    if(extensions.get(i).equals(iextension))
-		extensions.remove(i);
-	}
+        for (int i = 0; i < extensions.size(); i++) {
+            if (extensions.get(i).equals(iextension))
+                extensions.remove(i);
+        }
     }
+
     @Override
     public boolean accept(File f) {
 
-	if(f.isDirectory()) return true;
+        if (f.isDirectory()) return true;
 
         for (String extension : extensions) {
             if (f.getName().endsWith(extension))
                 return true;
         }
-	return false;
+        return false;
     }
+
     @Override
-    public String getDescription() { return description; }
+    public String getDescription() {
+        return description;
+    }
 }

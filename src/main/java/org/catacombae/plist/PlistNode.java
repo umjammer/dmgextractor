@@ -19,12 +19,17 @@ package org.catacombae.plist;
 
 import java.io.Reader;
 
+
 /**
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public abstract class PlistNode {
+
     public abstract PlistNode[] getChildren();
+
     public abstract PlistNode cd(String type);
+
     public abstract PlistNode cdkey(String key);
+
     public abstract Reader getKeyValue(String key);
 }

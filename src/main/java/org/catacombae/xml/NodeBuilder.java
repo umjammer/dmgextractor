@@ -17,88 +17,91 @@
 
 package org.catacombae.xml;
 
-import org.catacombae.dmgextractor.io.*;
-import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.Attributes;
 import java.nio.charset.Charset;
+
+import org.catacombae.dmgextractor.io.SynchronizedRandomAccessStream;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
 
 /**
  * Plugs into a SAXParser to build a tree of XMLElements representing the document.
  */
 public class NodeBuilder extends DefaultHandler {
+
     /** NEVER try to obtain anything from this except its children. */
     private final XMLNode artificialRoot;
 
     private XMLNode currentNode;
-    
+
     public NodeBuilder() {
-	artificialRoot = new XMLNode(null, null, null, null, null);
-	currentNode = artificialRoot;
+        artificialRoot = new XMLNode(null, null, null, null, null);
+        currentNode = artificialRoot;
     }
-    
+
     @Override
     public void startElement(String namespaceURI, String sName, String qName,
-			     Attributes attrs) throws SAXException {
-	//System.out.println("SE");
-	Attribute2[] attributes = new Attribute2[attrs.getLength()];
-	for(int i = 0; i < attributes.length; ++i) {
-	    attributes[i] = new Attribute2(attrs.getLocalName(i), attrs.getQName(i), 
-					   attrs.getType(i), attrs.getURI(i), attrs.getValue(i));
-	}
-	startElementInternal(namespaceURI, sName, qName, attributes);
+                             Attributes attrs) throws SAXException {
+        //System.out.println("SE");
+        Attribute2[] attributes = new Attribute2[attrs.getLength()];
+        for (int i = 0; i < attributes.length; ++i) {
+            attributes[i] = new Attribute2(attrs.getLocalName(i), attrs.getQName(i),
+                    attrs.getType(i), attrs.getURI(i), attrs.getValue(i));
+        }
+        startElementInternal(namespaceURI, sName, qName, attributes);
     }
-    
+
     void startElementInternal(String namespaceURI, String sName, String qName,
-			      Attribute2[] attributes) throws SAXException {
-	XMLNode newNode = new XMLNode(namespaceURI, sName, qName,
-				      attributes, currentNode);
-	currentNode.addChild(newNode);
-	currentNode = newNode;
+                              Attribute2[] attributes) throws SAXException {
+        XMLNode newNode = new XMLNode(namespaceURI, sName, qName,
+                attributes, currentNode);
+        currentNode.addChild(newNode);
+        currentNode = newNode;
     }
-    
+
     @Override
     public void endElement(String namespaceURI, String sName,
-			   String qName) throws SAXException {
-	//System.out.println("EE");
-	currentNode = currentNode.parent;
+                           String qName) throws SAXException {
+        //System.out.println("EE");
+        currentNode = currentNode.parent;
     }
-    
+
     public void characters(SynchronizedRandomAccessStream file, Charset encoding,
-			   int startLine, int startColumn, int endLine, int endColumn) {
-	currentNode.addChild(new XMLText(file, encoding, startLine, startColumn, endLine, endColumn));
+                           int startLine, int startColumn, int endLine, int endColumn) {
+        currentNode.addChild(new XMLText(file, encoding, startLine, startColumn, endLine, endColumn));
     }
-    
+
     @Override
     public void characters(char[] buf, int offset, int len)
-        throws SAXException {
-	//System.out.println("CH");
-	String s = new String(buf, offset, len).trim();
-	if(!s.isEmpty())
-	    currentNode.addChild(new XMLText(s));
+            throws SAXException {
+        //System.out.println("CH");
+        String s = new String(buf, offset, len).trim();
+        if (!s.isEmpty())
+            currentNode.addChild(new XMLText(s));
     }
-    
+
     @Override
     public void notationDecl(String name, String publicId,
-			     String systemId) throws SAXException {
-	//System.out.println("notationDecl(" + name + ", " + publicId + ", " + systemId + ");");
+                             String systemId) throws SAXException {
+        //System.out.println("notationDecl(" + name + ", " + publicId + ", " + systemId + ");");
     }
-    
+
     public XMLNode[] getRoots() throws RuntimeException {
-	if(artificialRoot != currentNode)
-	    throw new RuntimeException("Tree was not closed!");
-	
-	int numberOfNodes = 0;
-	for(XMLElement xe : artificialRoot.getChildren()) {
-	    if(xe instanceof XMLNode)
-		++numberOfNodes;
-	}
-	XMLNode[] result = new XMLNode[numberOfNodes];
-	int i = 0;
-	for(XMLElement xe : artificialRoot.getChildren()) {
-	    if(xe instanceof XMLNode)
-		result[i++] = (XMLNode)xe;
-	}
-	return result;
+        if (artificialRoot != currentNode)
+            throw new RuntimeException("Tree was not closed!");
+
+        int numberOfNodes = 0;
+        for (XMLElement xe : artificialRoot.getChildren()) {
+            if (xe instanceof XMLNode)
+                ++numberOfNodes;
+        }
+        XMLNode[] result = new XMLNode[numberOfNodes];
+        int i = 0;
+        for (XMLElement xe : artificialRoot.getChildren()) {
+            if (xe instanceof XMLNode)
+                result[i++] = (XMLNode) xe;
+        }
+        return result;
     }
 }

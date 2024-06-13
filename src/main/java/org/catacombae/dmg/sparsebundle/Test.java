@@ -19,10 +19,12 @@ package org.catacombae.dmg.sparsebundle;
 
 import java.io.File;
 
+
 /**
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class Test {
+
     public static void main(String[] args) {
         SparseBundle sb = new SparseBundle(new File(args[0]));
         System.out.println("image size: " + sb.getSize() + " bytes");
@@ -35,20 +37,20 @@ public class Test {
         long startTime = System.currentTimeMillis();
         long lastTime = startTime;
 
-        while(true) {
+        while (true) {
             int curBytesRead = stream.read(buf);
-            if(curBytesRead == -1)
+            if (curBytesRead == -1)
                 break;
-            else if(curBytesRead < 0)
+            else if (curBytesRead < 0)
                 throw new RuntimeException("Wtf... curBytesRead=" +
                         curBytesRead);
 
             bytesRead += curBytesRead;
 
             long curTime = System.currentTimeMillis();
-            if(curTime - lastTime > 1000) {
+            if (curTime - lastTime > 1000) {
                 System.err.println("Transferred " + bytesRead + " bytes in " +
-                        (curTime-startTime)/ 1000.0 + " seconds.");
+                        (curTime - startTime) / 1000.0 + " seconds.");
                 lastTime = curTime;
             }
         }
@@ -57,7 +59,7 @@ public class Test {
 
         long curTime = System.currentTimeMillis();
         System.err.println("Transferred " + bytesRead + " bytes in " +
-                (curTime-startTime)/ 1000.0 + " seconds.");
+                (curTime - startTime) / 1000.0 + " seconds.");
 
     }
 }

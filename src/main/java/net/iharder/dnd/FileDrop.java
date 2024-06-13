@@ -280,8 +280,7 @@ public class FileDrop {
 //                        evt.acceptDrag(DnDConstants.ACTION_COPY_OR_MOVE );
                         evt.acceptDrag(DnDConstants.ACTION_COPY);
                         log(out, "FileDrop: event accepted.");
-                    }
-                    else {
+                    } else {
                         evt.rejectDrag();
                         log(out, "FileDrop: event rejected.");
                     }
@@ -624,7 +623,7 @@ public class FileDrop {
          * of files that were dropped and the
          * {@link FileDrop} that initiated the event.
          *
-         * @param files The array of files that were dropped
+         * @param files  The array of files that were dropped
          * @param source The event source
          * @since 1.1
          */

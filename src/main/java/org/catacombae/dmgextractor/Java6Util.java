@@ -20,6 +20,7 @@ package org.catacombae.dmgextractor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+
 /**
  * This class should encapsulate all of the logic in DMGExtractor that is
  * Java 6-specific.
@@ -27,6 +28,7 @@ import java.lang.reflect.Method;
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class Java6Util extends org.catacombae.util.Java6Util {
+
     /**
      * Read password from console without echoing characters.
      *
@@ -38,27 +40,28 @@ public class Java6Util extends org.catacombae.util.Java6Util {
             Method systemConsoleMethod =
                     java.lang.System.class.getMethod("console");
             Object consoleObject = systemConsoleMethod.invoke(null);
-            if(consoleObject == null) {
+            if (consoleObject == null) {
                 /* No console. */
                 return null;
             }
 
             Class<?> consoleClass =
-                Class.forName("java.io.Console");
+                    Class.forName("java.io.Console");
             Method consoleReadPasswordMethod =
                     consoleClass.getMethod("readPassword");
 
             Object passwordObject =
                     consoleReadPasswordMethod.invoke(consoleObject);
-            if(passwordObject != null && !(passwordObject instanceof char[])) {
+            if (passwordObject != null && !(passwordObject instanceof char[])) {
                 throw new RuntimeException("Unexpected type returned from " +
                         "java.io.Console.readPassword(): " +
                         passwordObject.getClass().getName());
             }
 
             return (char[]) passwordObject;
-        } catch(ClassNotFoundException | InvocationTargetException | IllegalArgumentException | IllegalAccessException |
-                NoSuchMethodException ex) {
+        } catch (ClassNotFoundException | InvocationTargetException | IllegalArgumentException |
+                 IllegalAccessException |
+                 NoSuchMethodException ex) {
             throw new RuntimeException(ex);
         }
     }

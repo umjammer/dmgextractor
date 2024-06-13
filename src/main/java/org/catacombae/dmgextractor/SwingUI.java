@@ -22,7 +22,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.ProgressMonitor;
 import javax.swing.filechooser.FileFilter;
+
 import org.catacombae.dmgextractor.ui.PasswordDialog;
+
 
 /**
  * User interface implementation using Java Swing.
@@ -34,7 +36,7 @@ class SwingUI extends BasicUI implements UserInterface {
     private ProgressMonitor progmon = null;
     private String inputFilename = null;
     private String outputFilename = null;
-    
+
     public SwingUI(boolean verbose) {
         super(verbose);
 
@@ -42,7 +44,7 @@ class SwingUI extends BasicUI implements UserInterface {
         try {
             javax.swing.UIManager.setLookAndFeel(
                     javax.swing.UIManager.getSystemLookAndFeelClassName());
-        } catch(Exception e) {
+        } catch (Exception e) {
             // No big deal. Go with default.
         }
     }
@@ -53,8 +55,8 @@ class SwingUI extends BasicUI implements UserInterface {
         StringBuilder sb = new StringBuilder();
 
         boolean firstLine = true;
-        for(String s : messageLines) {
-            if(!firstLine)
+        for (String s : messageLines) {
+            if (!firstLine)
                 sb.append("\n");
             else
                 firstLine = false;
@@ -75,8 +77,8 @@ class SwingUI extends BasicUI implements UserInterface {
         StringBuilder sb = new StringBuilder();
 
         boolean firstLine = true;
-        for(String s : messageLines) {
-            if(!firstLine)
+        for (String s : messageLines) {
+            if (!firstLine)
                 sb.append("\n");
             else
                 firstLine = false;
@@ -90,14 +92,13 @@ class SwingUI extends BasicUI implements UserInterface {
     /** {@inheritDoc} */
     @Override
     public void reportProgress(int progressPercentage) {
-        if(progressPercentage != previousPercentage) {
-            if(progmon == null) {
+        if (progressPercentage != previousPercentage) {
+            if (progmon == null) {
                 String progmonText;
-                if(outputFilename != null) {
+                if (outputFilename != null) {
                     progmonText = "Extracting \"" +
                             inputFilename + "\" to\n    \"" + outputFilename + "\"...";
-                }
-                else {
+                } else {
                     progmonText = "Simulating extraction of \"" +
                             inputFilename + "\"...";
                 }
@@ -114,17 +115,17 @@ class SwingUI extends BasicUI implements UserInterface {
     @Override
     public void reportFinished(boolean simulation, int errorsReported, int warningsReported, long totalExtractedSize) {
         StringBuilder message = new StringBuilder();
-        if(simulation)
+        if (simulation)
             message.append("Simulation");
         else
             message.append("Extraction");
         message.append(" complete! ");
-        if(errorsReported != 0)
+        if (errorsReported != 0)
             message.append(errorsReported).append(" errors reported");
         else
             message.append("No errors reported");
 
-        if(warningsReported != 0)
+        if (warningsReported != 0)
             message.append(" (").append(warningsReported).append(" warnings emitted)");
 
         message.append(".\nSize of extracted data: ").append(totalExtractedSize);
@@ -147,8 +148,8 @@ class SwingUI extends BasicUI implements UserInterface {
     public void displayMessage(String... messageLines) {
         StringBuilder resultString = new StringBuilder();
         boolean firstIteration = true;
-        for(String s : messageLines) {
-            if(!firstIteration)
+        for (String s : messageLines) {
+            if (!firstIteration)
                 resultString.append("\n");
             else
                 firstIteration = false;
@@ -172,17 +173,15 @@ class SwingUI extends BasicUI implements UserInterface {
         jfc.setMultiSelectionEnabled(false);
         jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         jfc.setDialogTitle("Choose the image file to read...");
-        while(true) {
-            if(jfc.showDialog(null, "Open") == JFileChooser.APPROVE_OPTION) {
+        while (true) {
+            if (jfc.showDialog(null, "Open") == JFileChooser.APPROVE_OPTION) {
                 File f = jfc.getSelectedFile();
-                if(f.exists()) {
+                if (f.exists()) {
                     return f;
-                }
-                else
+                } else
                     JOptionPane.showMessageDialog(null, "The file does not exist! Choose again...",
                             "Error", JOptionPane.ERROR_MESSAGE);
-            }
-            else
+            } else
                 return null;
         }
     }
@@ -214,42 +213,40 @@ class SwingUI extends BasicUI implements UserInterface {
         jfc.addChoosableFileFilter(new SimplerFileFilter(".dmg", "Mac OS X read/write disk image (*.dmg)"));
         jfc.setFileFilter(defaultFileFilter);
         jfc.setDialogTitle("Select your output file");
-        
-        if(inputFile != null) {
+
+        if (inputFile != null) {
             String name = inputFile.getName();
             String defaultOutName = name;
             int lastDotIndex = defaultOutName.lastIndexOf(".");
-            if(lastDotIndex >= 0) {
+            if (lastDotIndex >= 0) {
                 defaultOutName = defaultOutName.substring(0, lastDotIndex);
             }
             jfc.setSelectedFile(new File(inputFile.getParentFile(),
                     defaultOutName));
         }
 
-        while(true) {
-            if(jfc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+        while (true) {
+            if (jfc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = jfc.getSelectedFile();
                 File saveFile;
                 FileFilter selectedFileFilter = jfc.getFileFilter();
-                if(selectedFileFilter instanceof SimplerFileFilter sff) {
-                    if(!selectedFile.getName().endsWith(sff.getExtension()))
+                if (selectedFileFilter instanceof SimplerFileFilter sff) {
+                    if (!selectedFile.getName().endsWith(sff.getExtension()))
                         saveFile = new File(selectedFile.getParentFile(), selectedFile.getName() + sff.getExtension());
                     else
                         saveFile = selectedFile;
-                }
-                else {
+                } else {
                     saveFile = selectedFile;
                 }
 
-                if(!saveFile.exists())
+                if (!saveFile.exists())
                     return saveFile;
-                else if(JOptionPane.showConfirmDialog(null, msgFileExists,
+                else if (JOptionPane.showConfirmDialog(null, msgFileExists,
                         "Confirmation", JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
                     return saveFile;
                 }
-            }
-            else
+            } else
                 return null;
         }
     }

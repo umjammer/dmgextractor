@@ -19,6 +19,7 @@ package org.catacombae.dmgextractor.utils;
 
 import java.util.LinkedList;
 
+
 public class ValidateResult {
 
     private final LinkedList<String> errors = new LinkedList<>();

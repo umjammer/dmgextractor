@@ -19,40 +19,63 @@ package org.catacombae.xml;
 
 import java.util.List;
 
+
 public class Attribute {
+
     public static abstract class ValueComponent {
+
         @Override
-	public abstract String toString();
+        public abstract String toString();
     }
+
     public static class StringComponent extends ValueComponent {
-	public final String content;
-	public StringComponent(String content) { this.content = content; }
-	public String toString() { return content; }
+
+        public final String content;
+
+        public StringComponent(String content) {
+            this.content = content;
+        }
+
+        public String toString() {
+            return content;
+        }
     }
+
     public static class ReferenceComponent extends ValueComponent {
-	public final String content;
-	public ReferenceComponent(String content) { this.content = content; }
-	public String toString() { return content; } // should resolve the reference here
+
+        public final String content;
+
+        public ReferenceComponent(String content) {
+            this.content = content;
+        }
+
+        public String toString() {
+            return content;
+        } // should resolve the reference here
     }
+
     public static class Value {
-	public final List<ValueComponent> components;
-	public Value(List<ValueComponent> components) {
-	    this.components = components;
-	}
-        
+
+        public final List<ValueComponent> components;
+
+        public Value(List<ValueComponent> components) {
+            this.components = components;
+        }
+
         @Override
-	public String toString() {
-	    StringBuilder result = new StringBuilder();
-	    for(ValueComponent vc : components)
-		result.append(vc.toString());
-	    return result.toString();
-	}
+        public String toString() {
+            StringBuilder result = new StringBuilder();
+            for (ValueComponent vc : components)
+                result.append(vc.toString());
+            return result.toString();
+        }
     }
+
     public final String identifier;
     public final Value value;
 
     public Attribute(String identifier, Value value) {
-	this.identifier = identifier;
-	this.value = value;
+        this.identifier = identifier;
+        this.value = value;
     }
 }

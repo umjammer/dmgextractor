@@ -49,28 +49,26 @@ abstract class BundleMember {
         stream.close();
 
         try {
-            if(fileLocked) {
+            if (fileLocked) {
                 file.unlock();
             }
-        } catch(RuntimeIOException ex) {
+        } catch (RuntimeIOException ex) {
             IOException cause = ex.getIOCause();
 
-            if(cause != null) {
+            if (cause != null) {
                 logger.log(Level.ERROR, ex.getMessage(), ex);
-            }
-            else {
+            } else {
                 throw ex;
             }
         }
 
         try {
             file.close();
-        } catch(RuntimeIOException ex) {
+        } catch (RuntimeIOException ex) {
             IOException cause = ex.getIOCause();
-            if(cause != null) {
+            if (cause != null) {
                 logger.log(Level.ERROR, ex.getMessage(), ex);
-            }
-            else {
+            } else {
                 throw ex;
             }
         }

@@ -18,71 +18,97 @@
 package org.catacombae.xml;
 
 //import org.catacombae.xml.*;
-import org.catacombae.dmgextractor.io.*;
-import java.util.List;
+
 import java.nio.charset.Charset;
+import java.util.List;
+
+import org.catacombae.dmgextractor.io.SynchronizedRandomAccessStream;
+
 
 public class NodeBuilderContentHandler extends XMLContentHandler {
+
     private final NodeBuilder nodeBuilder;
     private final SynchronizedRandomAccessStream sras;
     private final Charset encoding;
-    
+
     public NodeBuilderContentHandler(NodeBuilder nodeBuilder, SynchronizedRandomAccessStream sras, Charset encoding) {
-	super(encoding);
-	this.nodeBuilder = nodeBuilder;
-	this.sras = sras;
-	this.encoding = encoding;
+        super(encoding);
+        this.nodeBuilder = nodeBuilder;
+        this.sras = sras;
+        this.encoding = encoding;
     }
+
     @Override
-    public void xmlDecl(String version, String encoding, Boolean standalone) {}
+    public void xmlDecl(String version, String encoding, Boolean standalone) {
+    }
+
     @Override
-    public void pi(String id, String content) {}
+    public void pi(String id, String content) {
+    }
+
     @Override
-    public void comment(String comment) {}
+    public void comment(String comment) {
+    }
+
     @Override
-    public void doctype(String name, ExternalID eid) {} // Needs a DTD description also
+    public void doctype(String name, ExternalID eid) {
+    } // Needs a DTD description also
+
     @Override
     public void cdata(String cdata) {
-	try {
-	    nodeBuilder.characters(cdata.toCharArray(), 0, cdata.length());
-	} catch(Exception e) { throw new RuntimeException(e); }
+        try {
+            nodeBuilder.characters(cdata.toCharArray(), 0, cdata.length());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
+
     @Override
     public void emptyElement(String name, List<org.catacombae.xml.Attribute> attributes) {
-	try {
-	    startElement(name, attributes);
-	    endElement(name);
-	} catch(Exception e) { throw new RuntimeException(e); }
+        try {
+            startElement(name, attributes);
+            endElement(name);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
+
     @Override
     public void startElement(String name, List<org.catacombae.xml.Attribute> attributes) {
-	try {
-	    Attribute2[] attrs = new Attribute2[attributes.size()];
-	    //for(int i = 0; i < attributes.length; ++i) {
-	    int i = 0;
-	    for(org.catacombae.xml.Attribute a : attributes) {
-		attrs[i++] = new Attribute2("", a.identifier, 
-					      "CDATA", "", a.value.toString());
-	    }
+        try {
+            Attribute2[] attrs = new Attribute2[attributes.size()];
+            //for(int i = 0; i < attributes.length; ++i) {
+            int i = 0;
+            for (org.catacombae.xml.Attribute a : attributes) {
+                attrs[i++] = new Attribute2("", a.identifier,
+                        "CDATA", "", a.value.toString());
+            }
 // 	    org.xml.sax.ext.Attributes2Impl a2i = new org.xml.sax.ext.Attributes2Impl();
 // 	    for(org.catacombae.xml.Attribute a : attributes) {
 // 		System.err.println("id: " + a.identifier + " value: " + a.value.toString());
 // 		a2i.addAttribute("", a.identifier, a.identifier, "CDATA", a.value.toString());
 // 	    }
-	    nodeBuilder.startElementInternal(null, null, name, attrs);
-	} catch(Exception e) { throw new RuntimeException(e); }	    
+            nodeBuilder.startElementInternal(null, null, name, attrs);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
+
     @Override
     public void endElement(String name) {
-	try {
-	    nodeBuilder.endElement(null, null, name);
-	} catch(Exception e) { throw new RuntimeException(e); }
+        try {
+            nodeBuilder.endElement(null, null, name);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
+
     @Override
     public void chardata(int beginLine, int beginColumn, int endLine, int endColumn) {
-	nodeBuilder.characters(sras, encoding, beginLine, beginColumn, endLine, endColumn);
+        nodeBuilder.characters(sras, encoding, beginLine, beginColumn, endLine, endColumn);
     }
-//     public void chardata(CharSequence data) {
+
+    //     public void chardata(CharSequence data) {
 // 	try {
 // 	    //char[] ca = data.toCharArray();
 // 	    //nodeBuilder.characters(ca, 0, ca.length);
@@ -91,19 +117,20 @@ public class NodeBuilderContentHandler extends XMLContentHandler {
 //     }
     @Override
     public void reference(String ref) {
-	try {
-	    if(ref.startsWith("&#")) {
-		// CharRef
-		int[] codePoints = new int[1];
-		if(ref.startsWith("&#x"))
-		    codePoints[0] = Integer.parseInt(ref.substring(3), 16);
-		else
-		    codePoints[0] = Integer.parseInt(ref.substring(2), 10);
-		char[] cp_ca = Character.toChars(codePoints[0]);
-		nodeBuilder.characters(cp_ca, 0, cp_ca.length);
-	    }
-	    else
-		System.out.println("WARNING: Encountered external references, which cannot be resolved with this version of the parser.");
-	} catch(Exception e) { throw new RuntimeException(e); }
+        try {
+            if (ref.startsWith("&#")) {
+                // CharRef
+                int[] codePoints = new int[1];
+                if (ref.startsWith("&#x"))
+                    codePoints[0] = Integer.parseInt(ref.substring(3), 16);
+                else
+                    codePoints[0] = Integer.parseInt(ref.substring(2), 10);
+                char[] cp_ca = Character.toChars(codePoints[0]);
+                nodeBuilder.characters(cp_ca, 0, cp_ca.length);
+            } else
+                System.out.println("WARNING: Encountered external references, which cannot be resolved with this version of the parser.");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

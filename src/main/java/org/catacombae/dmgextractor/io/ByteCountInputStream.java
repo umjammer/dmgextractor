@@ -20,11 +20,13 @@ package org.catacombae.dmgextractor.io;
 import java.io.IOException;
 import java.io.InputStream;
 
+
 /**
  * Filter stream that records information about how many bytes have been
  * processed (either read or skipped).
  */
 public class ByteCountInputStream extends InputStream {
+
     private long bytePos = 0;
     private final InputStream is;
 
@@ -43,30 +45,40 @@ public class ByteCountInputStream extends InputStream {
      *
      * @return the number of bytes that have been read.
      */
-    public long getBytesRead() { return bytePos; }
-    
-    /** {@inheritDoc} */
-    @Override
-    public int available() throws IOException { return is.available(); }
+    public long getBytesRead() {
+        return bytePos;
+    }
 
     /** {@inheritDoc} */
     @Override
-    public void close() throws IOException { is.close(); }
+    public int available() throws IOException {
+        return is.available();
+    }
 
     /** {@inheritDoc} */
     @Override
-    public void mark(int readLimit) { throw new UnsupportedOperationException("Mark/reset not supported"); }
-    
+    public void close() throws IOException {
+        is.close();
+    }
+
     /** {@inheritDoc} */
     @Override
-    public boolean markSupported() { return false; }
+    public void mark(int readLimit) {
+        throw new UnsupportedOperationException("Mark/reset not supported");
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean markSupported() {
+        return false;
+    }
 
     /** {@inheritDoc} */
     @Override
     public int read() throws IOException {
         //System.out.println("read();");
         int res = is.read();
-        if(res > 0)
+        if (res > 0)
             ++bytePos;
         return res;
     }
@@ -76,7 +88,7 @@ public class ByteCountInputStream extends InputStream {
     public int read(byte[] b) throws IOException {
         //System.out.println("read(b.length=" + b.length + ");");
         int res = is.read(b);
-        if(res > 0)
+        if (res > 0)
             bytePos += res;
         return res;
     }
@@ -86,21 +98,23 @@ public class ByteCountInputStream extends InputStream {
     public int read(byte[] b, int off, int len) throws IOException {
         //System.out.println("read(b.length=" + b.length + ", " + off + ", " + len + ");");
         int res = is.read(b, off, len);
-        if(res > 0)
+        if (res > 0)
             bytePos += res;
         return res;
     }
 
     /** {@inheritDoc} */
     @Override
-    public void reset() throws IOException { throw new UnsupportedOperationException("Mark/reset not supported"); }
+    public void reset() throws IOException {
+        throw new UnsupportedOperationException("Mark/reset not supported");
+    }
 
     /** {@inheritDoc} */
     @Override
     public long skip(long n) throws IOException {
         System.out.println("skip(" + n + ");");
         long res = is.skip(n);
-        if(res > 0)
+        if (res > 0)
             bytePos += res;
         return res;
     }

@@ -19,21 +19,23 @@ package org.catacombae.dmg.sparsebundle;
 
 import java.io.File;
 
+
 /**
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class Dump {
+
     public static void main(String[] args) {
         ReadableSparseBundleStream stream =
                 new ReadableSparseBundleStream(new File(args[0]));
-        byte[] buf = new byte[512*1024];
+        byte[] buf = new byte[512 * 1024];
         long bytesRead = 0;
 
-        while(true) {
+        while (true) {
             int curBytesRead = stream.read(buf);
-            if(curBytesRead == -1)
+            if (curBytesRead == -1)
                 break;
-            else if(curBytesRead < 0)
+            else if (curBytesRead < 0)
                 throw new RuntimeException("Wtf... curBytesRead=" +
                         curBytesRead);
 

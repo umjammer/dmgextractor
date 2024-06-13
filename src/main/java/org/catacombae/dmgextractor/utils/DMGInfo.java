@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.catacombae.dmgextractor.utils;
 
 import java.io.IOException;
@@ -22,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+
 
 public class DMGInfo {
 
@@ -33,7 +35,7 @@ public class DMGInfo {
         byte[] koly = new byte[4];
         inRaf.readFully(koly);
         String kolySignature = new String(koly, StandardCharsets.US_ASCII);
-        if(!kolySignature.equals("koly"))
+        if (!kolySignature.equals("koly"))
             System.out.println("ERROR: Signature incorrect. Found \"" + kolySignature + "\" instead of \"koly\".");
         else
             System.out.println("\"koly\" signature OK.");
@@ -56,7 +58,7 @@ public class DMGInfo {
 
 
         long unknown_0x1C8 = inRaf.readLong();
-        if(unknown_0x1C8 != 0x0000000100000001L)
+        if (unknown_0x1C8 != 0x0000000100000001L)
             System.out.println("Assertion failed! unknown_0x1C8 == 0x" +
                     Long.toHexString(unknown_0x1C8) + " and not 0x0000000100000001");
 
@@ -69,7 +71,7 @@ public class DMGInfo {
 
 
         long unknown_0x1B0 = inRaf.readLong();
-        if(unknown_0x1B0 != 0x0000000200000020L)
+        if (unknown_0x1B0 != 0x0000000200000020L)
             System.out.println("Assertion failed! unknown_0x1B0 == 0x" +
                     Long.toHexString(unknown_0x1B0) + " and not 0x0000000200000020");
 
@@ -105,9 +107,9 @@ public class DMGInfo {
         // -0x0A0: Checksum type identifier (4 bytes)
         System.out.print("Checksum type");
         int cs_type = inRaf.readInt();
-        if(cs_type == 0x00000002)
+        if (cs_type == 0x00000002)
             System.out.println(": CRC-32");
-        else if(cs_type == 0x00000004)
+        else if (cs_type == 0x00000004)
             System.out.println(": MD5");
         else
             System.out.println(" unknown! Data: 0x" + Integer.toHexString(cs_type));
@@ -131,9 +133,9 @@ public class DMGInfo {
 
     public static String byteArrayToHexString(byte[] array) {
         StringBuilder result = new StringBuilder();
-        for(byte b : array) {
+        for (byte b : array) {
             String s = Integer.toHexString(b & 0xFF);
-            if(s.length() == 1)
+            if (s.length() == 1)
                 s = "0" + s;
             result.append(s);
         }
@@ -152,7 +154,7 @@ class DMGInfoFrame extends JFrame {
 
         StatisticsPanel statisticsPanel;
         statisticsPanel = new StatisticsPanel();
-    //mainPane.addTab(statisticsPanel, "Statistics");
+        //mainPane.addTab(statisticsPanel, "Statistics");
     }
 }
 

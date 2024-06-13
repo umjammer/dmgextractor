@@ -24,7 +24,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 
+
 public class PlistPartition {
+
     private static final Logger logger = Logger.getLogger(PlistPartition.class.getName());
 
     private final String name;
@@ -42,13 +44,13 @@ public class PlistPartition {
     private long finalInOffset = -1;
 
     public PlistPartition(String name, String id, String attributes, byte[] data,
-            long previousOutOffset, long previousInOffset) throws IOException {
+                          long previousOutOffset, long previousInOffset) throws IOException {
         this(name, id, attributes, new ByteArrayInputStream(data),
                 previousOutOffset, previousInOffset);
     }
 
     public PlistPartition(String name, String id, String attributes, InputStream data,
-            long previousOutOffset, long previousInOffset) throws IOException {
+                          long previousOutOffset, long previousInOffset) throws IOException {
         this.name = name;
         this.id = id;
         this.attributes = attributes;
@@ -92,13 +94,13 @@ public class PlistPartition {
     }
 
     public long getFinalOutOffset() {
-        if(finalOutOffset < 0)
+        if (finalOutOffset < 0)
             throw new RuntimeException("parseBlocks has not yet been called!");
         return finalOutOffset;
     }
 
     public long getFinalInOffset() {
-        if(finalInOffset < 0)
+        if (finalInOffset < 0)
             throw new RuntimeException("parseBlocks has not yet been called!");
         return finalInOffset;
     }
@@ -106,7 +108,7 @@ public class PlistPartition {
     private UDIFBlock[] parseBlocks(InputStream is) throws IOException {
         long bytesSkipped = is.read(new byte[0xCC]);
 
-        if(bytesSkipped != 0xCC)
+        if (bytesSkipped != 0xCC)
             throw new RuntimeException("Could not skip the desired amount of bytes...");
 
         int blockNumber = 0; // Increments by one for each block we read (each iteration in the while loop below)
@@ -120,9 +122,9 @@ public class PlistPartition {
         LinkedList<UDIFBlock> blocks = new LinkedList<>();
 
         int bytesRead = is.read(blockData);
-        while(bytesRead > 0) { //offset <= data.length-UDIFBlock) {
+        while (bytesRead > 0) { //offset <= data.length-UDIFBlock) {
             //System.err.println("Looping (read " + bytesRead + " bytes)");
-            if(bytesRead != blockData.length)
+            if (bytesRead != blockData.length)
                 throw new RuntimeException("Could not read the desired amount of bytes... (desired: " + blockData.length + " read: " + bytesRead + ")");
 
             long inOffset = UDIFBlock.peekInOffset(blockData, 0);
@@ -132,7 +134,7 @@ public class PlistPartition {
             long outOffsetCompensation = previousOutOffset;
 
             // Update pointer to the last byte read in the last block
-            if(lastByteReadInBlock == -1)
+            if (lastByteReadInBlock == -1)
                 lastByteReadInBlock = inOffset;
             lastByteReadInBlock += inSize;
 
@@ -143,12 +145,12 @@ public class PlistPartition {
              * relative to the previous partition's last inOffset. And sometimes it
              * doesn't (meaning the actual position 0 in the dmg file).
              */
-            if(inOffset == 0 && blockNumber == 0) {
+            if (inOffset == 0 && blockNumber == 0) {
                 logger.fine("Detected inOffset == 0, setting addInOffset flag.");
                 addInOffset = true;
             }
             long inOffsetCompensation = 0;
-            if(addInOffset) {
+            if (addInOffset) {
                 logger.fine("addInOffset mode: inOffset tranformation " + inOffset + "->" +
                         (inOffset + previousInOffset));
                 inOffsetCompensation = previousInOffset;
@@ -161,11 +163,11 @@ public class PlistPartition {
             //System.out.println("  " + currentBlock.toString());
 
             // Return if we have reached the end, and update
-            if(currentBlock.getBlockType() == UDIFBlock.BT_END) {
+            if (currentBlock.getBlockType() == UDIFBlock.BT_END) {
                 finalOutOffset = currentBlock.getTrueOutOffset();
                 finalInOffset = previousInOffset + lastByteReadInBlock;
 
-                if(is.read() != -1)
+                if (is.read() != -1)
                     logger.warning("Encountered additional data in blkx blob.");
                 return blocks.toArray(UDIFBlock[]::new);
             }
@@ -179,7 +181,7 @@ public class PlistPartition {
     public static long calculatePartitionSize(UDIFBlock[] data) throws IOException {
         long partitionSize = 0;
 
-        for(UDIFBlock db : data)
+        for (UDIFBlock db : data)
             partitionSize += db.getOutSize();
 
         return partitionSize;

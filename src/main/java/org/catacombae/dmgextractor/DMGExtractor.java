@@ -326,27 +326,25 @@ public class DMGExtractor {
                     return;
                 UDIFBlock currentBlock = blockIterator.next();
 
-                /* Offset of the input data for the current block in the input file */
+                // Offset of the input data for the current block in the input file
                 int blockType = currentBlock.getBlockType();
-                /* Offset of the input data for the current block in the input file */
+                // Offset of the input data for the current block in the input file
                 long inOffset = currentBlock.getTrueInOffset();
-                /* Size of the input data for the current block */
+                // Size of the input data for the current block
                 long inSize = currentBlock.getInSize();
-                /* Offset of the output data for the current block in the output file */
+                // Offset of the output data for the current block in the output file
                 long outOffset = currentBlock.getTrueOutOffset();
-                /* Size of the output data (possibly larger than inSize because of
-                decompression, zero expansion...) */
+                // Size of the output data (possibly larger than inSize because of
+                // decompression, zero expansion...)
                 long outSize = currentBlock.getOutSize();
 
                 long trueOutOffset = currentBlock.getTrueOutOffset();
                 long trueInOffset = currentBlock.getTrueInOffset();
                 String blockTypeString = currentBlock.getBlockTypeAsString();
 
-                /*
-                String[] variableStatus = {"outOffset=" + outOffset + " outSize=" + outSize,
-                "inOffset=" + inOffset + " inSize=" + inSize,
-                "trueOutOffset=" + trueOutOffset + " trueInOffset=" + trueInOffset};
-                 */
+//                String[] variableStatus = {"outOffset=" + outOffset + " outSize=" + outSize,
+//                        "inOffset=" + inOffset + " inSize=" + inSize,
+//                        "trueOutOffset=" + trueOutOffset + " trueInOffset=" + trueInOffset};
 
                 if (ses.debug) {
                     ui.displayMessage(
@@ -368,7 +366,6 @@ public class DMGExtractor {
                     if (!proceed)
                         return;
                 }
-
 
                 if (blockType == UDIFBlock.BT_ADC) {
                     ++errorsReported;
@@ -406,9 +403,9 @@ public class DMGExtractor {
                 } else if (blockType == UDIFBlock.BT_ZERO2) {
                     DMGBlockHandlers.processBlock(currentBlock, dmgRaf, isoRaf, testOnly, ui);
                 } else if (blockType == UDIFBlock.BT_UNKNOWN) {
-                    /* I have no idea what this blocktype is... but it's common, and usually
-                    doesn't appear more than 2-3 times in a dmg. As long as its input and
-                    output sizes are 0, there's no reason to complain... is there? */
+                    // I have no idea what this blocktype is... but it's common, and usually
+                    // doesn't appear more than 2-3 times in a dmg. As long as its input and
+                    // output sizes are 0, there's no reason to complain... is there?
                     if (!(inSize == 0 && outSize == 0)) {
                         String[] message = {"Blocktype BT_UNKNOWN had non-zero sizes...",
                                 "  inSize=" + inSize + ", outSize=" + outSize,
@@ -440,10 +437,10 @@ public class DMGExtractor {
                         String[] message = {"previously unseen blocktype " + blockType + " [0x" + Integer.toHexString(blockType) + "]",
                                 "outOffset=" + outOffset + " outSize=" + outSize + " inOffset=" + inOffset + " inSize=" + inSize,
                                 "CRITICAL. inSize and/or outSize are not 0!"};
-                        //errorMessage("previously unseen blocktype " + blockType + " [0x" + Integer.toHexString(blockType) + "]",
-                        //       ("  outOffset=" + outOffset + " outSize=" + outSize +
-                        //        " inOffset=" + inOffset + " inSize=" + inSize),
-                        //        "  CRITICAL. inSize and/or outSize are not 0!");
+//                        errorMessage("previously unseen blocktype " + blockType + " [0x" + Integer.toHexString(blockType) + "]",
+//                                ("  outOffset=" + outOffset + " outSize=" + outSize +
+//                                        " inOffset=" + inOffset + " inSize=" + inSize),
+//                                "  CRITICAL. inSize and/or outSize are not 0!");
                         ++errorsReported;
                         if (!ses.debug) {
                             String[] appended = {"outOffset=" + outOffset + " outSize=" + outSize,
@@ -457,7 +454,6 @@ public class DMGExtractor {
                         else
                             return;
                     }
-
                 }
 
                 ++blockCount;
@@ -587,7 +583,7 @@ public class DMGExtractor {
         }
     }
 
-    private static Session parseArgs(String[] args) {
+    private static DMGExtractor.Session parseArgs(String[] args) {
         Session ses = new Session();
         try {
             /* Take care of the options... */

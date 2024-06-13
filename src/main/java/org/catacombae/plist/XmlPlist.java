@@ -28,6 +28,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
 import org.catacombae.dmgextractor.io.RandomAccessInputStream;
 import org.catacombae.dmgextractor.io.SynchronizedRandomAccessStream;
 import org.catacombae.io.ReadableByteArrayStream;
@@ -78,17 +79,16 @@ public class XmlPlist {
 //        InputStream is = new ByteArrayInputStream(plistData);
         NodeBuilder handler = new NodeBuilder();
 
-        if(defaultToSAX) {
+        if (defaultToSAX) {
             parseXMLDataSAX(plistData, handler);
-        }
-        else {
+        } else {
             /* First try to parse with the internal homebrew parser, and if it
              * doesn't succeed, go for the SAX parser. */
 //            System.err.println("Trying to parse xml data...");
             try {
                 parseXMLDataAPX(plistData, handler);
 //                System.err.println("xml data parsed...");
-            } catch(Exception e) {
+            } catch (Exception e) {
                 logger.log(Level.ERROR, e.getMessage(), e);
                 System.err.println("APX parser threw exception... falling back to SAX parser. Report this error!");
                 handler = new NodeBuilder();
@@ -97,7 +97,7 @@ public class XmlPlist {
         }
 
         XMLNode[] rootNodes = handler.getRoots();
-        if(rootNodes.length != 1)
+        if (rootNodes.length != 1)
             throw new RuntimeException("Could not parse DMG-file!");
         else
             return rootNodes[0];
@@ -107,16 +107,16 @@ public class XmlPlist {
         try {
             ReadableByteArrayStream ya = new ReadableByteArrayStream(buffer);
             SynchronizedRandomAccessStream bufferStream =
-                new SynchronizedRandomAccessStream(ya);//new ReadableByteArrayStream(buffer));
+                    new SynchronizedRandomAccessStream(ya);//new ReadableByteArrayStream(buffer));
 
             // First we parse the xml declaration using a US-ASCII charset just to extract the charset description
             //System.err.println("parsing encoding");
             InputStream is = new RandomAccessInputStream(bufferStream);
             APXParser encodingParser = APXParser.create(new InputStreamReader(is, StandardCharsets.US_ASCII),
-                                            new NullXMLContentHandler(StandardCharsets.US_ASCII));
+                    new NullXMLContentHandler(StandardCharsets.US_ASCII));
             String encodingName = encodingParser.xmlDecl();
             //System.err.println("encodingName=" + encodingName);
-            if(encodingName == null)
+            if (encodingName == null)
                 encodingName = "US-ASCII";
 
             Charset encoding = Charset.forName(encodingName);
@@ -128,17 +128,16 @@ public class XmlPlist {
 //            try { FileOutputStream dump = new FileOutputStream("dump.xml"); dump.write(buffer); dump.close(); }
 //            catch(Exception e) { e.printStackTrace(); }
 
-            if(false) { //
+            if (false) { //
                 APXParser documentParser = APXParser.create(usedReader, new DebugXMLContentHandler(encoding));
                 documentParser.xmlDocument();
                 System.exit(0);
-            }
-            else {
+            } else {
                 APXParser documentParser = APXParser.create(usedReader, new NodeBuilderContentHandler(handler, bufferStream, encoding));
                 documentParser.xmlDocument();
             }
 
-        } catch(ParseException pe) {
+        } catch (ParseException pe) {
 //            System.err.println("Could not read the partition list...");
             throw new RuntimeException(pe);
         }
@@ -171,11 +170,11 @@ public class XmlPlist {
 
 //            System.out.println("isValidating: " + saxParser.isValidating());
             saxParser.parse(is, handler);
-        } catch(SAXException se) {
+        } catch (SAXException se) {
             logger.log(Level.ERROR, se.getMessage(), se);
 //            System.err.println("Could not read the partition list... exiting.");
             throw new RuntimeException(se);
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

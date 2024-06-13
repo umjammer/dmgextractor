@@ -18,10 +18,12 @@
 package org.catacombae.dmgextractor;
 
 public class DmgException extends RuntimeException {
+
     public DmgException() {
-	super();
+        super();
     }
+
     public DmgException(String message) {
-	super(message);
+        super(message);
     }
 }

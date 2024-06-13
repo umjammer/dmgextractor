@@ -19,6 +19,8 @@ package org.catacombae.xml;
 
 import java.io.PrintStream;
 
+
 public abstract class XMLElement {
+
     protected abstract void _printTree(PrintStream pw, int level);
 }

@@ -17,31 +17,53 @@
 
 package org.catacombae.xml;
 
-import java.util.List;
 import java.nio.charset.Charset;
+import java.util.List;
+
 
 public class NullXMLContentHandler extends XMLContentHandler {
+
     public NullXMLContentHandler(Charset encoding) {
-	super(encoding);
+        super(encoding);
     }
+
     @Override
-    public void xmlDecl(String version, String encoding, Boolean standalone) {}
+    public void xmlDecl(String version, String encoding, Boolean standalone) {
+    }
+
     @Override
-    public void pi(String id, String content) {}
+    public void pi(String id, String content) {
+    }
+
     @Override
-    public void comment(String comment) {}
+    public void comment(String comment) {
+    }
+
     @Override
-    public void doctype(String name, ExternalID eid) {} // Needs a DTD description also
+    public void doctype(String name, ExternalID eid) {
+    } // Needs a DTD description also
+
     @Override
-    public void cdata(String cdata) {}
+    public void cdata(String cdata) {
+    }
+
     @Override
-    public void emptyElement(String name, List<Attribute> attributes) {}
+    public void emptyElement(String name, List<Attribute> attributes) {
+    }
+
     @Override
-    public void startElement(String name, List<Attribute> attributes) {}
+    public void startElement(String name, List<Attribute> attributes) {
+    }
+
     @Override
-    public void endElement(String name) {}
+    public void endElement(String name) {
+    }
+
     @Override
-    public void chardata(int beginLine, int beginColumn, int endLine, int endColumn) {}
+    public void chardata(int beginLine, int beginColumn, int endLine, int endColumn) {
+    }
+
     @Override
-    public void reference(String ref) {}
+    public void reference(String ref) {
+    }
 }

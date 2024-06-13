@@ -31,7 +31,7 @@ import static java.lang.System.getLogger;
 
 public class MutableInputStreamReader extends Reader {
 
-	private static final Logger logger = getLogger(MutableInputStreamReader.class.getName());
+    private static final Logger logger = getLogger(MutableInputStreamReader.class.getName());
 
     private static final String PREFIX = "---->MutableInputStreamReader: ";
     private final InputStream iStream;
@@ -104,7 +104,7 @@ public class MutableInputStreamReader extends Reader {
     public int read(char[] cbuf, int off, int len) throws IOException {
         try {
             int result = isReader.read(cbuf, off, len);
-			logger.log(Level.TRACE, PREFIX + "isReader.read(" + cbuf.length + " bytes..., " + off + ", " + len + ") == " + result);
+            logger.log(Level.TRACE, PREFIX + "isReader.read(" + cbuf.length + " bytes..., " + off + ", " + len + ") == " + result);
             return result;
         } catch (IOException | RuntimeException e) {
             logger.log(Level.DEBUG, e.getMessage(), e);
@@ -116,7 +116,7 @@ public class MutableInputStreamReader extends Reader {
     public int read(CharBuffer target) throws IOException {
         try {
             int result = isReader.read(target);
-			logger.log(Level.TRACE, PREFIX + "isReader.read(CharBuffer with length " + target.length() + ") == " + result);
+            logger.log(Level.TRACE, PREFIX + "isReader.read(CharBuffer with length " + target.length() + ") == " + result);
             return result;
         } catch (IOException | RuntimeException e) {
             logger.log(Level.DEBUG, e.getMessage(), e);

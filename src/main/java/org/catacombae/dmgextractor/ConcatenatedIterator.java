@@ -17,38 +17,45 @@
 
 package org.catacombae.dmgextractor;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 
 public class ConcatenatedIterator<E> implements Iterator<E> {
+
     private final ArrayList<Iterator<E>> sequence = new ArrayList<>();
     private int index = 0;
-    public void add(Iterator<E> next) { sequence.add(next); }
+
+    public void add(Iterator<E> next) {
+        sequence.add(next);
+    }
 
     @Override
     public boolean hasNext() {
-	if(index < sequence.size()) {
-	    Iterator<E> curIt = sequence.get(index);
-	    while(!curIt.hasNext() && (index+1) < sequence.size())
-		curIt = sequence.get(++index);
-	    return curIt.hasNext();
-	}
-	else
-	    return false;
+        if (index < sequence.size()) {
+            Iterator<E> curIt = sequence.get(index);
+            while (!curIt.hasNext() && (index + 1) < sequence.size())
+                curIt = sequence.get(++index);
+            return curIt.hasNext();
+        } else
+            return false;
     }
+
     @Override
     public E next() {
-	if(index < sequence.size()) {
-	    Iterator<E> curIt = sequence.get(index);
-	    while(!curIt.hasNext() && (index+1) < sequence.size())
-		curIt = sequence.get(++index);
-	    return curIt.next();
-	}
-	else
-	    throw new NoSuchElementException();
-	
+        if (index < sequence.size()) {
+            Iterator<E> curIt = sequence.get(index);
+            while (!curIt.hasNext() && (index + 1) < sequence.size())
+                curIt = sequence.get(++index);
+            return curIt.next();
+        } else
+            throw new NoSuchElementException();
+
     }
+
     @Override
     public void remove() {
-	throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 }

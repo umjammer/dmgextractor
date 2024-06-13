@@ -21,8 +21,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
-import org.catacombae.io.ReadableFileStream;
+
 import org.catacombae.dmg.udif.UDIFFileView;
+import org.catacombae.io.ReadableFileStream;
+
 
 public class ExtractPlist {
 
@@ -32,7 +34,7 @@ public class ExtractPlist {
         try {
             inFile = new RandomAccessFile(args[0], "r");
             outStream = new FileOutputStream(args[1]);
-        } catch(ArrayIndexOutOfBoundsException aioobe) {
+        } catch (ArrayIndexOutOfBoundsException aioobe) {
             System.out.println("Usage: ExtractPlist <dmgFile> <xml output file>");
             return;//System.exit(0);
         }
@@ -40,7 +42,8 @@ public class ExtractPlist {
         UDIFFileView dfw =
                 new UDIFFileView(new ReadableFileStream(inFile, args[0]));
         byte[] plistData = dfw.getPlistData();
-        /*int bytesWritten = */        outStream.write(plistData);
+        /*int bytesWritten = */
+        outStream.write(plistData);
 // 	if(bytesWritten != plistData.length)
 // 	    System.out.println("ERROR: Could not write all data to output file. " + bytesWritten + " of " + plistData.length + " bytes written.");
 

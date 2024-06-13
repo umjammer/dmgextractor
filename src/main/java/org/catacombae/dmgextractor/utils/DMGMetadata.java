@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.catacombae.dmgextractor.utils;
 
 import java.io.ByteArrayInputStream;
@@ -26,6 +27,7 @@ import java.io.PrintStream;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
+
 
 public class DMGMetadata {
 
@@ -65,7 +67,7 @@ public class DMGMetadata {
         dmgFile.readFully(fourcc);
         String fourccString = new String(fourcc, StandardCharsets.US_ASCII);
         dmgFile.seek(dmgFile.getFilePointer() - 4);
-        while(fourccString.equals("mish")) {
+        while (fourccString.equals("mish")) {
             blockListList.add(new PartitionBlockList(dmgFile, length));
             length = dmgFile.readInt();
             dmgFile.readFully(fourcc);
@@ -83,13 +85,13 @@ public class DMGMetadata {
         byte[] pmSig = new byte[2];
         pmSig[0] = currentPartitionEntry[0];
         pmSig[1] = currentPartitionEntry[1];
-        while(new String(pmSig, StandardCharsets.US_ASCII).equals("PM")) {
+        while (new String(pmSig, StandardCharsets.US_ASCII).equals("PM")) {
             partitionList.addLast(new APMPartition(currentPartitionEntry));
             dmgFile.readFully(currentPartitionEntry);
             pmSig[0] = currentPartitionEntry[0];
             pmSig[1] = currentPartitionEntry[1];
         }
-        while(onlyZeros(currentPartitionEntry))
+        while (onlyZeros(currentPartitionEntry))
             dmgFile.readFully(currentPartitionEntry);
         partitions = partitionList.toArray(APMPartition[]::new);
 
@@ -100,16 +102,16 @@ public class DMGMetadata {
         dmgFile.seek(dmgFile.length() - koly.length);
         dmgFile.readFully(koly);
 
-        if(dmgFile.getFilePointer() != dmgFile.length())
+        if (dmgFile.getFilePointer() != dmgFile.length())
             System.out.println("MISCALCULATION! FP=" + dmgFile.getFilePointer() + " LENGTH=" + dmgFile.length());
     }
 
     public void printInfo(PrintStream ps) {
         ps.println("block list:");
-        for(PartitionBlockList pbl : blockLists)
+        for (PartitionBlockList pbl : blockLists)
             pbl.printInfo(ps);
         ps.println("partitions:");
-        for(APMPartition ap : partitions)
+        for (APMPartition ap : partitions)
             ap.printPartitionInfo(ps);
     }
 
@@ -135,7 +137,7 @@ public class DMGMetadata {
             di.readFully(header);
             position += header.length;
             LinkedList<BlockDescriptor> descs = new LinkedList<>();
-            while(position < length) {
+            while (position < length) {
                 descs.addLast(new BlockDescriptor(di));
                 position += 0x28;
             }
@@ -143,7 +145,7 @@ public class DMGMetadata {
         }
 
         public void printInfo(PrintStream ps) {
-            for(BlockDescriptor bd : descriptors)
+            for (BlockDescriptor bd : descriptors)
                 ps.println(bd.toString());
         }
     }
@@ -156,16 +158,16 @@ public class DMGMetadata {
         public static final int BT_ZLIB = 0x80000005;
         public static final int BT_END = 0xffffffff;
         public static final int BT_UNKNOWN1 = 0x7ffffffe;
-        private static final int[] KNOWN_BLOCK_TYPES = { BT_COPY,
-            BT_ZERO,
-            BT_ZLIB,
-            BT_END,
-            BT_UNKNOWN1 };
-        private static final String[] KNOWN_BLOCK_TYPE_NAMES = { "BT_COPY",
-            "BT_ZERO",
-            "BT_ZLIB",
-            "BT_END",
-            "BT_UNKNOWN1" };
+        private static final int[] KNOWN_BLOCK_TYPES = {BT_COPY,
+                BT_ZERO,
+                BT_ZLIB,
+                BT_END,
+                BT_UNKNOWN1};
+        private static final String[] KNOWN_BLOCK_TYPE_NAMES = {"BT_COPY",
+                "BT_ZERO",
+                "BT_ZLIB",
+                "BT_END",
+                "BT_UNKNOWN1"};
         private int blockType;
         private int unknown;
         private long outOffset;
@@ -195,10 +197,10 @@ public class DMGMetadata {
 
             dataOut.writeInt(blockType); // 4 bytes
             dataOut.writeInt(unknown); // 4 bytes
-            if((outOffset % 0x200) != 0)
+            if ((outOffset % 0x200) != 0)
                 throw new RuntimeException("Out offset must be aligned to 0x200 block size!");
             dataOut.writeLong(outOffset / 0x200); // 8 bytes
-            if((outSize % 0x200) != 0)
+            if ((outSize % 0x200) != 0)
                 throw new RuntimeException("Out size must be aligned to 0x200 block size!");
             dataOut.writeLong(outSize / 0x200); // 8 bytes
             dataOut.writeLong(inOffset); // 8 bytes
@@ -251,13 +253,13 @@ public class DMGMetadata {
         }
 
         public void setOutOffset(long outOffset) {
-            if((outOffset % 0x200) != 0)
+            if ((outOffset % 0x200) != 0)
                 throw new RuntimeException("Out offset must be aligned to 0x200 block size!");
             this.outOffset = outOffset;
         }
 
         public void setOutSize(long outSize) {
-            if((outSize % 0x200) != 0)
+            if ((outSize % 0x200) != 0)
                 throw new RuntimeException("Out size must be aligned to 0x200 block size!");
             this.outSize = outSize;
         }
@@ -271,17 +273,17 @@ public class DMGMetadata {
         }
 
         public boolean hasKnownBlockType() {
-            for(int current : KNOWN_BLOCK_TYPES) {
-                if(blockType == current)
+            for (int current : KNOWN_BLOCK_TYPES) {
+                if (blockType == current)
                     return true;
             }
             return false;
         }
 
         public String getBlockTypeName() {
-            for(int i = 0; i < KNOWN_BLOCK_TYPES.length; ++i) {
+            for (int i = 0; i < KNOWN_BLOCK_TYPES.length; ++i) {
                 int current = KNOWN_BLOCK_TYPES[i];
-                if(blockType == current)
+                if (blockType == current)
                     return KNOWN_BLOCK_TYPE_NAMES[i];
             }
             return null;
@@ -292,7 +294,7 @@ public class DMGMetadata {
             StringBuilder result = new StringBuilder("[BlockDescriptor");
 
             String blockTypeString = "\"" + getBlockTypeName() + "\"";
-            if(blockTypeString == null)
+            if (blockTypeString == null)
                 blockTypeString = "0x" + Integer.toHexString(blockType) + " (unknown type)";
 
             result.append(" blockType=").append(blockTypeString);
@@ -354,7 +356,7 @@ public class DMGMetadata {
             pmBootEntry2 = di.readInt() & 0xffff_ffffL;
             pmBootCksum = di.readInt() & 0xffff_ffffL;
             di.readFully(pmProcessor);
-            for(int i = 0; i < pmPad.length; ++i)
+            for (int i = 0; i < pmPad.length; ++i)
                 pmPad[i] = di.readShort() & 0xffff;
         }
 

@@ -19,20 +19,33 @@ package org.catacombae.dmg.sparsebundle;
 
 import org.catacombae.io.ReadableRandomAccessStream;
 
+
 /**
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
-*/
+ */
 public interface FileAccessor {
+
     FileAccessor[] listFiles();
+
     boolean isFile();
+
     boolean isDirectory();
+
     String getName();
+
     String getAbsolutePath();
+
     boolean exists();
+
     FileAccessor lookupChild(String name);
+
     long length();
+
     ReadableRandomAccessStream createReadableStream();
+
     void lock();
+
     void unlock();
+
     void close();
 }

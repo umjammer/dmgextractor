@@ -18,16 +18,18 @@
 package org.catacombae.xml;
 
 public class Attribute2 {
+
     public final String localName;
     public final String qName;
     public final String type;
     public final String URI;
     public final String value;
+
     public Attribute2(String localName, String qName, String type, String URI, String value) {
-	this.localName = localName;
-	this.qName = qName;
-	this.type = type;
-	this.URI = URI;
-	this.value = value;
+        this.localName = localName;
+        this.qName = qName;
+        this.type = type;
+        this.URI = URI;
+        this.value = value;
     }
 }

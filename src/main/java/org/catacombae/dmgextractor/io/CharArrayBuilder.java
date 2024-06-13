@@ -16,6 +16,7 @@
  */
 
 package org.catacombae.dmgextractor.io;
+
 // /* unused... remnants of old ideas */
 public class CharArrayBuilder {
     /*

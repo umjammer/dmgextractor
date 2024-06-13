@@ -42,10 +42,9 @@ abstract class BasicUI implements UserInterface {
     @Override
     public void addProgressRaw(long value) {
         currentProgress += value;
-        if(totalProgressLength > 0) {
+        if (totalProgressLength > 0) {
             reportProgress((int) (currentProgress * 100 / totalProgressLength));
-        }
-        else {
+        } else {
             reportProgress(0);
         }
     }
@@ -53,7 +52,7 @@ abstract class BasicUI implements UserInterface {
     /** {@inheritDoc} */
     @Override
     public void displayMessageVerbose(String... messageLines) {
-        if(verbose)
+        if (verbose)
             displayMessage(messageLines);
     }
 }

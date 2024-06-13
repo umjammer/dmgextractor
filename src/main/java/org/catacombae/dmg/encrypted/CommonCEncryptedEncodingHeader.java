@@ -70,6 +70,7 @@ public abstract class CommonCEncryptedEncodingHeader {
     }
 
     public abstract int getBlockSize();
+
     public abstract long getBlockDataStart();
 
     public abstract KeyData[] getKeys();
@@ -77,6 +78,7 @@ public abstract class CommonCEncryptedEncodingHeader {
     /**
      * Returns the amount of bytes at the end of the stream that are not part
      * of the block data area.
+     *
      * @return the amount of bytes at the end of the stream that are not part
      * of the block data area.
      */
@@ -86,11 +88,13 @@ public abstract class CommonCEncryptedEncodingHeader {
      * Returns the length of the data that has been encrypted. This length may
      * not be aligned with the encryption block size, in which case the last
      * encryption block will have been padded at the end
+     *
      * @return the length of the data that has been encrypted.
      */
     public abstract long getEncryptedDataLength();
 
     public static class KeySet {
+
         private final byte[] aesKey;
         private final byte[] hmacSha1Key;
 
@@ -99,8 +103,13 @@ public abstract class CommonCEncryptedEncodingHeader {
             this.hmacSha1Key = hmacSha1Key;
         }
 
-        public byte[] getAesKey() { return aesKey; }
-        public byte[] getHmacSha1Key() { return hmacSha1Key; }
+        public byte[] getAesKey() {
+            return aesKey;
+        }
+
+        public byte[] getHmacSha1Key() {
+            return hmacSha1Key;
+        }
 
         public void clearData() {
             Util.zero(aesKey);
@@ -109,14 +118,17 @@ public abstract class CommonCEncryptedEncodingHeader {
     }
 
     public static abstract class KeyData {
+
         /**
          * Returns the salt for the key derivation function.
+         *
          * @return the salt for the key derivation function.
          */
         public abstract byte[] getKdfSalt();
 
         /**
          * Returns the iteration count for the key derivation function.
+         *
          * @return the iteration count for the key derivation function.
          */
         public abstract int getKdfIterationCount();
@@ -124,6 +136,7 @@ public abstract class CommonCEncryptedEncodingHeader {
 
         /**
          * Returns the initialization vector for the key decryption cipher.
+         *
          * @return the initialization vector for the key decryption cipher.
          */
         public abstract byte[] getUnwrapInitializationVector();
@@ -134,6 +147,7 @@ public abstract class CommonCEncryptedEncodingHeader {
     }
 
     private static class V1Implementation extends CommonCEncryptedEncodingHeader {
+
         private final V1Header header;
         private final V1KeyDataImplementation keyData;
 
@@ -164,11 +178,12 @@ public abstract class CommonCEncryptedEncodingHeader {
 
         @Override
         public KeyData[] getKeys() {
-            return new KeyData[] { keyData };
+            return new KeyData[] {keyData};
         }
     }
 
     private static class V1KeyDataImplementation extends KeyData {
+
         private final V1Header header;
 
         private V1KeyDataImplementation(V1Header header) {
@@ -209,8 +224,8 @@ public abstract class CommonCEncryptedEncodingHeader {
             logger.log(Level.DEBUG, "  wrappedKey: 0x" + Util.byteArrayToHexString(wrappedKey));
 
             byte[] initialIv = new byte[] {
-                (byte) 0x4a, (byte) 0xdd, (byte) 0xa2, (byte) 0x2c,
-                (byte) 0x79, (byte) 0xe8, (byte) 0x21, (byte) 0x05
+                    (byte) 0x4a, (byte) 0xdd, (byte) 0xa2, (byte) 0x2c,
+                    (byte) 0x79, (byte) 0xe8, (byte) 0x21, (byte) 0x05
             };
             // irX = intermediate result X
 
@@ -221,24 +236,25 @@ public abstract class CommonCEncryptedEncodingHeader {
             logger.log(Level.DEBUG, "  ir1Len: " + ir1Len);
 
             byte[] ir2 = new byte[ir1Len];
-            for(int i = 0; i < ir1Len; ++i)
-                ir2[i] = ir1[ir1Len-1-i];
+            for (int i = 0; i < ir1Len; ++i)
+                ir2[i] = ir1[ir1Len - 1 - i];
             logger.log(Level.DEBUG, "  ir2: 0x" + Util.byteArrayToHexString(ir2));
             logger.log(Level.DEBUG, "  ir2.length: " + ir2.length);
 
-            byte[] ir3 = new byte[ir2.length-8];
+            byte[] ir3 = new byte[ir2.length - 8];
             cph.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(ir2, 0, 8));
-            int ir3Len = cph.doFinal(ir2, 8, ir2.length-8, ir3, 0);
+            int ir3Len = cph.doFinal(ir2, 8, ir2.length - 8, ir3, 0);
             logger.log(Level.DEBUG, "  ir3: 0x" + Util.byteArrayToHexString(ir3, 0, ir3Len));
             logger.log(Level.DEBUG, "  ir3Len: " + ir3Len);
 
-            byte[] result = Util.createCopy(ir3, 4, ir3Len-4);
+            byte[] result = Util.createCopy(ir3, 4, ir3Len - 4);
             Util.zero(ir1, ir2, ir3);
             return result;
         }
     }
 
     private static class V2Implementation extends CommonCEncryptedEncodingHeader {
+
         private final V2Header header;
         private final V2KeyDataImplementation[] keys;
 
@@ -247,8 +263,8 @@ public abstract class CommonCEncryptedEncodingHeader {
 
             LinkedList<V2KeyDataImplementation> keyList =
                     new LinkedList<>();
-            for(V2Header.KeyData kd : header.getKeys()) {
-                if(kd instanceof V2Header.UserKeyData) {
+            for (V2Header.KeyData kd : header.getKeys()) {
+                if (kd instanceof V2Header.UserKeyData) {
                     keyList.add(new V2KeyDataImplementation(header,
                             (V2Header.UserKeyData) kd));
                 }
@@ -284,12 +300,12 @@ public abstract class CommonCEncryptedEncodingHeader {
     }
 
     private static class V2KeyDataImplementation extends KeyData {
+
         private final V2Header header;
         private final V2Header.UserKeyData keyData;
 
         private V2KeyDataImplementation(V2Header header,
-                V2Header.UserKeyData keyData)
-        {
+                                        V2Header.UserKeyData keyData) {
             this.header = header;
             this.keyData = keyData;
         }

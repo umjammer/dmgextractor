@@ -19,6 +19,7 @@ package org.catacombae.dmgextractor;
 
 import java.io.File;
 
+
 interface UserInterface {
 
     boolean cancelSignaled();
@@ -35,6 +36,7 @@ interface UserInterface {
 
     /**
      * If outputFilename is null, is would mean that a simulation is in progress.
+     *
      * @param inputFilename
      * @param outputFilename
      */
@@ -73,14 +75,14 @@ interface UserInterface {
      * This method should be called to bring up a summary after a finished
      * extraction/simulation process.
      *
-     * @param simulation set to true when the extraction was only simulated,
-     * false for a real extraction.
-     * @param errorsReported the number of errors encountered during the
-     * extraction.
-     * @param warningsReported the number of warnings encountered during the
-     * extraction.
+     * @param simulation         set to true when the extraction was only simulated,
+     *                           false for a real extraction.
+     * @param errorsReported     the number of errors encountered during the
+     *                           extraction.
+     * @param warningsReported   the number of warnings encountered during the
+     *                           extraction.
      * @param totalExtractedSize the outgoing data size, i.e. the data that was
-     * written (or should have been written, in the case of a simulation).
+     *                           written (or should have been written, in the case of a simulation).
      */
     void reportFinished(boolean simulation, int errorsReported, int warningsReported, long totalExtractedSize);
 
@@ -90,7 +92,7 @@ interface UserInterface {
      * set forcibly to 100% when the process has completed.
      *
      * @param progressPercentage the percentage to set the progress to (range
-     * 0-100).
+     *                           0-100).
      */
     void reportProgress(int progressPercentage);
 
@@ -99,7 +101,7 @@ interface UserInterface {
      * denotes the total length of the data on which we monitor progress.
      *
      * @param len the number of bytes of data that is the maximum value for
-     * raw progress.
+     *            raw progress.
      */
     void setTotalProgressLength(long len);
 
