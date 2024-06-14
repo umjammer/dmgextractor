@@ -37,7 +37,6 @@ public class SimplerFileFilter extends FileFilter {
         this.description = description;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean accept(File f) {
         if (f.isDirectory())
@@ -48,7 +47,6 @@ public class SimplerFileFilter extends FileFilter {
             return false;
     }
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return description;

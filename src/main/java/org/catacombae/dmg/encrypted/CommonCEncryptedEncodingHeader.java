@@ -142,8 +142,7 @@ public abstract class CommonCEncryptedEncodingHeader {
         public abstract byte[] getUnwrapInitializationVector();
 
         public abstract KeySet unwrapKeys(Key derivedKey, Cipher cph)
-                throws GeneralSecurityException, InvalidKeyException,
-                InvalidAlgorithmParameterException;
+                throws GeneralSecurityException, InvalidKeyException, InvalidAlgorithmParameterException;
     }
 
     private static class V1Implementation extends CommonCEncryptedEncodingHeader {
@@ -207,8 +206,7 @@ public abstract class CommonCEncryptedEncodingHeader {
 
         @Override
         public KeySet unwrapKeys(Key derivedKey, Cipher cph)
-                throws GeneralSecurityException, InvalidKeyException,
-                InvalidAlgorithmParameterException {
+                throws GeneralSecurityException, InvalidKeyException, InvalidAlgorithmParameterException {
             byte[] aesKey = unwrapIndividualKey(derivedKey, cph,
                     Util.createCopy(header.getWrappedAesKey(), 0, header.getLenWrappedAesKey()));
 
@@ -218,8 +216,7 @@ public abstract class CommonCEncryptedEncodingHeader {
         }
 
         public byte[] unwrapIndividualKey(Key key, Cipher cph, byte[] wrappedKey)
-                throws InvalidKeyException, InvalidAlgorithmParameterException,
-                GeneralSecurityException {
+                throws InvalidKeyException, InvalidAlgorithmParameterException, GeneralSecurityException {
             logger.log(Level.DEBUG, "unwrapIndividualKey(" + key + ", " + cph + ", byte[" + wrappedKey.length + "]);");
             logger.log(Level.DEBUG, "  wrappedKey: 0x" + Util.byteArrayToHexString(wrappedKey));
 
@@ -261,12 +258,10 @@ public abstract class CommonCEncryptedEncodingHeader {
         public V2Implementation(V2Header header) {
             this.header = header;
 
-            LinkedList<V2KeyDataImplementation> keyList =
-                    new LinkedList<>();
+            LinkedList<V2KeyDataImplementation> keyList = new LinkedList<>();
             for (V2Header.KeyData kd : header.getKeys()) {
                 if (kd instanceof V2Header.UserKeyData) {
-                    keyList.add(new V2KeyDataImplementation(header,
-                            (V2Header.UserKeyData) kd));
+                    keyList.add(new V2KeyDataImplementation(header, (V2Header.UserKeyData) kd));
                 }
             }
             this.keys = keyList.toArray(V2KeyDataImplementation[]::new);
@@ -287,7 +282,6 @@ public abstract class CommonCEncryptedEncodingHeader {
             return 0;
         }
 
-
         @Override
         public long getEncryptedDataLength() {
             return header.getEncryptedDataLength();
@@ -304,16 +298,14 @@ public abstract class CommonCEncryptedEncodingHeader {
         private final V2Header header;
         private final V2Header.UserKeyData keyData;
 
-        private V2KeyDataImplementation(V2Header header,
-                                        V2Header.UserKeyData keyData) {
+        private V2KeyDataImplementation(V2Header header, V2Header.UserKeyData keyData) {
             this.header = header;
             this.keyData = keyData;
         }
 
         @Override
         public byte[] getKdfSalt() {
-            return Util.createCopy(keyData.getKdfSalt(), 0,
-                    keyData.getKdfSaltLen());
+            return Util.createCopy(keyData.getKdfSalt(), 0, keyData.getKdfSaltLen());
         }
 
         @Override
@@ -323,13 +315,11 @@ public abstract class CommonCEncryptedEncodingHeader {
 
         @Override
         public byte[] getUnwrapInitializationVector() {
-            return Util.createCopy(keyData.getBlobEncIv(), 0,
-                    keyData.getBlobEncIvSize());
+            return Util.createCopy(keyData.getBlobEncIv(), 0, keyData.getBlobEncIvSize());
         }
 
         private byte[] getEncryptedKeyBlob() {
-            return Util.createCopy(keyData.getEncryptedKeyblob(), 0,
-                    keyData.getEncryptedKeyblobSize());
+            return Util.createCopy(keyData.getEncryptedKeyblob(), 0, keyData.getEncryptedKeyblobSize());
         }
 
         @Override

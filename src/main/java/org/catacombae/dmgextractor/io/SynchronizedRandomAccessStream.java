@@ -61,43 +61,36 @@ public class SynchronizedRandomAccessStream extends BasicReadableRandomAccessStr
         return length() - getFilePointer();
     }
 
-    /** @see java.io.RandomAccessFile */
     @Override
     public synchronized void close() throws RuntimeIOException {
         ras.close();
     }
 
-    /** @see java.io.RandomAccessFile */
     @Override
     public synchronized long getFilePointer() throws RuntimeIOException {
         return ras.getFilePointer();
     }
 
-    /** @see java.io.RandomAccessFile */
     @Override
     public synchronized long length() throws RuntimeIOException {
         return ras.length();
     }
 
-    /** @see java.io.RandomAccessFile */
     @Override
     public synchronized int read() throws RuntimeIOException {
         return ras.read();
     }
 
-    /** @see java.io.RandomAccessFile */
     @Override
     public synchronized int read(byte[] b) throws RuntimeIOException {
         return ras.read(b);
     }
 
-    /** @see java.io.RandomAccessFile */
     @Override
     public synchronized int read(byte[] b, int off, int len) throws RuntimeIOException {
         return ras.read(b, off, len);
     }
 
-    /** @see java.io.RandomAccessFile */
     @Override
     public synchronized void seek(long pos) throws RuntimeIOException {
         ras.seek(pos);

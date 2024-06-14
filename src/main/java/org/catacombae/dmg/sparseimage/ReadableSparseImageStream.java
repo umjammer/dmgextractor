@@ -36,8 +36,7 @@ public class ReadableSparseImageStream extends BasicReadableRandomAccessStream {
 
     private long fp = 0;
 
-    public ReadableSparseImageStream(
-            ReadableRandomAccessStream backingStream) {
+    public ReadableSparseImageStream(ReadableRandomAccessStream backingStream) {
         this.backingStream = backingStream;
 
         byte[] headerData = new byte[4096];
@@ -46,11 +45,9 @@ public class ReadableSparseImageStream extends BasicReadableRandomAccessStream {
 
         this.header = new SparseImageHeader(headerData, 0);
 
-        String signature =
-                Util.readString(this.header.getSignature(), "US-ASCII");
+        String signature = Util.readString(this.header.getSignature(), "US-ASCII");
         if (!signature.equals("sprs")) {
-            throw new RuntimeException("Invalid signature: \"" + signature +
-                    "\"");
+            throw new RuntimeException("Invalid signature: \"" + signature + "\"");
         }
 
         /* Sector size appears to be fixed at 512. */
@@ -60,17 +57,14 @@ public class ReadableSparseImageStream extends BasicReadableRandomAccessStream {
         this.size = sectorCount * 512;
         this.blockSize = header.getSectorsPerBlock() * 512;
 
-        long blockMapElementCount =
-                (sectorCount + sectorsPerBlock - 1) / sectorsPerBlock;
+        long blockMapElementCount = (sectorCount + sectorsPerBlock - 1) / sectorsPerBlock;
         if (blockMapElementCount > Integer.MAX_VALUE) {
-            throw new RuntimeException("Block map size too large for address " +
-                    "space: " + blockMapElementCount);
+            throw new RuntimeException("Block map size too large for address space: " + blockMapElementCount);
         }
 
         this.blockMap = new int[(int) blockMapElementCount];
 
-        /* Iterate over the (reverse) block map in header and fill in the
-         * gaps. */
+        // Iterate over the (reverse) block map in header and fill in the gaps.
         int curBlock = 0;
         int curHeader = 0;
         for (; curBlock < blockMap.length; ++curHeader) {
@@ -81,14 +75,12 @@ public class ReadableSparseImageStream extends BasicReadableRandomAccessStream {
                 blockMapOffsetInHeader = 64;
                 blockMapEntriesInHeader = 1008;
             } else {
-                long nextHeaderOffset =
-                        4096 + 1008 * blockSize +
-                                (curHeader - 1) * (4096 + 1010 * blockSize);
+                long nextHeaderOffset = 4096 + 1008 * blockSize + (curHeader - 1) * (4096 + 1010 * blockSize);
 
                 backingStream.seek(nextHeaderOffset);
                 if (backingStream.read(headerData) == -1) {
-                    /* If we reach end of file here, all non-hole blocks have
-                     * been processed. The rest are just holes. */
+                    // If we reach end of file here, all non-hole blocks have
+                    // been processed. The rest are just holes.
                     break;
                 }
 
@@ -97,28 +89,21 @@ public class ReadableSparseImageStream extends BasicReadableRandomAccessStream {
             }
 
             int remainingBlocks = blockMap.length - curBlock;
-            int curEntriesToRead =
-                    remainingBlocks < blockMapEntriesInHeader ?
-                            remainingBlocks : blockMapEntriesInHeader;
+            int curEntriesToRead = Math.min(remainingBlocks, blockMapEntriesInHeader);
 
             for (int i = 0; i < curEntriesToRead; ++i, ++curBlock) {
-                long curMapping =
-                        Util.unsign(Util.readIntBE(headerData,
-                                blockMapOffsetInHeader + i * 4));
+                long curMapping = Util.unsign(Util.readIntBE(headerData, blockMapOffsetInHeader + i * 4));
 
                 if (curMapping == 0) {
-                    /* Hole. */
+                    // Hole.
                     continue;
                 } else if ((curMapping - 1) > blockMap.length) {
                     throw new RuntimeException("Inconsistent mapping at " +
                             curBlock + ": Points at block " + (curMapping - 1) +
-                            ". Number of blocks in sparse image: " +
-                            blockMap.length);
+                            ". Number of blocks in sparse image: " + blockMap.length);
                 } else if (blockMap[(int) curMapping - 1] != 0) {
-                    throw new RuntimeException("Cross-linked mapping: " +
-                            "Physical blocks " +
-                            blockMap[(int) curMapping - 1] + " and " +
-                            curBlock + " both point at virtual block " +
+                    throw new RuntimeException("Cross-linked mapping: Physical blocks " +
+                            blockMap[(int) curMapping - 1] + " and " + curBlock + " both point at virtual block " +
                             (curMapping - 1) + ".");
                 }
 
@@ -135,8 +120,7 @@ public class ReadableSparseImageStream extends BasicReadableRandomAccessStream {
     @Override
     public synchronized void seek(long offset) throws RuntimeIOException {
         if (offset < 0) {
-            throw new RuntimeIOException("Negative seek offset (" + offset +
-                    ")");
+            throw new RuntimeIOException("Negative seek offset (" + offset + ")");
         }
 
         this.fp = offset;
@@ -153,8 +137,7 @@ public class ReadableSparseImageStream extends BasicReadableRandomAccessStream {
     }
 
     @Override
-    public synchronized int read(byte[] data, int pos,
-                                 int len) throws RuntimeIOException {
+    public synchronized int read(byte[] data, int pos, int len) throws RuntimeIOException {
         int curPos = pos;
         int remaining;
         if (fp < size) {
@@ -167,9 +150,7 @@ public class ReadableSparseImageStream extends BasicReadableRandomAccessStream {
             long virtualBlockIndex = fp / blockSize;
             long offsetInBlock = fp % blockSize;
             long remainingInBlock = blockSize - offsetInBlock;
-            int bytesToRead =
-                    remaining < remainingInBlock ? remaining :
-                            (int) remainingInBlock;
+            int bytesToRead = remaining < remainingInBlock ? remaining : (int) remainingInBlock;
 
             if (virtualBlockIndex >= blockMap.length) {
                 break;
@@ -181,11 +162,8 @@ public class ReadableSparseImageStream extends BasicReadableRandomAccessStream {
             if (blockMapValue != 0) {
                 int physicalBlockIndex = blockMapValue - 1;
                 long segmentShift =
-                        4096 + (physicalBlockIndex < 1008 ? 0 :
-                                4096 + ((physicalBlockIndex - 1008) / 1010) * 4096L);
-                long seekOffset = segmentShift +
-                        ((long) physicalBlockIndex) * blockSize +
-                        offsetInBlock;
+                        4096 + (physicalBlockIndex < 1008 ? 0 : 4096 + ((physicalBlockIndex - 1008) / 1010) * 4096L);
+                long seekOffset = segmentShift + ((long) physicalBlockIndex) * blockSize + offsetInBlock;
                 backingStream.seek(seekOffset);
                 bytesRead = backingStream.read(data, curPos, bytesToRead);
                 if (bytesRead < 0) {
@@ -194,7 +172,7 @@ public class ReadableSparseImageStream extends BasicReadableRandomAccessStream {
             }
 
             if (bytesRead != bytesToRead) {
-                /* Not allocated. Just fill with zeroes. */
+                // Not allocated. Just fill with zeroes.
                 Util.zero(data, curPos + bytesRead, bytesToRead - bytesRead);
                 bytesRead = bytesToRead;
             }

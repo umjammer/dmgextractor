@@ -95,14 +95,14 @@ public class XmlPlistNode extends PlistNode {
                     } catch (IOException ex) {
                         logger.log(Level.ERROR, ex.getMessage(), ex);
                     }
-                    throw new RuntimeException("Unexpected text inside array " + "plist element: \"" + text + "\"");
+                    throw new RuntimeException("Unexpected text inside array plist element: \"" + text + "\"");
                 } else {
-                    System.err.println(xe.toString());
-                    throw new RuntimeException("Unexpected element inside " + "array: " + xe);
+                    logger.log(Level.DEBUG, xe.toString());
+                    throw new RuntimeException("Unexpected element inside array: " + xe);
                 }
             }
         } else {
-            throw new RuntimeException("getChildren called for " + "non-dict/array type \"" + xmlNode.qName + "\".");
+            throw new RuntimeException("getChildren called for non-dict/array type \"" + xmlNode.qName + "\".");
         }
 
         return children.toArray(PlistNode[]::new);
@@ -150,7 +150,7 @@ public class XmlPlistNode extends PlistNode {
                         try {
                             if (xn2 instanceof XMLText) {
                                 String s = Util.readFully(((XMLText) xn2).getText());
-//                                System.err.println("cdkey searching: \"" + s + "\"");
+//                                logger.log(Level.TRACE, "cdkey searching: \"" + s + "\"");
                                 if (s.equals(key))
                                     keyFound = true;
                             }
@@ -166,14 +166,14 @@ public class XmlPlistNode extends PlistNode {
 
     @Override
     public Reader getKeyValue(String key) {
-//        System.out.println("XMLNode.getKeyValue(\"" + key + "\")");
+//        logger.log(Level.TRACE, "XMLNode.getKeyValue(\"" + key + "\")");
         XmlPlistNode keyNode = cdkeyXml(key);
         if (keyNode == null)
             return null;
 
         XMLElement[] nodeChildren = keyNode.getXMLNode().getChildren();
         if (nodeChildren.length != 1) {
-//            System.out.println("  nodeChildren.length == " + nodeChildren.length);
+//            logger.log(Level.TRACE, "  nodeChildren.length == " + nodeChildren.length);
 
             LinkedList<Reader> collectedReaders = new LinkedList<>();
             for (XMLElement xe : keyNode.getXMLNode().getChildren()) {
@@ -184,24 +184,24 @@ public class XmlPlistNode extends PlistNode {
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
-//                    System.out.print("\"");
+//                    logger.log(Level.TRACE, "\"");
 //                    for(int i = 0; i < xt.length(); ++i) System.out.print(xt.charAt(i));
-//                    System.out.println("\"");
-//                    System.out.println("free memory: " + Runtime.getRuntime().freeMemory() + " total memory: " + Runtime.getRuntime().totalMemory());
+//                    logger.log(Level.TRACE, "\"");
+//                    logger.log(Level.TRACE, "free memory: " + Runtime.getRuntime().freeMemory() + " total memory: " + Runtime.getRuntime().totalMemory());
                 }
             }
             ConcatenatedReader result;
             if (collectedReaders.isEmpty())
                 result = null;
             else {
-//                System.out.println("doing a toString... free memory: " + Runtime.getRuntime().freeMemory() + " total memory: " + Runtime.getRuntime().totalMemory());
+//                logger.log(Level.TRACE, "doing a toString... free memory: " + Runtime.getRuntime().freeMemory() + " total memory: " + Runtime.getRuntime().totalMemory());
 //                result = returnString.toString();
-//                System.out.println("done.free memory: " + Runtime.getRuntime().freeMemory() + " total memory: " + Runtime.getRuntime().totalMemory());
+//                logger.log(Level.TRACE, "done.free memory: " + Runtime.getRuntime().freeMemory() + " total memory: " + Runtime.getRuntime().totalMemory());
                 result = new ConcatenatedReader(collectedReaders.toArray(Reader[]::new));
             }
             return result;
         } else if (nodeChildren[0] instanceof XMLText) {
-//            System.err.println("Special case!");
+//            logger.log(Level.TRACE, "Special case!");
             try {
                 return ((XMLText) nodeChildren[0]).getText();
             } catch (Exception e) {

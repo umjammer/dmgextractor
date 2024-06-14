@@ -88,10 +88,10 @@ public class DMGInfoPanel extends javax.swing.JPanel {
         for (ContentPair content : contents) contentsPane.add(content.getB(), content.getA());
 
         contentsList.addListSelectionListener(lse -> {
-            //System.out.println(lse);
+            //logger.log(Level.TRACE, lse);
             if (!lse.getValueIsAdjusting()) {
                 int index = contentsList.getSelectedIndex();
-//System.out.println("Switching to " + index + "...");
+//logger.log(Level.TRACE, "Switching to " + index + "...");
                 contentsCardLayout.show(contentsPane,
                         contents[index].getA());
             }

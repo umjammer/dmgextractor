@@ -73,5 +73,4 @@ abstract class BundleMember {
             }
         }
     }
-
 }

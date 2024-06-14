@@ -41,9 +41,9 @@ public class ValidateDmg {
 
     public static void main(String[] filenames) throws IOException {
         if (filenames.length == 0)
-            logger.log(Level.DEBUG, "No files to validate.");
+            System.out.print("No files to validate.");
         for (String fn : filenames) {
-            logger.log(Level.DEBUG, "Processing \"" + fn + "\"...");
+            System.out.print("Processing \"" + fn + "\"...");
             try {
                 RandomAccessFile raf = new RandomAccessFile(fn, "r");
                 UDIFFileView dfw = new UDIFFileView(new ReadableFileStream(raf, fn));
@@ -53,25 +53,25 @@ public class ValidateDmg {
                 String[] warnings = vr.getWarnings();
                 for (int i = 0; i < errors.length; ++i) {
                     if (i == 0)
-                        logger.log(Level.DEBUG, "  " + errors.length + " errors");
-                    logger.log(Level.DEBUG, "    " + errors[i]);
+                        System.out.print("  " + errors.length + " errors");
+                    System.out.print("    " + errors[i]);
                 }
                 for (int i = 0; i < warnings.length; ++i) {
                     if (i == 0)
-                        logger.log(Level.DEBUG, "  " + warnings.length + " warnings:");
-                    logger.log(Level.DEBUG, "    " + warnings[i]);
+                        System.out.print("  " + warnings.length + " warnings:");
+                    System.out.print("    " + warnings[i]);
                 }
                 dfw.getPlist(); // Creates a new Plist, which automatically parses the XML data (and validates it).
             } catch (Exception e) {
                 logger.log(Level.ERROR, e.getMessage(), e);
             }
-            logger.log(Level.DEBUG, "\n");
+            System.out.print("\n");
         }
     }
 
     public static ValidateResult validateKoly(RandomAccessFile sourceFile, Koly koly) throws IOException {
-        /* Validates the data in the koly block, as much as we can validate it
-         * given what we know about it.. */
+        // Validates the data in the koly block, as much as we can validate it
+        // given what we know about it...
 
         ValidateResult vr = new ValidateResult();
 
@@ -82,10 +82,12 @@ public class ValidateDmg {
 
         // unknown1 has always been a certain byte-sequence in examples. checkit
         // 0000 0004 0000 0200 0000 0001 0000 0000 0000 0000 0000 0000 0000 0000
-        byte[] previouslySeenString = {0x0, 0x0, 0x0, 0x4, 0x0, 0x0, 0x20, 0x0,
+        byte[] previouslySeenString = {
+                0x0, 0x0, 0x0, 0x4, 0x0, 0x0, 0x20, 0x0,
                 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0, 0x0,
                 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-                0x0, 0x0, 0x0, 0x0};
+                0x0, 0x0, 0x0, 0x0
+        };
         if (!Util.arraysEqual(previouslySeenString, koly.getUnknown1()))
             vr.addWarning("unknown1 deviates from earlier observations: 0x" + Util.byteArrayToHexString(koly.getUnknown1()));
 

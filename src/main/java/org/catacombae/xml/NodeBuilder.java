@@ -17,6 +17,7 @@
 
 package org.catacombae.xml;
 
+import java.lang.System.Logger.Level;
 import java.nio.charset.Charset;
 
 import org.catacombae.dmgextractor.io.SynchronizedRandomAccessStream;
@@ -41,9 +42,8 @@ public class NodeBuilder extends DefaultHandler {
     }
 
     @Override
-    public void startElement(String namespaceURI, String sName, String qName,
-                             Attributes attrs) throws SAXException {
-        //System.out.println("SE");
+    public void startElement(String namespaceURI, String sName, String qName, Attributes attrs) throws SAXException {
+        //logger.log(Level.TRACE, "SE");
         Attribute2[] attributes = new Attribute2[attrs.getLength()];
         for (int i = 0; i < attributes.length; ++i) {
             attributes[i] = new Attribute2(attrs.getLocalName(i), attrs.getQName(i),
@@ -52,18 +52,16 @@ public class NodeBuilder extends DefaultHandler {
         startElementInternal(namespaceURI, sName, qName, attributes);
     }
 
-    void startElementInternal(String namespaceURI, String sName, String qName,
-                              Attribute2[] attributes) throws SAXException {
-        XMLNode newNode = new XMLNode(namespaceURI, sName, qName,
-                attributes, currentNode);
+    void startElementInternal(String namespaceURI, String sName, String qName, Attribute2[] attributes)
+            throws SAXException {
+        XMLNode newNode = new XMLNode(namespaceURI, sName, qName, attributes, currentNode);
         currentNode.addChild(newNode);
         currentNode = newNode;
     }
 
     @Override
-    public void endElement(String namespaceURI, String sName,
-                           String qName) throws SAXException {
-        //System.out.println("EE");
+    public void endElement(String namespaceURI, String sName, String qName) throws SAXException {
+//        logger.log(Level.TRACE, "EE");
         currentNode = currentNode.parent;
     }
 
@@ -73,18 +71,16 @@ public class NodeBuilder extends DefaultHandler {
     }
 
     @Override
-    public void characters(char[] buf, int offset, int len)
-            throws SAXException {
-        //System.out.println("CH");
+    public void characters(char[] buf, int offset, int len) throws SAXException {
+//        logger.log(Level.TRACE, "CH");
         String s = new String(buf, offset, len).trim();
         if (!s.isEmpty())
             currentNode.addChild(new XMLText(s));
     }
 
     @Override
-    public void notationDecl(String name, String publicId,
-                             String systemId) throws SAXException {
-        //System.out.println("notationDecl(" + name + ", " + publicId + ", " + systemId + ");");
+    public void notationDecl(String name, String publicId, String systemId) throws SAXException {
+//        logger.log(Level.TRACE, "notationDecl(" + name + ", " + publicId + ", " + systemId + ");");
     }
 
     public XMLNode[] getRoots() throws RuntimeException {

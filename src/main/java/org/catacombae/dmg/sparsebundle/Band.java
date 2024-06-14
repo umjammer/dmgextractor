@@ -81,8 +81,7 @@ class Band extends BundleMember {
         }
 
         if (actualLength != readLength) {
-            Arrays.fill(dest, destOffset + actualLength,
-                    destOffset + readLength, (byte) 0);
+            Arrays.fill(dest, destOffset + actualLength, destOffset + readLength, (byte) 0);
         }
 
         return readLength;

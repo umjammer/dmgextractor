@@ -45,14 +45,12 @@ class TextModeUI extends BasicUI implements UserInterface {
                     "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b" +
                     "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b";
     private final PrintStream ps = System.out;
-    private final BufferedReader stdin =
-            new BufferedReader(new InputStreamReader(System.in));
+    private final BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
 
     public TextModeUI(boolean verbose) {
         super(verbose);
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean warning(String... messageLines) {
         if (messageLines.length > 0) {
@@ -63,7 +61,6 @@ class TextModeUI extends BasicUI implements UserInterface {
         return true;
     }
 
-    /** {@inheritDoc} */
     @Override
     public void error(String... messageLines) {
         if (messageLines.length > 0) {
@@ -73,7 +70,6 @@ class TextModeUI extends BasicUI implements UserInterface {
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void reportProgress(int progressPercentage) {
         if (progressPercentage != previousPercentage) {
@@ -82,7 +78,6 @@ class TextModeUI extends BasicUI implements UserInterface {
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void reportFinished(boolean simulation, int errorsReported, int warningsReported, long totalExtractedSize) {
         StringBuilder summary = new StringBuilder();
@@ -102,92 +97,80 @@ class TextModeUI extends BasicUI implements UserInterface {
             ps.println("Size of extracted data: " + totalExtractedSize + " bytes");
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean cancelSignaled() {
         return false;
     }
 
-    /** {@inheritDoc} */
     @Override
     public void displayMessage(String... messageLines) {
-        //ps.print(BACKSPACE79);
+//        ps.print(BACKSPACE79);
         for (String s : messageLines)
             ps.println(s);
         if (messageLines.length < 1)
             ps.println();
     }
 
-    /** {@inheritDoc} */
     @Override
     public File getInputFileFromUser() {
-        /*
-        //String s = "";
-        while(true) {
-        printCurrentLine("Please specify the path to the dmg file to extract from: ");
-        File f = new File(stdin.readLine().trim());
-        while(!f.exists()) {
-        println("File does not exist!");
-        printCurrentLine("Please specify the path to the dmg file to extract from: ");
-        f = new File(stdin.readLine().trim());
-        }
-        return f;
-        }
-         */
+////        String s = "";
+//        while (true) {
+//            printCurrentLine("Please specify the path to the dmg file to extract from: ");
+//            File f = new File(stdin.readLine().trim());
+//            while (!f.exists()) {
+//                println("File does not exist!");
+//                printCurrentLine("Please specify the path to the dmg file to extract from: ");
+//                f = new File(stdin.readLine().trim());
+//            }
+//            return f;
+//        }
 
         // Text mode operation is not interactive anymore.
         return null;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean getOutputConfirmationFromUser() {
-        /*
-        String s = "";
-        while(true) {
-        printCurrentLine("Do you want to specify an output file (y/n)? ");
-        s = stdin.readLine().trim();
-        if(s.equalsIgnoreCase("y"))
-        return true;
-        else if(s.equalsIgnoreCase("n"))
-        return false;
-        }
-         */
+//        String s = "";
+//        while (true) {
+//            printCurrentLine("Do you want to specify an output file (y/n)? ");
+//            s = stdin.readLine().trim();
+//            if (s.equalsIgnoreCase("y"))
+//                return true;
+//            else if (s.equalsIgnoreCase("n"))
+//                return false;
+//        }
 
         // Text mode operation is not interactive anymore.
         return false;
     }
 
-    /** {@inheritDoc} */
     @Override
     public File getOutputFileFromUser(File inputFile) {
-        /*
-        final String msg1 = "Please specify the path of the iso file to extract to: ";
-        final String msg2 = "The file already exists. Do you want to overwrite?";
-        while(true) {
-        printCurrentLine(msg1);
-        File f = new File(stdin.readLine().trim());
-        while(f.exists()) {
-        while(true) {
-        printCurrentLine(msg2 + " (y/n)? ");
-        String s = stdin.readLine().trim();
-        if(s.equalsIgnoreCase("y"))
-        return f;
-        else if(s.equalsIgnoreCase("n"))
-        break;
-        }
-        printCurrentLine(msg1);
-        f = new File(stdin.readLine().trim());
-        }
-        return f;
-        }
-         */
+//        final String msg1 = "Please specify the path of the iso file to extract to: ";
+//        final String msg2 = "The file already exists. Do you want to overwrite?";
+//        while (true) {
+//            printCurrentLine(msg1);
+//            File f = new File(stdin.readLine().trim());
+//            while (f.exists()) {
+//                while (true) {
+//                    printCurrentLine(msg2 + " (y/n)? ");
+//                    String s = stdin.readLine().trim();
+//                    if (s.equalsIgnoreCase("y"))
+//                        return f;
+//                    else if (s.equalsIgnoreCase("n"))
+//                        break;
+//                }
+//                printCurrentLine(msg1);
+//                f = new File(stdin.readLine().trim());
+//            }
+//            return f;
+//        }
 
         // Text mode operation is not interactive anymore.
         return null;
     }
 
-    /** {@inheritDoc} */
     @Override
     public char[] getPasswordFromUser() {
         displayMessage("The disk image you are trying to extract is encrypted.");

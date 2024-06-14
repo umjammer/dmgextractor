@@ -380,7 +380,7 @@ public class V1Header {
     public String toString() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream ps = new PrintStream(baos);
-        ps.println("    " + "V1Header:");
+        ps.println("    V1Header:");
         printFields(ps, "    ");
         return baos.toString(StandardCharsets.UTF_8);
     }

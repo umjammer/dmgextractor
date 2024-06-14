@@ -18,12 +18,18 @@
 package org.catacombae.dmg.sparsebundle;
 
 import java.io.File;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+
+import static java.lang.System.getLogger;
 
 
 /**
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class Test {
+
+    private static final Logger logger = getLogger(Test.class.getName());
 
     public static void main(String[] args) {
         SparseBundle sb = new SparseBundle(new File(args[0]));
@@ -42,24 +48,22 @@ public class Test {
             if (curBytesRead == -1)
                 break;
             else if (curBytesRead < 0)
-                throw new RuntimeException("Wtf... curBytesRead=" +
-                        curBytesRead);
+                throw new RuntimeException("Wtf... curBytesRead=" + curBytesRead);
 
             bytesRead += curBytesRead;
 
             long curTime = System.currentTimeMillis();
             if (curTime - lastTime > 1000) {
-                System.err.println("Transferred " + bytesRead + " bytes in " +
+                logger.log(Level.DEBUG, "Transferred " + bytesRead + " bytes in " +
                         (curTime - startTime) / 1000.0 + " seconds.");
                 lastTime = curTime;
             }
         }
 
-        System.err.println("Transfer complete.");
+        logger.log(Level.DEBUG, "Transfer complete.");
 
         long curTime = System.currentTimeMillis();
-        System.err.println("Transferred " + bytesRead + " bytes in " +
+        logger.log(Level.DEBUG, "Transferred " + bytesRead + " bytes in " +
                 (curTime - startTime) / 1000.0 + " seconds.");
-
     }
 }

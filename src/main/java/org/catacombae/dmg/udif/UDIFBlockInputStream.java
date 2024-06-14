@@ -22,6 +22,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
@@ -33,8 +35,12 @@ import org.catacombae.dmgextractor.io.SynchronizedRandomAccessStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.RuntimeIOException;
 
+import static java.lang.System.getLogger;
+
 
 public abstract class UDIFBlockInputStream extends InputStream {
+
+    private static final Logger logger = getLogger(UDIFBlockInputStream.class.getName());
 
     protected final ReadableRandomAccessStream raf;
     protected final UDIFBlock block;
@@ -62,22 +68,20 @@ public abstract class UDIFBlockInputStream extends InputStream {
      * @param addInOffset the number to add to the block's inOffset to find the
      *                    data.
      */
-    protected UDIFBlockInputStream(ReadableRandomAccessStream raf,
-                                   UDIFBlock block, int addInOffset) {
-
+    protected UDIFBlockInputStream(ReadableRandomAccessStream raf, UDIFBlock block, int addInOffset) {
         this.raf = raf;
         this.block = block;
         this.addInOffset = addInOffset;
-        //fillBuffer();
-        //bufferPos = buffer.length;
+//        fillBuffer();
+//        bufferPos = buffer.length;
     }
 
     /**
      * This method WILL throw a RuntimeException if <code>block</code> has a
      * type that there is no handler for.
      */
-    public static UDIFBlockInputStream getStream(ReadableRandomAccessStream raf,
-                                                 UDIFBlock block) throws IOException, RuntimeIOException {
+    public static UDIFBlockInputStream getStream(
+            ReadableRandomAccessStream raf, UDIFBlock block) throws IOException, RuntimeIOException {
 
         return switch (block.getBlockType()) {
             case UDIFBlock.BT_ZLIB -> new ZlibBlockInputStream(raf, block, 0);
@@ -85,10 +89,9 @@ public abstract class UDIFBlockInputStream extends InputStream {
             case UDIFBlock.BT_LZFSE -> new LzfseBlockInputStream(raf, block, 0);
             case UDIFBlock.BT_COPY -> new CopyBlockInputStream(raf, block, 0);
             case UDIFBlock.BT_ZERO, UDIFBlock.BT_ZERO2 -> new ZeroBlockInputStream(raf, block, 0);
-            case UDIFBlock.BT_END, UDIFBlock.BT_UNKNOWN -> throw new RuntimeException("Block type is a marker and " +
-                    "contains no data.");
-            default -> throw new RuntimeException("No handler for block type " +
-                    block.getBlockTypeAsString());
+            case UDIFBlock.BT_END, UDIFBlock.BT_UNKNOWN ->
+                    throw new RuntimeException("Block type is a marker and contains no data.");
+            default -> throw new RuntimeException("No handler for block type " + block.getBlockTypeAsString());
         };
     }
 
@@ -124,23 +127,20 @@ public abstract class UDIFBlockInputStream extends InputStream {
         return false;
     }
 
-    /** @see java.io.InputStream */
     @Override
     public int read() throws IOException {
         byte[] b = new byte[1];
         return read(b, 0, 1);
     }
 
-    /** @see java.io.InputStream */
     @Override
     public int read(byte[] b) throws IOException {
         return read(b, 0, b.length);
     }
 
-    /** @see java.io.InputStream */
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-// 	System.out.println("UDIFBlockInputStream.read(b, " + off + ", " + len + ") {");
+//        logger.log(Level.TRACE, "UDIFBlockInputStream.read(b, " + off + ", " + len + ") {");
 
         int bytesToRead = len;
 
@@ -149,27 +149,25 @@ public abstract class UDIFBlockInputStream extends InputStream {
         while (bytesRead < bytesToRead) {
             int bytesRemainingInBuffer = bufferDataLength - bufferPos;
             if (bytesRemainingInBuffer == 0) {
-// 		System.out.println("  first call to fillBuffer");
+//                logger.log(Level.TRACE, "  first call to fillBuffer");
                 fillBuffer();
-// 		System.out.println("  bufferDataLength=" + bufferDataLength + ",bufferPos=" + bufferPos);
+//                logger.log(Level.TRACE, "  bufferDataLength=" + bufferDataLength + ",bufferPos=" + bufferPos);
                 bytesRemainingInBuffer = bufferDataLength - bufferPos;
                 if (bytesRemainingInBuffer == 0) { // We apparently have no more data.
                     if (bytesRead == 0) {
-                        //System.out.println("return: -1 }");
+//                        logger.log(Level.TRACE, "return: -1 }");
                         return -1;
                     } else
                         break;
                 }
             }
-//          System.out.println("  bytesRemainingInBuffer=" +
-//                  bytesRemainingInBuffer + ",bufferPos=" + bufferPos +
-//                  ",bufferDataLength=" + bufferDataLength);
+//            logger.log(Level.TRACE, "  bytesRemainingInBuffer=" +
+//                    bytesRemainingInBuffer + ",bufferPos=" + bufferPos + ",bufferDataLength=" + bufferDataLength);
             int bytesToReadFromBuffer =
                     Math.min(bytesToRead - bytesRead, bytesRemainingInBuffer);
-// 	    System.out.println("  bytesToReadFromBuffer=" +
-//                  bytesToReadFromBuffer);
-// 	    System.out.println("  System.arraycopy(buffer, " + bufferPos +
-//                  ", b, " + outPos + ", " + bytesToReadFromBuffer + ");");
+//            logger.log(Level.TRACE, "  bytesToReadFromBuffer=" + bytesToReadFromBuffer);
+//            logger.log(Level.TRACE, "  System.arraycopy(buffer, " + bufferPos +
+//                    ", b, " + outPos + ", " + bytesToReadFromBuffer + ");");
             System.arraycopy(buffer, bufferPos, b, outPos, bytesToReadFromBuffer);
 
             outPos += bytesToReadFromBuffer;
@@ -180,7 +178,7 @@ public abstract class UDIFBlockInputStream extends InputStream {
 
         globalBytesRead += bytesRead;
 
-// 	System.out.println("return: " + bytesRead + " }");
+//        logger.log(Level.TRACE, "return: " + bytesRead + " }");
         return bytesRead;
     }
 
@@ -199,8 +197,7 @@ public abstract class UDIFBlockInputStream extends InputStream {
         while (bytesSkipped < n) {
             int curSkip = (int) Math.min(n - bytesSkipped, skipBuffer.length);
             if (curSkip < 0) {
-                throw new RuntimeException("Internal error: curSkip is " +
-                        "negative (" + curSkip + ").");
+                throw new RuntimeException("Internal error: curSkip is negative (" + curSkip + ").");
             }
 
             int res = read(skipBuffer, 0, curSkip);
@@ -220,8 +217,8 @@ public abstract class UDIFBlockInputStream extends InputStream {
         private final byte[] inBuffer;
         private long inPos;
 
-        public ZlibBlockInputStream(ReadableRandomAccessStream raf,
-                                    UDIFBlock block, int addInOffset) throws IOException {
+        public ZlibBlockInputStream(ReadableRandomAccessStream raf, UDIFBlock block, int addInOffset)
+                throws IOException {
             super(raf, block, addInOffset);
             inflater = new Inflater();
             inBuffer = new byte[4096];
@@ -230,31 +227,30 @@ public abstract class UDIFBlockInputStream extends InputStream {
         }
 
         private void feedInflater() throws IOException {
-            //System.err.println("ZlibBlockInputStream.feedInflater() {");
+//            logger.log(Level.TRACE, "ZlibBlockInputStream.feedInflater() {");
             long seekPos = addInOffset + inPos + block.getTrueInOffset();
-            //System.out.println("  seeking to " + seekPos + " (file length: " +
-            //        raf.length() + ")");
+//            logger.log(Level.TRACE, "  seeking to " + seekPos + " (file length: " + raf.length() + ")");
             raf.seek(seekPos);
             long bytesLeftToRead = block.getInSize() - inPos;
             int bytesToFeed = (int) Math.min(inBuffer.length, bytesLeftToRead);
-            //System.out.println("  bytesToFeed=" + bytesToFeed);
+//            logger.log(Level.TRACE, "  bytesToFeed=" + bytesToFeed);
 
             int curBytesRead = raf.read(inBuffer, 0, bytesToFeed);
             inPos += curBytesRead;
             inflater.setInput(inBuffer, 0, curBytesRead);
-            //System.out.println("  curBytesRead=" + curBytesRead);
-            //System.out.println("}");
+//            logger.log(Level.TRACE, "  curBytesRead=" + curBytesRead);
+//            logger.log(Level.TRACE, "}");
         }
 
         @Override
         protected void fillBuffer() throws RuntimeIOException, IOException {
-            //System.err.println("ZlibBlockInputStream.fillBuffer() {");
-            //if(inflater == null)
-            //    System.err.println("INFLATER IS NULL");
-            //if(inBuffer == null)
-            //    System.err.println("INBUFFER IS NULL");
+//            logger.log(Level.TRACE, "ZlibBlockInputStream.fillBuffer() {");
+//            if (inflater == null)
+//                logger.log(Level.TRACE, "INFLATER IS NULL");
+//            if (inBuffer == null)
+//                logger.log(Level.TRACE, "INBUFFER IS NULL");
             if (inflater.finished()) {
-                //System.out.println("inflater claims to be finished...");
+//                logger.log(Level.TRACE, "inflater claims to be finished...");
                 bufferPos = 0;
                 bufferDataLength = 0;
             }
@@ -268,8 +264,7 @@ public abstract class UDIFBlockInputStream extends InputStream {
                     if (res >= 0)
                         bytesInflated += res;
                     else
-                        throw new DmgException("Negative return value when " +
-                                "inflating");
+                        throw new DmgException("Negative return value when inflating");
                 }
 
                 // The fillBuffer method is responsible for updating bufferPos
@@ -281,7 +276,7 @@ public abstract class UDIFBlockInputStream extends InputStream {
                 re.initCause(e);
                 throw re;
             }
-            //System.out.println("}");
+//            logger.log(Level.TRACE, "}");
         }
     }
 
@@ -289,8 +284,8 @@ public abstract class UDIFBlockInputStream extends InputStream {
 
         private long inPos = 0;
 
-        public CopyBlockInputStream(ReadableRandomAccessStream raf,
-                                    UDIFBlock block, int addInOffset) throws RuntimeIOException {
+        public CopyBlockInputStream(ReadableRandomAccessStream raf, UDIFBlock block, int addInOffset)
+                throws RuntimeIOException {
             super(raf, block, addInOffset);
         }
 
@@ -298,12 +293,10 @@ public abstract class UDIFBlockInputStream extends InputStream {
         protected void fillBuffer() throws IOException {
             raf.seek(addInOffset + inPos + block.getTrueInOffset());
 
-            int bytesToRead = (int) Math.min(block.getInSize() - inPos,
-                    buffer.length);
+            int bytesToRead = (int) Math.min(block.getInSize() - inPos, buffer.length);
             int totalBytesRead = 0;
             while (totalBytesRead < bytesToRead) {
-                int bytesRead = raf.read(buffer, totalBytesRead,
-                        bytesToRead - totalBytesRead);
+                int bytesRead = raf.read(buffer, totalBytesRead, bytesToRead - totalBytesRead);
                 if (bytesRead < 0)
                     break;
                 else {
@@ -312,8 +305,7 @@ public abstract class UDIFBlockInputStream extends InputStream {
                 }
             }
 
-            // The fillBuffer method is responsible for updating bufferPos and
-            // bufferDataLength
+            // The fillBuffer method is responsible for updating bufferPos and bufferDataLength
             bufferPos = 0;
             bufferDataLength = totalBytesRead;
         }
@@ -321,16 +313,14 @@ public abstract class UDIFBlockInputStream extends InputStream {
         /** Extremely more efficient skip method! */
         @Override
         public long skip(long n) throws IOException {
-            long bytesToSkip =
-                    Math.min(block.getInSize() - inPos, n);
+            long bytesToSkip = Math.min(block.getInSize() - inPos, n);
             if (bytesToSkip < 0) {
-                throw new RuntimeException("Internal error: bytesToSkip is " +
-                        "negative (" + bytesToSkip + ").");
+                throw new RuntimeException("Internal error: bytesToSkip is negative (" + bytesToSkip + ").");
             }
 
             inPos += bytesToSkip;
 
-            // make read() refill buffer at next call..
+            // make read() refill buffer at next call...
             bufferPos = 0;
             bufferDataLength = 0;
 
@@ -342,20 +332,18 @@ public abstract class UDIFBlockInputStream extends InputStream {
 
         private long outPos = 0;
 
-        public ZeroBlockInputStream(ReadableRandomAccessStream raf,
-                                    UDIFBlock block, int addInOffset) throws RuntimeIOException {
+        public ZeroBlockInputStream(ReadableRandomAccessStream raf, UDIFBlock block, int addInOffset)
+                throws RuntimeIOException {
             super(raf, block, addInOffset);
         }
 
         @Override
         protected void fillBuffer() throws IOException {
-            int bytesToWrite =
-                    (int) Math.min(block.getOutSize() - outPos, buffer.length);
+            int bytesToWrite = (int) Math.min(block.getOutSize() - outPos, buffer.length);
             Util.zero(buffer, 0, bytesToWrite);
             outPos += bytesToWrite;
 
-            // The fillBuffer method is responsible for updating bufferPos and
-            // bufferDataLength
+            // The fillBuffer method is responsible for updating bufferPos and bufferDataLength
             bufferPos = 0;
             bufferDataLength = bytesToWrite;
         }
@@ -363,16 +351,14 @@ public abstract class UDIFBlockInputStream extends InputStream {
         /** Extremely more efficient skip method! */
         @Override
         public long skip(long n) throws IOException {
-            long bytesToSkip =
-                    Math.min(block.getOutSize() - outPos, n);
+            long bytesToSkip = Math.min(block.getOutSize() - outPos, n);
             if (bytesToSkip < 0) {
-                throw new RuntimeException("Internal error: bytesToSkip is " +
-                        "negative (" + bytesToSkip + ").");
+                throw new RuntimeException("Internal error: bytesToSkip is negative (" + bytesToSkip + ").");
             }
 
             outPos += bytesToSkip;
 
-            // make read() refill buffer at next call..
+            // make read() refill buffer at next call...
             bufferPos = 0;
             bufferDataLength = 0;
 
@@ -387,8 +373,7 @@ public abstract class UDIFBlockInputStream extends InputStream {
         private final CBZip2InputStream decompressingStream;
         private long outPos = 0;
 
-        public Bzip2BlockInputStream(ReadableRandomAccessStream raf,
-                                     UDIFBlock block, int addInOffset)
+        public Bzip2BlockInputStream(ReadableRandomAccessStream raf, UDIFBlock block, int addInOffset)
                 throws IOException, RuntimeIOException {
 
             super(raf, block, addInOffset);
@@ -400,19 +385,17 @@ public abstract class UDIFBlockInputStream extends InputStream {
                 int i = 1;
                 while (outFile.exists())
                     outFile = new File(basename + "_" + i++ + "_bz2.bin");
-                System.err.println("Creating a new Bzip2BlockInputStream. " +
+                logger.log(Level.DEBUG, "Creating a new Bzip2BlockInputStream. " +
                         "Dumping bzip2 block data to file \"" + outFile + "\"");
                 FileOutputStream outStream = new FileOutputStream(outFile);
                 raf.seek(block.getTrueInOffset());
                 long bytesWritten = 0;
                 long bytesToWrite = block.getInSize();
                 while (bytesWritten < bytesToWrite) {
-                    int curBytesRead = raf.read(inBuffer, 0,
-                            (int) Math.min(bytesToWrite - bytesWritten,
-                                    inBuffer.length));
+                    int curBytesRead =
+                            raf.read(inBuffer, 0, (int) Math.min(bytesToWrite - bytesWritten, inBuffer.length));
                     if (curBytesRead <= 0)
-                        throw new RuntimeException("Unable to read bzip2 " +
-                                "block fully.");
+                        throw new RuntimeException("Unable to read bzip2 block fully.");
                     outStream.write(inBuffer, 0, curBytesRead);
                     bytesWritten += curBytesRead;
                 }
@@ -420,8 +403,7 @@ public abstract class UDIFBlockInputStream extends InputStream {
             }
 
             bzip2DataStream = new RandomAccessInputStream(
-                    new SynchronizedRandomAccessStream(raf),
-                    block.getTrueInOffset(), block.getInSize());
+                    new SynchronizedRandomAccessStream(raf), block.getTrueInOffset(), block.getInSize());
 
             byte[] signature = new byte[2];
             if (bzip2DataStream.read(signature) != signature.length)
@@ -429,21 +411,17 @@ public abstract class UDIFBlockInputStream extends InputStream {
             if (!Util.arraysEqual(signature, BZIP2_SIGNATURE))
                 throw new RuntimeException("Invalid bzip2 block!");
 
-            /* Buffering needed because of implementation issues in
-             * CBZip2InputStream. */
-            decompressingStream = new CBZip2InputStream(
-                    new BufferedInputStream(bzip2DataStream));
+            // Buffering needed because of implementation issues in CBZip2InputStream.
+            decompressingStream = new CBZip2InputStream(new BufferedInputStream(bzip2DataStream));
         }
 
         @Override
         protected void fillBuffer() throws IOException {
 
-            int bytesToRead = (int) Math.min(block.getOutSize() - outPos,
-                    buffer.length);
+            int bytesToRead = (int) Math.min(block.getOutSize() - outPos, buffer.length);
             int totalBytesRead = 0;
             while (totalBytesRead < bytesToRead) {
-                int bytesRead = decompressingStream.read(buffer, totalBytesRead,
-                        bytesToRead - totalBytesRead);
+                int bytesRead = decompressingStream.read(buffer, totalBytesRead, bytesToRead - totalBytesRead);
                 if (bytesRead < 0)
                     break;
                 else {
@@ -452,8 +430,7 @@ public abstract class UDIFBlockInputStream extends InputStream {
                 }
             }
 
-            // The fillBuffer method is responsible for updating bufferPos and
-            // bufferDataLength
+            // The fillBuffer method is responsible for updating bufferPos and bufferDataLength
             bufferPos = 0;
             bufferDataLength = totalBytesRead;
         }

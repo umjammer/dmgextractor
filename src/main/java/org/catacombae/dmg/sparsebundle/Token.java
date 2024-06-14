@@ -38,8 +38,7 @@ class Token extends BundleMember {
             IOException cause = ex.getIOCause();
 
             if (cause != null) {
-                throw new RuntimeIOException("Exception while getting size " +
-                        "of 'token' file.", cause);
+                throw new RuntimeIOException("Exception while getting size of 'token' file.", cause);
             }
 
             throw ex;
@@ -50,8 +49,7 @@ class Token extends BundleMember {
         return this.size;
     }
 
-    public final int read(long pos, byte[] data, int offset,
-                          int length) throws RuntimeIOException {
+    public final int read(long pos, byte[] data, int offset, int length) throws RuntimeIOException {
         this.stream.seek(pos);
 
         return this.stream.read(data, offset, length);

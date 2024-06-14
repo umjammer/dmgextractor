@@ -56,7 +56,6 @@ public class DMGInfoWindow extends JFrame {
 
         pack();
         setLocationRelativeTo(null);
-
     }
 
     private void loadFile(File f) throws IOException {

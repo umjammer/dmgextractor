@@ -153,11 +153,11 @@ public class DMGMetadata {
     public static class BlockDescriptor {
         // Known block types
 
-        public static final int BT_COPY = 0x00000001;
-        public static final int BT_ZERO = 0x00000002;
-        public static final int BT_ZLIB = 0x80000005;
-        public static final int BT_END = 0xffffffff;
-        public static final int BT_UNKNOWN1 = 0x7ffffffe;
+        public static final int BT_COPY = 0x0000_0001;
+        public static final int BT_ZERO = 0x0000_0002;
+        public static final int BT_ZLIB = 0x8000_0005;
+        public static final int BT_END = 0xffff_ffff;
+        public static final int BT_UNKNOWN1 = 0x7fff_fffe;
         private static final int[] KNOWN_BLOCK_TYPES = {BT_COPY,
                 BT_ZERO,
                 BT_ZLIB,

@@ -76,17 +76,17 @@ public class Plist extends XmlPlist {
             String partitionName = pn.getKeyValue("Name") != null ? Util.readFully(pn.getKeyValue("Name")) : "";
             String partitionID = Util.readFully(pn.getKeyValue("ID"));
             String partitionAttributes = Util.readFully(pn.getKeyValue("Attributes"));
-//            System.err.println("Retrieving data...");
+//            logger.log(Level.TRACE, "Retrieving data...");
 //            (new BufferedReader(new InputStreamReader(System.in))).readLine();
             Reader base64Data = pn.getKeyValue("Data");
 //            System.gc();
-//            System.err.println("Converting data to binary form... free memory: " + Runtime.getRuntime().freeMemory() + " total memory: " + Runtime.getRuntime().totalMemory());
+//            logger.log(Level.TRACE, "Converting data to binary form... free memory: " + Runtime.getRuntime().freeMemory() + " total memory: " + Runtime.getRuntime().totalMemory());
 //            byte[] data = Base64.decode(base64Data);
 
 //             try {
 //                 InputStream yo = new Base64.InputStream(new ReaderInputStream(base64Data, Charset.forName("US-ASCII")));
 //                 String filename1 = "dump_plist_java-" + System.currentTimeMillis() + ".datadpp";
-//                 System.err.println("Dumping output from ReaderInputStream to file \"" + filename1 + "\"");
+//                 logger.log(Level.TRACE, "Dumping output from ReaderInputStream to file \"" + filename1 + "\"");
 //                 FileOutputStream fos = new FileOutputStream(filename1);
 //                 if(false) { // Standard way
 //                     byte[] buffer = new byte[4096];
@@ -117,8 +117,8 @@ public class Plist extends XmlPlist {
 
             InputStream base64DataInputStream = new Base64.InputStream(new ReaderInputStream(base64Data, StandardCharsets.US_ASCII));
 
-//            System.err.println("Creating PlistPartition.");
-//            System.out.println("Block list for partition " + i++ + ":");
+//            logger.log(Level.TRACE, "Creating PlistPartition.");
+//            logger.log(Level.TRACE, "Block list for partition " + i++ + ":");
             PlistPartition dpp = new PlistPartition(partitionName, partitionID, partitionAttributes,
                     base64DataInputStream, previousOutOffset, previousInOffset);
             previousOutOffset = dpp.getFinalOutOffset();

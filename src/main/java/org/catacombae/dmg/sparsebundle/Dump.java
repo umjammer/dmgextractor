@@ -26,8 +26,7 @@ import java.io.File;
 public class Dump {
 
     public static void main(String[] args) {
-        ReadableSparseBundleStream stream =
-                new ReadableSparseBundleStream(new File(args[0]));
+        ReadableSparseBundleStream stream = new ReadableSparseBundleStream(new File(args[0]));
         byte[] buf = new byte[512 * 1024];
         long bytesRead = 0;
 
@@ -36,8 +35,7 @@ public class Dump {
             if (curBytesRead == -1)
                 break;
             else if (curBytesRead < 0)
-                throw new RuntimeException("Wtf... curBytesRead=" +
-                        curBytesRead);
+                throw new RuntimeException("Wtf... curBytesRead=" + curBytesRead);
 
             bytesRead += curBytesRead;
 

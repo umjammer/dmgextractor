@@ -129,12 +129,10 @@ public class ReadableCEncryptedEncodingStream extends BasicReadableRandomAccessS
         }
 
         this.streamLength = header.getEncryptedDataLength();
-        /*
-        if(this.length % header.getBlockSize() != 0) {
-            System.err.println("WARNING: Block data area length (" + this.length +
-                    ") is not aligned to block size (" + header.getBlockSize() + ")!");
-        }
-         * */
+//        if (this.length % header.getBlockSize() != 0) {
+//            logger.log(Level.TRACE, "WARNING: Block data area length (" + this.length +
+//                    ") is not aligned to block size (" + header.getBlockSize() + ")!");
+//        }
 
         RuntimeException firstException = null;
         SecretKeySpec curAesKey = null;
@@ -148,34 +146,27 @@ public class ReadableCEncryptedEncodingStream extends BasicReadableRandomAccessS
                 // Note: Why doesn't"PBEWithHmacSHA1AndDESede" work?
 
                 // Derive the proper key from our password.
-                PBEKeySpec ks = new PBEKeySpec(password, key.getKdfSalt(),
-                        key.getKdfIterationCount(), 192);
-                SecretKeyFactory fact =
-                        SecretKeyFactory.getInstance(pbeAlgorithmName);
+                PBEKeySpec ks = new PBEKeySpec(password, key.getKdfSalt(), key.getKdfIterationCount(), 192);
+                SecretKeyFactory fact = SecretKeyFactory.getInstance(pbeAlgorithmName);
                 Key k = fact.generateSecret(ks);
 
                 byte[] keyData = k.getEncoded();
-                logger.log(Level.DEBUG, "Derived key: 0x" +
-                        Util.byteArrayToHexString(keyData));
+                logger.log(Level.DEBUG, "Derived key: 0x" + Util.byteArrayToHexString(keyData));
 
                 // Set up the cipher
                 final String cipherAlgorithmName = "DESede/CBC/PKCS5Padding";
-                Cipher keyDecryptionCipher =
-                        Cipher.getInstance(cipherAlgorithmName);
+                Cipher keyDecryptionCipher = Cipher.getInstance(cipherAlgorithmName);
                 SecretKeyFactory fact2 = SecretKeyFactory.getInstance("DESede");
                 Key k2 = fact2.generateSecret(new DESedeKeySpec(keyData));
 
                 // Call the version specific unwrap function.
                 KeySet keys = key.unwrapKeys(k2, keyDecryptionCipher);
 
-                logger.log(Level.DEBUG, "AES key: 0x" +
-                        Util.byteArrayToHexString(keys.getAesKey()));
-                logger.log(Level.DEBUG, "HmacSHA1 key: 0x" +
-                        Util.byteArrayToHexString(keys.getHmacSha1Key()));
+                logger.log(Level.DEBUG, "AES key: 0x" + Util.byteArrayToHexString(keys.getAesKey()));
+                logger.log(Level.DEBUG, "HmacSHA1 key: 0x" + Util.byteArrayToHexString(keys.getHmacSha1Key()));
 
                 curAesKey = new SecretKeySpec(keys.getAesKey(), "AES");
-                curHmacSha1Key =
-                        new SecretKeySpec(keys.getHmacSha1Key(), "HmacSHA1");
+                curHmacSha1Key = new SecretKeySpec(keys.getHmacSha1Key(), "HmacSHA1");
 
                 keys.clearData(); // No unused keys in memory please.
 
@@ -186,8 +177,7 @@ public class ReadableCEncryptedEncodingStream extends BasicReadableRandomAccessS
                 break;
             } catch (Exception e) {
                 if (firstException == null) {
-                    firstException = new RuntimeException("Exception while " +
-                            "trying to decrypt keys.", e);
+                    firstException = new IllegalStateException("Exception while trying to decrypt keys.", e);
                 }
             }
         }
@@ -226,8 +216,8 @@ public class ReadableCEncryptedEncodingStream extends BasicReadableRandomAccessS
         if (pos < 0)
             throw new IllegalArgumentException("Negative seek request: pos (" + pos + ") < 0");
         else if (streamLength != 0 && pos > streamLength) {
-            // throw new IllegalArgumentException("Trying to seek beyond EOF: pos (" + pos +
-            //        ") > length (" + length + ")");
+//            throw new IllegalArgumentException("Trying to seek beyond EOF: pos (" + pos +
+//                    ") > length (" + length + ")");
 
             // Let's just seek to the end of file instead of throwing stuff around us.
             this.blockNumber = streamLength / header.getBlockSize();
@@ -236,12 +226,10 @@ public class ReadableCEncryptedEncodingStream extends BasicReadableRandomAccessS
             long nextBlockNumber = pos / header.getBlockSize();
             int nextPosInBlock = (int) (pos % header.getBlockSize());
 
-            /*
-            if(header.getBlockDataStart() + (nextBlockNumber+1)*header.getBlockSize() > backingStream.length()) {
-            nextBlockNumber = (backingStream.length()-header.getBlockDataStart())/header.getBlockSize();
-            nextPosInBlock = 0;
-            }
-             * */
+//            if (header.getBlockDataStart() + (nextBlockNumber + 1) * header.getBlockSize() > backingStream.length()) {
+//                nextBlockNumber = (backingStream.length() - header.getBlockDataStart()) / header.getBlockSize();
+//                nextPosInBlock = 0;
+//            }
 
             this.blockNumber = nextBlockNumber;
             this.posInBlock = nextPosInBlock;
@@ -268,8 +256,7 @@ public class ReadableCEncryptedEncodingStream extends BasicReadableRandomAccessS
         else if (off < 0)
             throw new IndexOutOfBoundsException("off (" + off + ") < 0");
         else if (off + len > b.length)
-            throw new IndexOutOfBoundsException("off+len (" + (off + len) +
-                    ") > b.length (" + b.length + ")");
+            throw new IndexOutOfBoundsException("off+len (" + (off + len) + ") > b.length (" + b.length + ")");
         // </Input check>
 
         backingStream.seek(header.getBlockDataStart() + blockNumber * header.getBlockSize());
@@ -305,7 +292,7 @@ public class ReadableCEncryptedEncodingStream extends BasicReadableRandomAccessS
 
                 if (bytesRead != encBlockData.length) {
                     if (bytesRead > 0)
-                        System.err.println("WARNING: Could not read entire block! " +
+                        logger.log(Level.DEBUG, "WARNING: Could not read entire block! " +
                                 "blockNumber=" + blockNumber + ", bytesRead=" + bytesRead);
                     break;
                 }
@@ -333,8 +320,7 @@ public class ReadableCEncryptedEncodingStream extends BasicReadableRandomAccessS
                             break;
                         default:
                             throw new RuntimeIOException("Unexpected: Got " +
-                                    holeList.size() + " holes in " +
-                                    encBlockData.length + " byte read.");
+                                    holeList.size() + " holes in " + encBlockData.length + " byte read.");
                     }
                 } else {
                     isHole = false;
@@ -350,10 +336,8 @@ public class ReadableCEncryptedEncodingStream extends BasicReadableRandomAccessS
                         virtualBlockNumber = blockNumber;
                     }
 
-                    int bytesDecrypted =
-                            decrypt(encBlockData, decBlockData,
-                                    virtualBlockNumber);
-                    Assert.eq(bytesDecrypted, decBlockData.length);
+                    int bytesDecrypted = decrypt(encBlockData, decBlockData, virtualBlockNumber);
+                    assert bytesDecrypted ==  decBlockData.length;
                 }
 
                 int blockSize;
@@ -405,44 +389,38 @@ public class ReadableCEncryptedEncodingStream extends BasicReadableRandomAccessS
         hmacSha1.update(Util.toByteArrayBE(blockNumberInt));
         byte[] iv = new byte[16];
 
-        /* The 160-bit MAC value is truncated to 16 bytes (128 bits) to be
-         * used as the cipher's IV. */
+        // The 160-bit MAC value is truncated to 16 bytes (128 bits) to be
+        // used as the cipher's IV.
         System.arraycopy(hmacSha1.doFinal(), 0, iv, 0, iv.length);
-        //logger.log(Level.DEBUG, "  iv: 0x" + Util.byteArrayToHexString(iv));
+//        logger.log(Level.TRACE, "  iv: 0x" + Util.byteArrayToHexString(iv));
 
         try {
             aesCipher.init(Cipher.DECRYPT_MODE, aesKey, new IvParameterSpec(iv));
-            int bytesDecrypted =
-                    aesCipher.doFinal(encBlockData, 0, encBlockData.length, decBlockData, 0);
+            int bytesDecrypted = aesCipher.doFinal(encBlockData, 0, encBlockData.length, decBlockData, 0);
 
             return bytesDecrypted;
         } catch (Exception e) {
-            throw new RuntimeException("Unexpected exception when trying to " +
-                    "decrypt block " + blockNumber + ".", e);
+            throw new RuntimeException("Unexpected exception when trying to decrypt block " + blockNumber + ".", e);
         } finally {
             Util.zero(iv);
         }
     }
 
     private static void printHelp() {
-        System.err.println("usage: " + ReadableCEncryptedEncodingStream.class.getName() +
+        logger.log(Level.DEBUG, "usage: " + ReadableCEncryptedEncodingStream.class.getName() +
                 " -i in-file -p password -o out-file");
         System.exit(-1);
     }
 
     public static void main(String[] args) throws IOException {
-        /*
-        boolean debugMode = true;
-        if(debugMode && args.length == 0) {
-            String imageprefix = "v2";
-            File inFile = new File("/Users/erik/devel/reference/vilefault/vfdecrypt/" +
-                    imageprefix + "image.dmg");
-            File outFile = new File("/Users/erik/devel/reference/vilefault/vfdecrypt/" +
-                    imageprefix + "image_javadec.dmg");
-            char[] password = SecretPassword.PASSWORD;
-            runTest(inFile, outFile, password);
-        }
-         * */
+//        boolean debugMode = true;
+//        if (debugMode && args.length == 0) {
+//            String imageprefix = "v2";
+//            File inFile = new File("/Users/erik/devel/reference/vilefault/vfdecrypt/" + imageprefix + "image.dmg");
+//            File outFile = new File("/Users/erik/devel/reference/vilefault/vfdecrypt/" + imageprefix + "image_javadec.dmg");
+//            char[] password = SecretPassword.PASSWORD;
+//            runTest(inFile, outFile, password);
+//        }
 
         String inputFilename = null;
         String outputFilename = null;
@@ -475,8 +453,7 @@ public class ReadableCEncryptedEncodingStream extends BasicReadableRandomAccessS
     private static void runTest(String inputFilename, String outputFilename, String password) throws IOException {
         ReadableRandomAccessStream backingStream = new ReadableFileStream(inputFilename);
 
-        ReadableRandomAccessStream rras =
-                new ReadableCEncryptedEncodingStream(backingStream, password.toCharArray());
+        ReadableRandomAccessStream rras = new ReadableCEncryptedEncodingStream(backingStream, password.toCharArray());
 
         System.out.println("Length of encrypted data: " + rras.length() + " bytes");
 
@@ -527,7 +504,7 @@ public class ReadableCEncryptedEncodingStream extends BasicReadableRandomAccessS
             System.out.println("Finished. bytesRead=" + bytesRead + " totBytesRead=" + totBytesRead);
         }
 
-        //System.exit(0);
+//        System.exit(0);
 
         FileOutputStream out = new FileOutputStream(outputFilename);
         System.out.println("Extracting encrypted data to file: " + outputFilename);

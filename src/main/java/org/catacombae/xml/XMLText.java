@@ -23,7 +23,9 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.lang.System.Logger.Level;
 import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
 import java.util.Scanner;
 
 import org.catacombae.dmgextractor.io.ByteCountInputStream;
@@ -48,14 +50,13 @@ public class XMLText extends XMLElement {
         this.xmlFile = null;
     }
 
-    public XMLText(SynchronizedRandomAccessStream xmlFile, Charset encoding,
-                   long beginOffset, long endOffset) {
+    public XMLText(SynchronizedRandomAccessStream xmlFile, Charset encoding, long beginOffset, long endOffset) {
         this.text = null;
         this.xmlFile = xmlFile;
         this.encoding = encoding;
         this.beginOffset = beginOffset;
         this.endOffset = endOffset;
-        //SynchronizedRandomAccessStream sras = new SynchronizedRandomAccessStream(new RandomAccessFileStream(raf));
+//        SynchronizedRandomAccessStream sras = new SynchronizedRandomAccessStream(new RandomAccessFileStream(raf));
     }
 
     /**
@@ -88,12 +89,12 @@ public class XMLText extends XMLElement {
     private void calculateOffsets() throws IOException {
         ByteCountInputStream bcis = new ByteCountInputStream(new BufferedInputStream(new RandomAccessInputStream(xmlFile)));
         Reader lnr = new CharByCharReader(bcis, encoding);
-        //Vi har xmlFile
-        //CharsetDecoder decoder = Charset.newDecoder();
+        // we have xmlFile
+//        CharsetDecoder decoder = Charset.newDecoder();
 
         boolean previousCR = false;
         long lineNumber = 1, colNumber = -1;
-        //int beginOffset = -1, endOffset = -1;
+//        int beginOffset = -1, endOffset = -1;
 
         int currentChar = 0;
         while (currentChar >= 0) {
@@ -119,7 +120,7 @@ public class XMLText extends XMLElement {
                 previousCR = false;
             }
 
-// 	    System.err.println("Trying to read... lineNumber=" + lineNumber + " colNumber=" + colNumber);
+//            logger.log(Level.TRACE, "Trying to read... lineNumber=" + lineNumber + " colNumber=" + colNumber);
 
             if (!lfskip) {
                 if (lineNumber == beginLine && colNumber == beginColumn)
@@ -134,8 +135,8 @@ public class XMLText extends XMLElement {
 
         if (beginOffset == -1 || endOffset == -1)
             throw new RuntimeException("Could not find the requested interval! (begin: (" + beginLine + "," + beginColumn + ") end: (" + endLine + "," + endColumn + "))");
-// 	else
-// 	    System.out.println("Terminating with beginOffset=" + beginOffset + " endOffset=" + endOffset);
+//        else
+//            logger.log(Level.TRACE, "Terminating with beginOffset=" + beginOffset + " endOffset=" + endOffset);
     }
 
     @Override
@@ -157,7 +158,8 @@ public class XMLText extends XMLElement {
             return null;
         }
     }
-//     public static void main(String[] args) {
-// 	System.out.println(args[0] + " " + args[1]);
-//     }
+
+//    public static void main(String[] args) {
+//        logger.log(Level.TRACE, args[0] + " " + args[1]);
+//    }
 }

@@ -133,8 +133,7 @@ public class DMGExtractor {
                         System.exit(0);
                     }
                 } else if (!ses.graphical)
-                    printUsageInstructions(ui, ses.startupCommand,
-                            "Error: No input file specified.");
+                    printUsageInstructions(ui, ses.startupCommand, "Error: No input file specified.");
             } else
                 printUsageInstructions(ui, ses.startupCommand, ses.parseArgsErrorMessage);
 
@@ -177,8 +176,7 @@ public class DMGExtractor {
         }
 
         if (dmgRaf == null) {
-            dmgRaf = new ReadableFileStream(new RandomAccessFile(ses.dmgFile,
-                    "r"), ses.dmgFile.getPath());
+            dmgRaf = new ReadableFileStream(new RandomAccessFile(ses.dmgFile, "r"), ses.dmgFile.getPath());
         }
 
         boolean encrypted;
@@ -193,8 +191,7 @@ public class DMGExtractor {
                     return true;
                 }
                 try {
-                    ReadableCEncryptedEncodingStream encryptionFilter =
-                            new ReadableCEncryptedEncodingStream(dmgRaf, password);
+                    var encryptionFilter = new ReadableCEncryptedEncodingStream(dmgRaf, password);
                     dmgRaf = encryptionFilter;
                     break;
                 } catch (Exception e) {
@@ -206,8 +203,7 @@ public class DMGExtractor {
 
         boolean sparseImage = false;
         if (!sparseBundle && SparseImageRecognizer.isSparseImage(dmgRaf)) {
-            ReadableSparseImageStream sparseImageStream =
-                    new ReadableSparseImageStream(dmgRaf);
+            ReadableSparseImageStream sparseImageStream = new ReadableSparseImageStream(dmgRaf);
             dmgRaf = sparseImageStream;
             sparseImage = true;
         }
@@ -227,8 +223,7 @@ public class DMGExtractor {
             if (!sparseBundle && !encrypted && !sparseImage &&
                     !ui.warning("The image you selected does not seem to be " +
                                     "UDIF encoded, sparse or encrypted.",
-                            "Its contents will be copied unchanged to the " +
-                                    "destination.")) {
+                            "Its contents will be copied unchanged to the destination.")) {
                 result = false;
             } else {
                 copyData(dmgRaf, isoRaf, ui);
@@ -248,9 +243,8 @@ public class DMGExtractor {
         return result;
     }
 
-    private static void extractUDIF(ReadableRandomAccessStream dmgRaf,
-                                    TruncatableRandomAccessStream isoRaf, UserInterface ui, Session ses)
-            throws Exception {
+    private static void extractUDIF(ReadableRandomAccessStream dmgRaf, TruncatableRandomAccessStream isoRaf,
+                                    UserInterface ui, Session ses) throws Exception {
         boolean testOnly = ses.isoFile == null;
 
         Koly koly;
@@ -273,12 +267,12 @@ public class DMGExtractor {
         if (koly.getPlistBegin1() != koly.getPlistBegin2()) {
             ui.displayMessage("WARNING: Addresses not equal! Assumption false.",
                     koly.getPlistBegin1() + " != " + koly.getPlistBegin2());
-            //System.exit(0);
+//            System.exit(0);
         }
-        // if(false && plistSize != (plistEnd-plistBegin1)) { // This assumption is proven false. plistEnd means something else
-        //     println("NOTE: plistSize field does not match plistEnd marker. Assumption false.",
-        // 	    "plistSize=" + plistSize + " plistBegin1=" + plistBegin1 + " plistEnd=" + plistEnd + " plistEnd-plistBegin1=" + (plistEnd-plistBegin1));
-        // }
+//        if (false && plistSize != (plistEnd - plistBegin1)) { // This assumption is proven false. plistEnd means something else
+//            logger.log(Level.TRACE, "NOTE: plistSize field does not match plistEnd marker. Assumption false.",
+//                    "plistSize=" + plistSize + " plistBegin1=" + plistBegin1 + " plistEnd=" + plistEnd + " plistEnd-plistBegin1=" + (plistEnd - plistBegin1));
+//        }
         ui.displayMessageVerbose("Jumping to address...");
         dmgRaf.seek(koly.getPlistBegin1());
         long plistSize = koly.getPlistSize();
@@ -529,9 +523,9 @@ public class DMGExtractor {
                     if (size < 0) {
                         ui.error("ERROR: Negative array size (" + size + ")...",
                                 "  current:",
-                                "    " + b.toString(),
+                                "    " + b,
                                 "  previous:",
-                                "    " + previous.toString());
+                                "    " + previous);
                     }
 
                     byte[] data = new byte[size];
@@ -546,8 +540,8 @@ public class DMGExtractor {
         }
     }
 
-    private static void copyData(ReadableRandomAccessStream inStream,
-                                 TruncatableRandomAccessStream outStream, UserInterface ui) {
+    private static void copyData(
+            ReadableRandomAccessStream inStream, TruncatableRandomAccessStream outStream, UserInterface ui) {
         byte[] buffer = new byte[64 * 1024];
 
         ui.setTotalProgressLength(inStream.length());
@@ -566,21 +560,18 @@ public class DMGExtractor {
         ui.reportFinished(outStream == null, 0, 0, totalBytesCopied);
     }
 
-
     /**
      * @param message
      * @param ui
      * @param testOnly
      * @return true if the extraction should proceed, false if it should not.
      */
-    private static boolean extractionError(UserInterface ui, boolean testOnly,
-                                           String... message) {
+    private static boolean extractionError(UserInterface ui, boolean testOnly, String... message) {
         if (!testOnly) {
             ui.error(message);
             return false;
         } else {
-            message = Util.concatenate(message, "The program is " +
-                    "run in testing mode, so we can continue...");
+            message = Util.concatenate(message, "The program is run in testing mode, so we can continue...");
             return ui.warning(message);
         }
     }
@@ -588,11 +579,11 @@ public class DMGExtractor {
     private static DMGExtractor.Session parseArgs(String[] args) {
         Session ses = new Session();
         try {
-            /* Take care of the options... */
+            // Take care of the options...
             int i;
             for (i = 0; i < args.length; ++i) {
                 String cur = args[i];
-                //System.err.println("Parsing argument: \"" + cur + "\"");
+//                logger.log(Level.TRACE, "Parsing argument: \"" + cur + "\"");
                 if (!cur.startsWith("-"))
                     break;
                 else if (cur.equals("-gui"))
@@ -621,7 +612,7 @@ public class DMGExtractor {
                 if (args[i].isEmpty())
                     ++emptyTrailingEntries;
             }
-            //System.err.println("empty: " + emptyTrailingEntries);
+//            logger.log(Level.TRACE, "empty: " + emptyTrailingEntries);
 
             if (i != args.length && (args.length - i) != emptyTrailingEntries) {
                 ses.dmgFile = new File(args[i++]);
@@ -632,20 +623,17 @@ public class DMGExtractor {
 
                     if (i != args.length) {
                         if (!args[i].trim().isEmpty())
-                            ses.parseArgsErrorMessage = "Invalid argument: " +
-                                    args[i];
+                            ses.parseArgsErrorMessage = "Invalid argument: " + args[i];
                     }
                 } else {
-                    ses.parseArgsErrorMessage =
-                            "Input file \"" + ses.dmgFile + "\" not found!";
+                    ses.parseArgsErrorMessage = "Input file \"" + ses.dmgFile + "\" not found!";
                 }
             } else if (!ses.graphical) {
                 ses.parseArgsErrorMessage = "Error: No input file specified.";
             }
         } catch (Exception e) {
             logger.log(Level.ERROR, e.getMessage(), e);
-            ses.parseArgsErrorMessage = "Unhandled exception: " + e +
-                    " (see console for stacktrace)";
+            ses.parseArgsErrorMessage = "Unhandled exception: " + e + " (see console for stacktrace)";
         }
         return ses;
     }
@@ -679,9 +667,7 @@ public class DMGExtractor {
                 ""
         };
 
-
         ui.displayMessage(Util.concatenate(prefixMessage, mainMessage));
-
     }
 
     private static void printSAXParserInfo(XMLReader saxParser, PrintStream ps, String prefix) throws Exception {
@@ -690,7 +676,7 @@ public class DMGExtractor {
         ps.println(prefix + "  external-parameter-entities: " + saxParser.getFeature("http://xml.org/sax/features/external-parameter-entities"));
         ps.println(prefix + "  is-standalone: " + saxParser.getFeature("http://xml.org/sax/features/is-standalone"));
         ps.println(prefix + "  lexical-handler/parameter-entities: " + saxParser.getFeature("http://xml.org/sax/features/lexical-handler/parameter-entities"));
-        //ps.println(prefix + "  parameter-entities: " + saxParser.getFeature("http://xml.org/sax/features/parameter-entities"));
+//        ps.println(prefix + "  parameter-entities: " + saxParser.getFeature("http://xml.org/sax/features/parameter-entities"));
         ps.println(prefix + "  namespaces: " + saxParser.getFeature("http://xml.org/sax/features/namespaces"));
         ps.println(prefix + "  namespace-prefixes: " + saxParser.getFeature("http://xml.org/sax/features/namespace-prefixes"));
         ps.println(prefix + "  resolve-dtd-uris: " + saxParser.getFeature("http://xml.org/sax/features/resolve-dtd-uris"));
@@ -710,7 +696,7 @@ public class DMGExtractor {
         ps.println(prefix + "  lexical-handler: " + saxParser.getProperty("http://xml.org/sax/properties/lexical-handler"));
         ps.println(prefix + "  xml-string: " + saxParser.getProperty("http://xml.org/sax/properties/xml-string"));
 
-        //ps.println("isValidating: " + saxParser.isValidating());
+//        ps.println("isValidating: " + saxParser.isValidating());
     }
 
     private static LinkedList<UDIFBlock> mergeBlocks(LinkedList<UDIFBlock> blockList) {
@@ -722,10 +708,10 @@ public class DMGExtractor {
         LinkedList<UDIFBlock> result = new LinkedList<>();
         UDIFBlock previous = it.next();
         while (previous.getInSize() == 0 && it.hasNext()) {
-            //System.err.println("Skipping: " + previous.toString());
+//            logger.log(Level.TRACE, "Skipping: " + previous.toString());
             previous = it.next();
         }
-        //System.err.println("First block in merge sequence: " + previous.toString());
+//        logger.log(Level.TRACE, "First block in merge sequence: " + previous.toString());
 
         UDIFBlock current;
         while (it.hasNext()) {
@@ -751,6 +737,4 @@ public class DMGExtractor {
         result.addLast(previous);
         return result;
     }
-
 }
-

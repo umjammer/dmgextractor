@@ -24,12 +24,12 @@ public class LzfseBlockInputStream extends UDIFBlockInputStream {
         decompressingStream = new LZFSEInputStream(inputStream);
     }
 
+    @Override
     protected void fillBuffer() throws IOException {
-        final int bytesToRead = (int) Math.min(block.getOutSize() - outPos, buffer.length);
+        int bytesToRead = (int) Math.min(block.getOutSize() - outPos, buffer.length);
         int totalBytesRead = 0;
         while (totalBytesRead < bytesToRead) {
-            int bytesRead = decompressingStream.read(buffer, totalBytesRead,
-                    bytesToRead - totalBytesRead);
+            int bytesRead = decompressingStream.read(buffer, totalBytesRead, bytesToRead - totalBytesRead);
             if (bytesRead < 0)
                 break;
             else {
@@ -38,8 +38,7 @@ public class LzfseBlockInputStream extends UDIFBlockInputStream {
             }
         }
 
-        // The fillBuffer method is responsible for updating bufferPos and
-        // bufferDataLength
+        // The fillBuffer method is responsible for updating bufferPos and bufferDataLength
         bufferPos = 0;
         bufferDataLength = totalBytesRead;
     }

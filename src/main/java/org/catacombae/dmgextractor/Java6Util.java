@@ -37,25 +37,20 @@ public class Java6Util extends org.catacombae.util.Java6Util {
      */
     public static char[] readPassword() {
         try {
-            Method systemConsoleMethod =
-                    java.lang.System.class.getMethod("console");
+            Method systemConsoleMethod = java.lang.System.class.getMethod("console");
             Object consoleObject = systemConsoleMethod.invoke(null);
             if (consoleObject == null) {
-                /* No console. */
+                // No console.
                 return null;
             }
 
-            Class<?> consoleClass =
-                    Class.forName("java.io.Console");
-            Method consoleReadPasswordMethod =
-                    consoleClass.getMethod("readPassword");
+            Class<?> consoleClass = Class.forName("java.io.Console");
+            Method consoleReadPasswordMethod = consoleClass.getMethod("readPassword");
 
-            Object passwordObject =
-                    consoleReadPasswordMethod.invoke(consoleObject);
+            Object passwordObject = consoleReadPasswordMethod.invoke(consoleObject);
             if (passwordObject != null && !(passwordObject instanceof char[])) {
                 throw new RuntimeException("Unexpected type returned from " +
-                        "java.io.Console.readPassword(): " +
-                        passwordObject.getClass().getName());
+                        "java.io.Console.readPassword(): " + passwordObject.getClass().getName());
             }
 
             return (char[]) passwordObject;

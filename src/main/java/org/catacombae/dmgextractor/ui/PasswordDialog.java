@@ -43,8 +43,8 @@ public class PasswordDialog extends JDialog {
 
     private void actionOkButtonClicked() {
         password = passwordPanel.getPassword();
-        /* It is important to call dispose() to dispose of AWT resources, allowing the calling
-         * thread to exit the program at will. Otherwise, an active AWT thread will block. */
+        // It is important to call dispose() to dispose of AWT resources, allowing the calling
+        // thread to exit the program at will. Otherwise, an active AWT thread will block.
         dispose();
     }
 

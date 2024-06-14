@@ -19,6 +19,7 @@ package org.catacombae.dmgextractor.io;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.System.Logger.Level;
 
 
 /**
@@ -49,67 +50,58 @@ public class ByteCountInputStream extends InputStream {
         return bytePos;
     }
 
-    /** {@inheritDoc} */
     @Override
     public int available() throws IOException {
         return is.available();
     }
 
-    /** {@inheritDoc} */
     @Override
     public void close() throws IOException {
         is.close();
     }
 
-    /** {@inheritDoc} */
     @Override
     public void mark(int readLimit) {
         throw new UnsupportedOperationException("Mark/reset not supported");
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean markSupported() {
         return false;
     }
 
-    /** {@inheritDoc} */
     @Override
     public int read() throws IOException {
-        //System.out.println("read();");
+//        logger.log(Level.TRACE, "read();");
         int res = is.read();
         if (res > 0)
             ++bytePos;
         return res;
     }
 
-    /** {@inheritDoc} */
     @Override
     public int read(byte[] b) throws IOException {
-        //System.out.println("read(b.length=" + b.length + ");");
+//        logger.log(Level.TRACE, "read(b.length=" + b.length + ");");
         int res = is.read(b);
         if (res > 0)
             bytePos += res;
         return res;
     }
 
-    /** {@inheritDoc} */
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-        //System.out.println("read(b.length=" + b.length + ", " + off + ", " + len + ");");
+//        logger.log(Level.TRACE, "read(b.length=" + b.length + ", " + off + ", " + len + ");");
         int res = is.read(b, off, len);
         if (res > 0)
             bytePos += res;
         return res;
     }
 
-    /** {@inheritDoc} */
     @Override
     public void reset() throws IOException {
         throw new UnsupportedOperationException("Mark/reset not supported");
     }
 
-    /** {@inheritDoc} */
     @Override
     public long skip(long n) throws IOException {
         System.out.println("skip(" + n + ");");

@@ -30,8 +30,7 @@ public class XMLNode extends XMLElement {
     public final XMLNode parent;
     private final LinkedList<XMLElement> children;
 
-    public XMLNode(String namespaceURI, String sName,
-                   String qName, Attribute2[] attrs, XMLNode parent) {
+    public XMLNode(String namespaceURI, String sName, String qName, Attribute2[] attrs, XMLNode parent) {
         this.namespaceURI = namespaceURI;
         this.sName = sName;
         this.qName = qName;
@@ -68,5 +67,4 @@ public class XMLNode extends XMLElement {
     public XMLElement[] getChildren() {
         return children.toArray(XMLElement[]::new);
     }
-
 }

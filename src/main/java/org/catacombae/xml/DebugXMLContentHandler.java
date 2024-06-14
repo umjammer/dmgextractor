@@ -27,7 +27,7 @@ public class DebugXMLContentHandler extends XMLContentHandler {
         super(encoding);
     }
 
-    //public void doctype(String
+//    public void doctype(String
     @Override
     public void xmlDecl(String version, String encoding, Boolean standalone) {
         print("xmlDecl: <?xml version=\"" + version + "\"");

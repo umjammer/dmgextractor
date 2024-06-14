@@ -77,17 +77,17 @@ public class NodeBuilderContentHandler extends XMLContentHandler {
     public void startElement(String name, List<org.catacombae.xml.Attribute> attributes) {
         try {
             Attribute2[] attrs = new Attribute2[attributes.size()];
-            //for(int i = 0; i < attributes.length; ++i) {
+//            for(int i = 0; i < attributes.length; ++i) {
             int i = 0;
             for (org.catacombae.xml.Attribute a : attributes) {
                 attrs[i++] = new Attribute2("", a.identifier,
                         "CDATA", "", a.value.toString());
             }
-// 	    org.xml.sax.ext.Attributes2Impl a2i = new org.xml.sax.ext.Attributes2Impl();
-// 	    for(org.catacombae.xml.Attribute a : attributes) {
-// 		System.err.println("id: " + a.identifier + " value: " + a.value.toString());
-// 		a2i.addAttribute("", a.identifier, a.identifier, "CDATA", a.value.toString());
-// 	    }
+//            org.xml.sax.ext.Attributes2Impl a2i = new org.xml.sax.ext.Attributes2Impl();
+//            for (org.catacombae.xml.Attribute a : attributes) {
+//                logger.log(Level.TRACE, "id: " + a.identifier + " value: " + a.value.toString());
+//                a2i.addAttribute("", a.identifier, a.identifier, "CDATA", a.value.toString());
+//            }
             nodeBuilder.startElementInternal(null, null, name, attrs);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -108,13 +108,16 @@ public class NodeBuilderContentHandler extends XMLContentHandler {
         nodeBuilder.characters(sras, encoding, beginLine, beginColumn, endLine, endColumn);
     }
 
-    //     public void chardata(CharSequence data) {
-// 	try {
-// 	    //char[] ca = data.toCharArray();
-// 	    //nodeBuilder.characters(ca, 0, ca.length);
-// 	    nodeBuilder.characters(data);
-// 	} catch(Exception e) { throw new RuntimeException(e); }
-//     }
+//    public void chardata(CharSequence data) {
+//        try {
+//            //char[] ca = data.toCharArray();
+//            //nodeBuilder.characters(ca, 0, ca.length);
+//            nodeBuilder.characters(data);
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+
     @Override
     public void reference(String ref) {
         try {

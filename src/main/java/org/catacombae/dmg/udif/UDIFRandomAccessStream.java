@@ -17,7 +17,6 @@
 
 package org.catacombae.dmg.udif;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
@@ -29,10 +28,8 @@ import org.catacombae.io.RuntimeIOException;
 
 public class UDIFRandomAccessStream extends BasicReadableRandomAccessStream {
 
-    /*
-      We have a string of data divided into blocks. Different algorithms must be applied to
-      different types of blocks in order to extract the data.
-     */
+    // We have a string of data divided into blocks. Different algorithms must be applied to
+    // different types of blocks in order to extract the data.
     private final UDIFFile dmgFile;
     private final UDIFBlock[] allBlocks;
     private UDIFBlock currentBlock;
@@ -43,12 +40,7 @@ public class UDIFRandomAccessStream extends BasicReadableRandomAccessStream {
     private long logicalFilePointer = 0;
     private boolean seekCalled = false;
 
-    private static void dbg(String s) {
-        System.err.println(s);
-    }
-
-    public UDIFRandomAccessStream(RandomAccessFile raf, String openPath)
-            throws RuntimeIOException {
+    public UDIFRandomAccessStream(RandomAccessFile raf, String openPath) throws RuntimeIOException {
         this(new ReadableFileStream(raf, openPath));
     }
 
@@ -58,34 +50,34 @@ public class UDIFRandomAccessStream extends BasicReadableRandomAccessStream {
 
     public UDIFRandomAccessStream(UDIFFile dmgFile) throws RuntimeIOException {
         this.dmgFile = dmgFile;
-        //dbg("dmgFile.getView().getPlist(); free memory: " + Runtime.getRuntime().freeMemory() + " total memory: " + Runtime.getRuntime().totalMemory());
+//        logger.log(Level.TRACE, "dmgFile.getView().getPlist(); free memory: " + Runtime.getRuntime().freeMemory() + " total memory: " + Runtime.getRuntime().totalMemory());
         Plist plist = dmgFile.getView().getPlist();
-        //dbg("before gc(): free memory: " + Runtime.getRuntime().freeMemory() + " total memory: " + Runtime.getRuntime().totalMemory());
-        //Runtime.getRuntime().gc();
-        //dbg("plist.getPartitions(); free memory: " + Runtime.getRuntime().freeMemory() + " total memory: " + Runtime.getRuntime().totalMemory());
+//        logger.log(Level.TRACE, "before gc(): free memory: " + Runtime.getRuntime().freeMemory() + " total memory: " + Runtime.getRuntime().totalMemory());
+//        Runtime.getRuntime().gc();
+//        logger.log(Level.TRACE, "plist.getPartitions(); free memory: " + Runtime.getRuntime().freeMemory() + " total memory: " + Runtime.getRuntime().totalMemory());
         try {
             PlistPartition[] partitions = plist.getPartitions();
 
             int totalBlockCount = 0;
             for (PlistPartition pp : partitions) {
                 totalBlockCount += pp.getBlockCount();
-                //dbg("totalBlockCount = " + totalBlockCount);
+//                logger.log(Level.TRACE, "totalBlockCount = " + totalBlockCount);
             }
             allBlocks = new UDIFBlock[totalBlockCount];
             int pos = 0;
-            //dbg("looping for each of " + partitions.length + " partitions...");
+//            logger.log(Level.TRACE, "looping for each of " + partitions.length + " partitions...");
             for (PlistPartition pp : partitions) {
                 UDIFBlock[] blocks = pp.getBlocks();
-                //dbg("Blocks in partition: " + blocks.length);
+//                logger.log(Level.TRACE, "Blocks in partition: " + blocks.length);
                 System.arraycopy(blocks, 0, allBlocks, pos, blocks.length);
                 pos += blocks.length;
                 length += pp.getPartitionSize();
             }
             if (totalBlockCount > 0) {
                 currentBlock = allBlocks[0];
-                //dbg("Repositioning stream");
+//                logger.log(Level.TRACE, "Repositioning stream");
                 repositionStream();
-                //dbg("repositioning done.");
+//                logger.log(Level.TRACE, "repositioning done.");
             } else {
                 throw new RuntimeException("Could not find any blocks in the DMG file...");
             }
@@ -94,24 +86,20 @@ public class UDIFRandomAccessStream extends BasicReadableRandomAccessStream {
         }
     }
 
-    /** @see java.io.RandomAccessFile */
     @Override
     public void close() throws RuntimeIOException {
     }
 
-    /** @see java.io.RandomAccessFile */
     @Override
     public long getFilePointer() throws RuntimeIOException {
         return logicalFilePointer;
     }
 
-    /** @see java.io.RandomAccessFile */
     @Override
     public long length() throws RuntimeIOException {
         return length;
     }
 
-    /** @see java.io.RandomAccessFile */
     @Override
     public int read() throws RuntimeIOException {
         byte[] b = new byte[1];
@@ -121,34 +109,32 @@ public class UDIFRandomAccessStream extends BasicReadableRandomAccessStream {
             return b[0] & 0xFF;
     }
 
-    /** @see java.io.RandomAccessFile */
     @Override
     public int read(byte[] b) throws RuntimeIOException {
         return read(b, 0, b.length);
     }
 
-    /** @see java.io.RandomAccessFile */
     @Override
     public int read(byte[] b, int off, int len) throws RuntimeIOException {
         try {
-            //System.out.println("UDIFRandomAccessStream.read(b.length=" + b.length + ", " + off + ", " + len + ") {");
+//            logger.log(Level.TRACE, "UDIFRandomAccessStream.read(b.length=" + b.length + ", " + off + ", " + len + ") {");
             if (seekCalled) {
                 seekCalled = false;
-                //System.out.print("  Repositioning stream after seek (logical file pointer: " + logicalFilePointer + ")...");
+//                logger.log(Level.TRACE, "  Repositioning stream after seek (logical file pointer: " + logicalFilePointer + ")...");
                 try {
                     repositionStream();
                 } catch (RuntimeException re) {
-// 		System.out.println("return: -1 }");
+//                    logger.log(Level.TRACE, "return: -1 }");
                     return -1;
                 }
-                //System.out.println("done.");
+//                logger.log(Level.TRACE, "done.");
             }
             int bytesRead = 0;
             while (bytesRead < len) {
 
                 int curBytesRead = currentBlockStream.read(b, off + bytesRead, len - bytesRead);
                 if (curBytesRead < 0) {
-                    //System.out.print("  Repositioning stream...");
+//                    logger.log(Level.TRACE, "  Repositioning stream...");
                     try {
                         repositionStream();
                     } catch (RuntimeException re) {
@@ -156,30 +142,29 @@ public class UDIFRandomAccessStream extends BasicReadableRandomAccessStream {
                             bytesRead = -1; // If no bytes could be read, we must indicate that the stream has no more data
                         break;
                     }
-                    //System.out.println("done.");
+//                    logger.log(Level.TRACE, "done.");
                     curBytesRead = currentBlockStream.read(b, off + bytesRead, len - bytesRead);
                     if (curBytesRead < 0) {
                         throw new RuntimeException("No bytes could be read, and no exception was thrown! Program error...");
-// 		    if(bytesRead == 0)
-// 			bytesRead = -1; // If no bytes could be read, we must indicate that the stream has no more data
-// 		    break;
+//                        if (bytesRead == 0)
+//                            bytesRead = -1; // If no bytes could be read, we must indicate that the stream has no more data
+//                        break;
                     }
                 }
 
-// 	    if(curBytesRead >= 0)
+//                if (curBytesRead >= 0)
                 bytesRead += curBytesRead;
                 logicalFilePointer += curBytesRead;
             }
 
 
-// 	System.out.println("return: " + bytesRead + " }");
+//            logger.log(Level.TRACE, "return: " + bytesRead + " }");
             return bytesRead;
         } catch (IOException ex) {
             throw new RuntimeIOException(ex);
         }
     }
 
-    /** @see java.io.RandomAccessFile */
     @Override
     public void seek(long pos) throws RuntimeIOException {
         if (logicalFilePointer != pos) {
@@ -189,7 +174,7 @@ public class UDIFRandomAccessStream extends BasicReadableRandomAccessStream {
     }
 
     private void repositionStream() throws RuntimeIOException {
-// 	System.out.println("<UDIFRandomAccessStream.repositionStream()>");
+//        logger.log(Level.TRACE, "<UDIFRandomAccessStream.repositionStream()>");
         try {
             // if the global file pointer is not within the bounds of the current block, then find the accurate block
             if (!(currentBlock.getTrueOutOffset() <= logicalFilePointer &&
@@ -204,11 +189,11 @@ public class UDIFRandomAccessStream extends BasicReadableRandomAccessStream {
                     }
                 }
                 if (soughtBlock != null) {
-                    //System.out.println("REPOSITION " + currentBlock.getBlockTypeAsString() + "(" + currentBlock.getTrueOutOffset() + "," + currentBlock.getOutSize() + ") -> " + soughtBlock.getBlockTypeAsString() + "(" + soughtBlock.getTrueOutOffset() + "," + soughtBlock.getOutSize() + ")");
-// 		if(soughtBlock.getTrueOutOffset() == currentBlock.getTrueOutOffset()+currentBlock.getOutSize())
-// 		    System.out.println("  Continuous! :)");
-// 		else
-// 		    System.out.println("  FUCKADSFOA!!!1one");
+//                    logger.log(Level.TRACE, "REPOSITION " + currentBlock.getBlockTypeAsString() + "(" + currentBlock.getTrueOutOffset() + "," + currentBlock.getOutSize() + ") -> " + soughtBlock.getBlockTypeAsString() + "(" + soughtBlock.getTrueOutOffset() + "," + soughtBlock.getOutSize() + ")");
+//                    if (soughtBlock.getTrueOutOffset() == currentBlock.getTrueOutOffset() + currentBlock.getOutSize())
+//                        logger.log(Level.TRACE, "  Continuous! :)");
+//                    else
+//                        logger.log(Level.TRACE, "  FUCKADSFOA!!!1one");
                     currentBlock = soughtBlock;
                 } else
                     throw new RuntimeException("Trying to seek outside bounds.");
@@ -216,37 +201,12 @@ public class UDIFRandomAccessStream extends BasicReadableRandomAccessStream {
 
             currentBlockStream = UDIFBlockInputStream.getStream(dmgFile.getStream(), currentBlock);
             long bytesToSkip = logicalFilePointer - currentBlock.getTrueOutOffset();
-// 	System.out.print("  skipping " + bytesToSkip + " bytes...");
+//            logger.log(Level.TRACE, "  skipping " + bytesToSkip + " bytes...");
             currentBlockStream.skip(bytesToSkip);
-// 	System.out.println("done.");
+//            logger.log(Level.TRACE, "done.");
         } catch (IOException ex) {
             throw new RuntimeIOException(ex);
         }
-// 	System.out.println("</UDIFRandomAccessStream.repositionStream()>");
-    }
-
-    public static void main(String[] args) throws IOException {
-        System.out.println("UDIFRandomAccessStream simple test program");
-        System.out.println("(Simply extracts the contents of a DMG file to a designated output file)");
-        if (args.length != 2)
-            System.out.println("  ERROR: You must supply exactly two arguments: 1. the DMG, 2. the output file");
-        else {
-            byte[] buffer = new byte[4096];
-            UDIFRandomAccessStream dras =
-                    new UDIFRandomAccessStream(new UDIFFile(new ReadableFileStream(
-                            new RandomAccessFile(args[0], "r"), args[0])));
-            FileOutputStream fos = new FileOutputStream(args[1]);
-
-            long totalBytesRead = 0;
-
-            int bytesRead = dras.read(buffer);
-            while (bytesRead > 0) {
-                totalBytesRead += bytesRead;
-                fos.write(buffer, 0, bytesRead);
-                bytesRead = dras.read(buffer);
-            }
-            System.out.println("Done! Extracted " + totalBytesRead + " bytes.");
-            System.out.println("Length: " + dras.length() + " bytes");
-        }
+//        logger.log(Level.TRACE, "</UDIFRandomAccessStream.repositionStream()>");
     }
 }

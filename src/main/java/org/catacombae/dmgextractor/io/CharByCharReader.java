@@ -20,14 +20,20 @@ package org.catacombae.dmgextractor.io;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
 
+import static java.lang.System.getLogger;
+
 
 public class CharByCharReader extends Reader {
+
+    private static final Logger logger = getLogger(CharByCharReader.class.getName());
 
     private final InputStream is;
     private final Charset cs;
@@ -35,15 +41,14 @@ public class CharByCharReader extends Reader {
     private final byte[] tempBuffer;
     private int tempBufferPtr = 0;
 
-    //private CharArrayBuilder cab = new CharArrayBuilder();
+//    private CharArrayBuilder cab = new CharArrayBuilder();
 
-    /* The assumption we make here is that a number of bytes define a Unicode character. */
+    /** The assumption we make here is that a number of bytes define a Unicode character. */
     public CharByCharReader(InputStream is, Charset cs) {
         this.is = is;
         this.cs = cs;
         this.cdec = cs.newDecoder();
-        tempBuffer =
-                new byte[(int) Math.ceil(cs.newEncoder().maxBytesPerChar())];
+        tempBuffer = new byte[(int) Math.ceil(cs.newEncoder().maxBytesPerChar())];
     }
 
     @Override
@@ -65,10 +70,10 @@ public class CharByCharReader extends Reader {
 
                     CoderResult res = cdec.decode(bb, out, true);
                     if (!res.isError()) {
-                        cbuf[off + charsRead] = out.get(0);//cab.put(out.get(0));
+                        cbuf[off + charsRead] = out.get(0); // cab.put(out.get(0));
                         break;
                     } else if (tempBufferPtr == tempBuffer.length) {
-                        System.err.println(res);
+                        logger.log(Level.DEBUG, res);
                         throw new RuntimeException("error while decoding");
                     }
                 } else

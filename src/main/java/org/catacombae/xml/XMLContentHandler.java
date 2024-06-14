@@ -29,7 +29,8 @@ public abstract class XMLContentHandler {
         this.encoding = encoding;
     }
 
-    //public void doctype(String
+//    public void doctype(String
+
     public abstract void xmlDecl(String version, String encoding, Boolean standalone);
 
     public abstract void pi(String id, String content);

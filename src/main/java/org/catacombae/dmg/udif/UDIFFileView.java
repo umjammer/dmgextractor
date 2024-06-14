@@ -32,10 +32,8 @@ public class UDIFFileView {
 
     public UDIFFileView(File file) {
         try {
-            //this.file = file;
-            this.dmgRaf =
-                    new ReadableFileStream(new RandomAccessFile(file, "r"),
-                            file.getPath());
+//            this.file = file;
+            this.dmgRaf = new ReadableFileStream(new RandomAccessFile(file, "r"), file.getPath());
         } catch (IOException ioe) {
             throw new RuntimeIOException(ioe);
         }
@@ -47,7 +45,8 @@ public class UDIFFileView {
 
     public byte[] getPlistData() throws RuntimeIOException {
         Koly koly = getKoly();
-        byte[] plistData = new byte[(int) koly.getPlistSize()]; // Let's hope the plistsize is within int range... (though memory will run out long before that)
+        // Let's hope the plistsize is within int range... (though memory will run out long before that)
+        byte[] plistData = new byte[(int) koly.getPlistSize()];
 
         dmgRaf.seek(koly.getPlistBegin1());
         if (dmgRaf.read(plistData) == plistData.length)

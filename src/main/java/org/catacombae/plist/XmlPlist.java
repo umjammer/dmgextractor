@@ -82,15 +82,15 @@ public class XmlPlist {
         if (defaultToSAX) {
             parseXMLDataSAX(plistData, handler);
         } else {
-            /* First try to parse with the internal homebrew parser, and if it
-             * doesn't succeed, go for the SAX parser. */
-//            System.err.println("Trying to parse xml data...");
+            // First try to parse with the internal homebrew parser, and if it
+            // doesn't succeed, go for the SAX parser.
+//            logger.log(Level.TRACE, "Trying to parse xml data...");
             try {
                 parseXMLDataAPX(plistData, handler);
-//                System.err.println("xml data parsed...");
+//                logger.log(Level.TRACE, "xml data parsed...");
             } catch (Exception e) {
                 logger.log(Level.ERROR, e.getMessage(), e);
-                System.err.println("APX parser threw exception... falling back to SAX parser. Report this error!");
+                logger.log(Level.DEBUG, "APX parser threw exception... falling back to SAX parser. Report this error!");
                 handler = new NodeBuilder();
                 parseXMLDataSAX(plistData, handler);
             }
@@ -106,16 +106,16 @@ public class XmlPlist {
     private void parseXMLDataAPX(byte[] buffer, NodeBuilder handler) {
         try {
             ReadableByteArrayStream ya = new ReadableByteArrayStream(buffer);
-            SynchronizedRandomAccessStream bufferStream =
-                    new SynchronizedRandomAccessStream(ya);//new ReadableByteArrayStream(buffer));
+            SynchronizedRandomAccessStream bufferStream = new SynchronizedRandomAccessStream(ya); // new ReadableByteArrayStream(buffer));
 
             // First we parse the xml declaration using a US-ASCII charset just to extract the charset description
-            //System.err.println("parsing encoding");
+//            logger.log(Level.TRACE, "parsing encoding");
             InputStream is = new RandomAccessInputStream(bufferStream);
-            APXParser encodingParser = APXParser.create(new InputStreamReader(is, StandardCharsets.US_ASCII),
+            APXParser encodingParser = APXParser.create(
+                    new InputStreamReader(is, StandardCharsets.US_ASCII),
                     new NullXMLContentHandler(StandardCharsets.US_ASCII));
             String encodingName = encodingParser.xmlDecl();
-            //System.err.println("encodingName=" + encodingName);
+//            logger.log(Level.TRACE, "encodingName=" + encodingName);
             if (encodingName == null)
                 encodingName = "US-ASCII";
 
@@ -124,7 +124,7 @@ public class XmlPlist {
             // Then we proceed to parse the entire document
             is = new RandomAccessInputStream(bufferStream);
             Reader usedReader = new BufferedReader(new InputStreamReader(is, encoding));
-//            System.err.println("parsing document");
+//            logger.log(Level.TRACE, "parsing document");
 //            try { FileOutputStream dump = new FileOutputStream("dump.xml"); dump.write(buffer); dump.close(); }
 //            catch(Exception e) { e.printStackTrace(); }
 
@@ -133,13 +133,13 @@ public class XmlPlist {
                 documentParser.xmlDocument();
                 System.exit(0);
             } else {
-                APXParser documentParser = APXParser.create(usedReader, new NodeBuilderContentHandler(handler, bufferStream, encoding));
+                var documentParser = APXParser.create(usedReader, new NodeBuilderContentHandler(handler, bufferStream, encoding));
                 documentParser.xmlDocument();
             }
 
         } catch (ParseException pe) {
-//            System.err.println("Could not read the partition list...");
-            throw new RuntimeException(pe);
+//            logger.log(Level.TRACE, "Could not read the partition list...");
+            throw new IllegalArgumentException(pe);
         }
     }
 
@@ -147,32 +147,32 @@ public class XmlPlist {
         try {
             InputStream is = new ByteArrayInputStream(buffer);
             SAXParser saxParser = SAXParserFactory.newInstance().newSAXParser();
-//          System.out.println("validation: " + saxParser.getProperty("validation"));
-//          System.out.println("external-general-entities: " + saxParser.getProperty("external-general-entities"));
-//          System.out.println("external-parameter-entities: " + saxParser.getProperty("external-parameter-entities"));
-//          System.out.println("is-standalone: " + saxParser.getProperty("is-standalone"));
-//          System.out.println("lexical-handler: " + saxParser.getProperty("lexical-handler"));
-//          System.out.println("parameter-entities: " + saxParser.getProperty("parameter-entities"));
-//          System.out.println("namespaces: " + saxParser.getProperty("namespaces"));
-//          System.out.println("namespace-prefixes: " + saxParser.getProperty("namespace-prefixes"));
-//          System.out.println(": " + saxParser.getProperty(""));
-//          System.out.println(": " + saxParser.getProperty(""));
-//          System.out.println(": " + saxParser.getProperty(""));
-//          System.out.println(": " + saxParser.getProperty(""));
-//          System.out.println("" + saxParser.getProperty(""));
-//          System.out.println("" + saxParser.getProperty(""));
-//          System.out.println("" + saxParser.getProperty(""));
-//          System.out.println("" + saxParser.getProperty(""));
-//          System.out.println("" + saxParser.getProperty(""));
-//          System.out.println("" + saxParser.getProperty(""));
-//          System.out.println("" + saxParser.getProperty(""));
-//          System.out.println("" + saxParser.getProperty(""));
+//            logger.log(Level.TRACE, "validation: " + saxParser.getProperty("validation"));
+//            logger.log(Level.TRACE, "external-general-entities: " + saxParser.getProperty("external-general-entities"));
+//            logger.log(Level.TRACE, "external-parameter-entities: " + saxParser.getProperty("external-parameter-entities"));
+//            logger.log(Level.TRACE, "is-standalone: " + saxParser.getProperty("is-standalone"));
+//            logger.log(Level.TRACE, "lexical-handler: " + saxParser.getProperty("lexical-handler"));
+//            logger.log(Level.TRACE, "parameter-entities: " + saxParser.getProperty("parameter-entities"));
+//            logger.log(Level.TRACE, "namespaces: " + saxParser.getProperty("namespaces"));
+//            logger.log(Level.TRACE, "namespace-prefixes: " + saxParser.getProperty("namespace-prefixes"));
+//            logger.log(Level.TRACE, ": " + saxParser.getProperty(""));
+//            logger.log(Level.TRACE, ": " + saxParser.getProperty(""));
+//            logger.log(Level.TRACE, ": " + saxParser.getProperty(""));
+//            logger.log(Level.TRACE, ": " + saxParser.getProperty(""));
+//            logger.log(Level.TRACE, "" + saxParser.getProperty(""));
+//            logger.log(Level.TRACE, "" + saxParser.getProperty(""));
+//            logger.log(Level.TRACE, "" + saxParser.getProperty(""));
+//            logger.log(Level.TRACE, "" + saxParser.getProperty(""));
+//            logger.log(Level.TRACE, "" + saxParser.getProperty(""));
+//            logger.log(Level.TRACE, "" + saxParser.getProperty(""));
+//            logger.log(Level.TRACE, "" + saxParser.getProperty(""));
+//            logger.log(Level.TRACE, "" + saxParser.getProperty(""));
 
-//            System.out.println("isValidating: " + saxParser.isValidating());
+//            logger.log(Level.TRACE, "isValidating: " + saxParser.isValidating());
             saxParser.parse(is, handler);
         } catch (SAXException se) {
             logger.log(Level.ERROR, se.getMessage(), se);
-//            System.err.println("Could not read the partition list... exiting.");
+//            logger.log(Level.TRACE, "Could not read the partition list... exiting.");
             throw new RuntimeException(se);
         } catch (Exception e) {
             throw new RuntimeException(e);

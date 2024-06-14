@@ -23,41 +23,40 @@ import org.catacombae.dmgextractor.Util;
 public class UDIFBlock implements Comparable<UDIFBlock> {
 
     /** This blocktype means the data is compressed using some "ADC" algorithm that I have no idea how to decompress... */
-    public static final int BT_ADC = 0x80000004;
+    public static final int BT_ADC = 0x8000_0004;
 
     /** This blocktype means the data is compressed with zlib. */
-    public static final int BT_ZLIB = 0x80000005;
+    public static final int BT_ZLIB = 0x8000_0005;
 
     /**
      * This blocktype means the data is compressed with the bzip2 compression algorithm. These blocktypes are unsupported,
      * as I haven't found a GPL-compatible bzip2 decompressor written in Java yet.
      */
-    public static final int BT_BZIP2 = 0x80000006;
+    public static final int BT_BZIP2 = 0x8000_0006;
 
     /** This blocktype means the data is compressed with the LZFSE compression algorithm. */
-    public static final int BT_LZFSE = 0x80000007;
+    public static final int BT_LZFSE = 0x8000_0007;
     
     /** This blocktype means the data is uncompressed and can simply be copied. */
-    public static final int BT_COPY = 0x00000001;
+    public static final int BT_COPY = 0x0000_0001;
 
     /** This blocktype represents a fill of zeroes. */
-    public static final int BT_ZERO = 0x00000002;
+    public static final int BT_ZERO = 0x0000_0002;
 
     /**
      * This blocktype represents a fill of zeroes (the difference between this blocktype and BT_ZERO is not documented,
      * and parsing of these blocks is experimental).
      */
-    public static final int BT_ZERO2 = 0x00000000;
+    public static final int BT_ZERO2 = 0x0000_0000;
 
     /** This blocktype indicates the end of the partition. */
-    public static final int BT_END = 0xffffffff;
+    public static final int BT_END = 0xffff_ffff;
 
     /**
      * This blocktype has been observed, but its purpose is currently unknown. In all the observed cases the outSize was
      * equal to 0, so it's probably some marker, like BT_END.
      */
-    public static final int BT_UNKNOWN = 0x7ffffffe;
-
+    public static final int BT_UNKNOWN = 0x7fff_fffe;
 
     private static final String BT_ADC_STRING = "BT_ADC";
     private static final String BT_ZLIB_STRING = "BT_ZLIB";
@@ -174,16 +173,17 @@ public class UDIFBlock implements Comparable<UDIFBlock> {
         return inOffsetComp;
     }
 
-    //public void setOutOffsetCompensation(long offset) {
-    //    if(immutable)
-    //        throw new RuntimeException("This block has been toggled immutable!");
-    //    outOffsetComp = offset;
-    //}
-    //public void setInOffsetCompensation(long offset) {
-    // 	  if(immutable)
-    // 	      throw new RuntimeException("This block has been toggled immutable!");
-    //    inOffsetComp = offset;
-    //}
+//    public void setOutOffsetCompensation(long offset) {
+//        if (immutable)
+//            throw new RuntimeException("This block has been toggled immutable!");
+//        outOffsetComp = offset;
+//    }
+
+//    public void setInOffsetCompensation(long offset) {
+//        if (immutable)
+//            throw new RuntimeException("This block has been toggled immutable!");
+//        inOffsetComp = offset;
+//    }
 
     /** Convenience method for determining the actual compensated out offset. This is what you should use. */
     public long getTrueOutOffset() {
@@ -195,15 +195,16 @@ public class UDIFBlock implements Comparable<UDIFBlock> {
         return inOffset + inOffsetComp;
     }
 
-    //public void markImmutable() {
-    //    immutable = true;
-    //}
+//    public void markImmutable() {
+//        immutable = true;
+//    }
 
     @Override
     public String toString() {
         return getBlockTypeAsString() +
                 "(reserved=0x" + Integer.toHexString(reserved) + ",outOffset=" + outOffset +
-                ",outSize=" + outSize + ",inOffset=" + inOffset + ",inSize=" + inSize + ",outOffsetComp=" + outOffsetComp + ",inOffsetComp=" + inOffsetComp + ")";
+                ",outSize=" + outSize + ",inOffset=" + inOffset + ",inSize=" + inSize +
+                ",outOffsetComp=" + outOffsetComp + ",inOffsetComp=" + inOffsetComp + ")";
     }
 
     /**

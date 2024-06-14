@@ -17,6 +17,8 @@
 
 package org.catacombae.dmg.sparseimage;
 
+import java.nio.charset.StandardCharsets;
+
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.util.Util;
 
@@ -34,11 +36,6 @@ public class SparseImageRecognizer {
         }
 
         SparseImageHeader header = new SparseImageHeader(headerData, 0);
-        if (Util.readString(header.getSignature(), "US-ASCII").
-                equals("sprs")) {
-            return true;
-        }
-
-        return false;
+        return Util.readString(header.getSignature(), StandardCharsets.US_ASCII.name()).equals("sprs");
     }
 }

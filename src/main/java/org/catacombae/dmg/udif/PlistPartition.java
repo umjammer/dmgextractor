@@ -20,14 +20,17 @@ package org.catacombae.dmg.udif;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.logging.Logger;
+
+import static java.lang.System.getLogger;
 
 
 public class PlistPartition {
 
-    private static final Logger logger = Logger.getLogger(PlistPartition.class.getName());
+    private static final Logger logger = getLogger(PlistPartition.class.getName());
 
     private final String name;
     private final String id;
@@ -45,8 +48,7 @@ public class PlistPartition {
 
     public PlistPartition(String name, String id, String attributes, byte[] data,
                           long previousOutOffset, long previousInOffset) throws IOException {
-        this(name, id, attributes, new ByteArrayInputStream(data),
-                previousOutOffset, previousInOffset);
+        this(name, id, attributes, new ByteArrayInputStream(data), previousOutOffset, previousInOffset);
     }
 
     public PlistPartition(String name, String id, String attributes, InputStream data,
@@ -95,13 +97,13 @@ public class PlistPartition {
 
     public long getFinalOutOffset() {
         if (finalOutOffset < 0)
-            throw new RuntimeException("parseBlocks has not yet been called!");
+            throw new IllegalStateException("parseBlocks has not yet been called!");
         return finalOutOffset;
     }
 
     public long getFinalInOffset() {
         if (finalInOffset < 0)
-            throw new RuntimeException("parseBlocks has not yet been called!");
+            throw new IllegalStateException("parseBlocks has not yet been called!");
         return finalInOffset;
     }
 
@@ -109,11 +111,11 @@ public class PlistPartition {
         long bytesSkipped = is.read(new byte[0xCC]);
 
         if (bytesSkipped != 0xCC)
-            throw new RuntimeException("Could not skip the desired amount of bytes...");
+            throw new IllegalStateException("Could not skip the desired amount of bytes...");
 
         int blockNumber = 0; // Increments by one for each block we read (each iteration in the while loop below)
 
-        /* These two variables are part of the "hack" described below. */
+        // These two variables are part of the "hack" described below.
         long lastByteReadInBlock = -1;
         boolean addInOffset = false;
 
@@ -123,7 +125,7 @@ public class PlistPartition {
 
         int bytesRead = is.read(blockData);
         while (bytesRead > 0) { //offset <= data.length-UDIFBlock) {
-            //System.err.println("Looping (read " + bytesRead + " bytes)");
+//            logger.log(Level.TRACE, "Looping (read " + bytesRead + " bytes)");
             if (bytesRead != blockData.length)
                 throw new RuntimeException("Could not read the desired amount of bytes... (desired: " + blockData.length + " read: " + bytesRead + ")");
 
@@ -138,20 +140,19 @@ public class PlistPartition {
                 lastByteReadInBlock = inOffset;
             lastByteReadInBlock += inSize;
 
-            /*
-             * The lines below are a "hack" that I had to do to make dmgx work with
-             * certain dmg-files. I don't understand the issue at all, which is why
-             * this hack is here, but sometimes inOffset == 0 means that it is 0
-             * relative to the previous partition's last inOffset. And sometimes it
-             * doesn't (meaning the actual position 0 in the dmg file).
-             */
+            // The lines below are a "hack" that I had to do to make dmgx work with
+            // certain dmg-files. I don't understand the issue at all, which is why
+            // this hack is here, but sometimes inOffset == 0 means that it is 0
+            // relative to the previous partition's last inOffset. And sometimes it
+            // doesn't (meaning the actual position 0 in the dmg file).
+            //
             if (inOffset == 0 && blockNumber == 0) {
-                logger.fine("Detected inOffset == 0, setting addInOffset flag.");
+                logger.log(Level.DEBUG, "Detected inOffset == 0, setting addInOffset flag.");
                 addInOffset = true;
             }
             long inOffsetCompensation = 0;
             if (addInOffset) {
-                logger.fine("addInOffset mode: inOffset tranformation " + inOffset + "->" +
+                logger.log(Level.DEBUG, "addInOffset mode: inOffset tranformation " + inOffset + "->" +
                         (inOffset + previousInOffset));
                 inOffsetCompensation = previousInOffset;
             }
@@ -160,7 +161,7 @@ public class PlistPartition {
             blocks.add(currentBlock);
             ++blockNumber;
 
-            //System.out.println("  " + currentBlock.toString());
+//            logger.log(Level.DEBUG, "  " + currentBlock.toString());
 
             // Return if we have reached the end, and update
             if (currentBlock.getBlockType() == UDIFBlock.BT_END) {
@@ -168,7 +169,7 @@ public class PlistPartition {
                 finalInOffset = previousInOffset + lastByteReadInBlock;
 
                 if (is.read() != -1)
-                    logger.warning("Encountered additional data in blkx blob.");
+                    logger.log(Level.WARNING, "Encountered additional data in blkx blob.");
                 return blocks.toArray(UDIFBlock[]::new);
             }
 
