@@ -17,52 +17,54 @@
 
 package org.catacombae.xml;
 
+import java.io.PrintStream;
 import java.util.LinkedList;
-import java.io.*;
+
 
 public class XMLNode extends XMLElement {
+
     public final String namespaceURI;
     public final String sName;
     public final String qName;
     public final Attribute2[] attrs;
     public final XMLNode parent;
     private final LinkedList<XMLElement> children;
-    
-    public XMLNode(String namespaceURI, String sName, 
-		   String qName, Attribute2[] attrs, XMLNode parent) {
-	this.namespaceURI = namespaceURI;
-	this.sName = sName;
-	this.qName = qName;
-	this.attrs = attrs;
-	this.parent = parent;
-	this.children = new LinkedList<>();
+
+    public XMLNode(String namespaceURI, String sName, String qName, Attribute2[] attrs, XMLNode parent) {
+        this.namespaceURI = namespaceURI;
+        this.sName = sName;
+        this.qName = qName;
+        this.attrs = attrs;
+        this.parent = parent;
+        this.children = new LinkedList<>();
     }
-    
+
     public void addChild(XMLElement x) {
-	children.addLast(x);
+        children.addLast(x);
     }
 
     public void printTree(PrintStream pw) {
-	_printTree(pw, 0);
+        _printTree(pw, 0);
     }
 
+    @Override
     protected void _printTree(PrintStream pw, int level) {
-	for(int i = 0; i < level; ++i)
-	    pw.print(" ");
-	pw.print("<");
-	pw.print(qName);
-	for(Attribute2 a : attrs)
-	    pw.print(" " + a.qName + "=" + a.value);
-	pw.println(">");
-	for(XMLElement xe : children)
-	    xe._printTree(pw, level+1);
-	
-	for(int i = 0; i < level; ++i)
-	    pw.print(" ");
-	pw.println("</" + qName + ">");
+        for (int i = 0; i < level; ++i)
+            pw.print(" ");
+        pw.print("<");
+        pw.print(qName);
+        for (Attribute2 a : attrs)
+            pw.print(" " + a.qName + "=" + a.value);
+        pw.println(">");
+        for (XMLElement xe : children)
+            xe._printTree(pw, level + 1);
+
+        for (int i = 0; i < level; ++i)
+            pw.print(" ");
+        pw.println("</" + qName + ">");
     }
+
     public XMLElement[] getChildren() {
-	return children.toArray(new XMLElement[children.size()]);
+        return children.toArray(XMLElement[]::new);
     }
-    
 }

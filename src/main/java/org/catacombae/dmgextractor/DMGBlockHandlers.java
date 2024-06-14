@@ -18,10 +18,16 @@
 package org.catacombae.dmgextractor;
 
 import java.io.IOException;
-import org.catacombae.dmg.udif.UDIFBlockInputStream;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+
 import org.catacombae.dmg.udif.UDIFBlock;
+import org.catacombae.dmg.udif.UDIFBlockInputStream;
 import org.catacombae.io.RandomAccessStream;
 import org.catacombae.io.ReadableRandomAccessStream;
+
+import static java.lang.System.getLogger;
+
 
 /**
  * Please don't try to use this code with concurrent threads... :) Use external
@@ -29,7 +35,9 @@ import org.catacombae.io.ReadableRandomAccessStream;
  */
 class DMGBlockHandlers {
 
-    private static byte[] inBuffer = new byte[0x40000];
+    private static final Logger logger = getLogger(DMGBlockHandlers.class.getName());
+
+    private static final byte[] inBuffer = new byte[0x40000];
 
     /**
      * Extracts an UDIFBlock describing a region of the file <code>dmgRaf</code>
@@ -39,31 +47,28 @@ class DMGBlockHandlers {
      * interaction, use {@link UserInterface.NullUI}.
      */
     static long processBlock(UDIFBlock block, ReadableRandomAccessStream dmgRaf,
-            RandomAccessStream isoRaf, boolean testOnly, UserInterface ui)
-            throws IOException {
+                             RandomAccessStream isoRaf, boolean testOnly, UserInterface ui) throws IOException {
 
         UDIFBlockInputStream is = UDIFBlockInputStream.getStream(dmgRaf, block);
         long res = processStream(is, isoRaf, testOnly, ui);
         is.close();
-        if(res != block.getOutSize()) {
-            System.err.println("WARNING: Could not extract entire block! " +
-                    "Extracted " + res + " of " + block.getOutSize() +
-                    " bytes");
+        if (res != block.getOutSize()) {
+            logger.log(Level.DEBUG, "WARNING: Could not extract entire block! " +
+                    "Extracted " + res + " of " + block.getOutSize() + " bytes");
         }
         return res;
     }
 
-    private static long processStream(UDIFBlockInputStream is,
-            RandomAccessStream isoRaf, boolean testOnly, UserInterface ui)
-            throws IOException {
+    private static long processStream(
+            UDIFBlockInputStream is, RandomAccessStream isoRaf, boolean testOnly, UserInterface ui) throws IOException {
 
         long totalBytesRead = 0;
         int bytesRead = is.read(inBuffer);
-        while(bytesRead > 0) {
+        while (bytesRead > 0) {
             totalBytesRead += bytesRead;
-            //ui.reportProgress((int)(dmgRaf.getFilePointer()*100/dmgRaf.length()));
+//            ui.reportProgress((int) (dmgRaf.getFilePointer() * 100 / dmgRaf.length()));
             ui.addProgressRaw(bytesRead);
-            if(!testOnly) {
+            if (!testOnly) {
                 isoRaf.write(inBuffer, 0, bytesRead);
             }
             bytesRead = is.read(inBuffer);

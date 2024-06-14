@@ -1,14 +1,29 @@
 [![jitpack](https://jitpack.io/v/umjammer/dmgextractor.svg)](https://jitpack.io/#umjammer/dmgextractor)
-[![Java CI](https://github.com/umjammer/dmgextractor/workflows/Java%20CI%20with%20Maven/badge.svg)](https://github.com/umjammer/dmgextractor/actions)
+[![Java CI](https://github.com/umjammer/dmgextractor/actions/workflows/maven.yml/badge.svg)](https://github.com/umjammer/dmgextractor/actions/workflows/maven.yml)
 [![CodeQL](https://github.com/umjammer/dmgextractor/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/umjammer/dmgextractor/actions/workflows/codeql-analysis.yml)
-![Java](https://img.shields.io/badge/Java-8-b07219)
+![Java](https://img.shields.io/badge/Java-17-b07219)
 [![Parent](https://img.shields.io/badge/Parent-hfsexplorer-pink)](https://github.com/umjammer/hfsexplorer)
 
 # dmg extractor
 
 this is a fork of https://github.com/unsound/dmgextractor and mavenized
 
+## Install
+
+ * [maven](https://jitpack.io/#umjammer/dmgextractor)
+
+## Usage
+
+## References
+
+## TODO
+
+ * cstruct2java
+ * javacc
+
 ----
+
+# [Original](http://www.catacombae.org/dmgextractor/)
 
 DMGExtractor is a lightweight Java application for extracting the contents of a Mac OS X Disk Image file (extension .dmg) to raw binary format (such as an ISO file). It can handle most disk images of type CUDIFDiskImage, with the exception of UDCO images (using a compression method that is unknown to me). It also (as of version 0.70) handles AES-128 encrypted disk images.
 This application has been tested and developed under version 1.5.0 (5.0) of the Sun JDK. Anything less is probably insufficient.
@@ -20,7 +35,3 @@ I publish this program under the GPL license version 3, so feel free to modify i
 GNU General Public License version 3
 
 If you have any comment on my work or would like to report a bug, just send me an e-mail. Also, if you publish any modifications to the program, I'd like to know about it so that I may port them back into my source tree.
-
-----
-
-[Project Page](http://www.catacombae.org/dmgextractor/)

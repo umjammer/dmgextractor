@@ -20,6 +20,7 @@ package org.catacombae.dmgextractor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+
 /**
  * This class should encapsulate all of the logic in DMGExtractor that is
  * Java 6-specific.
@@ -27,6 +28,7 @@ import java.lang.reflect.Method;
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 public class Java6Util extends org.catacombae.util.Java6Util {
+
     /**
      * Read password from console without echoing characters.
      *
@@ -35,37 +37,26 @@ public class Java6Util extends org.catacombae.util.Java6Util {
      */
     public static char[] readPassword() {
         try {
-            final Method systemConsoleMethod =
-                    java.lang.System.class.getMethod("console");
-            final Object consoleObject = systemConsoleMethod.invoke(null);
-            if(consoleObject == null) {
-                /* No console. */
+            Method systemConsoleMethod = java.lang.System.class.getMethod("console");
+            Object consoleObject = systemConsoleMethod.invoke(null);
+            if (consoleObject == null) {
+                // No console.
                 return null;
             }
 
-            final Class<? extends Object> consoleClass =
-                Class.forName("java.io.Console");
-            final Method consoleReadPasswordMethod =
-                    consoleClass.getMethod("readPassword");
+            Class<?> consoleClass = Class.forName("java.io.Console");
+            Method consoleReadPasswordMethod = consoleClass.getMethod("readPassword");
 
-            final Object passwordObject =
-                    consoleReadPasswordMethod.invoke(consoleObject);
-            if(passwordObject != null && !(passwordObject instanceof char[])) {
+            Object passwordObject = consoleReadPasswordMethod.invoke(consoleObject);
+            if (passwordObject != null && !(passwordObject instanceof char[])) {
                 throw new RuntimeException("Unexpected type returned from " +
-                        "java.io.Console.readPassword(): " +
-                        passwordObject.getClass().getName());
+                        "java.io.Console.readPassword(): " + passwordObject.getClass().getName());
             }
 
             return (char[]) passwordObject;
-        } catch(ClassNotFoundException ex) {
-            throw new RuntimeException(ex);
-        } catch(NoSuchMethodException ex) {
-            throw new RuntimeException(ex);
-        } catch (IllegalAccessException ex) {
-            throw new RuntimeException(ex);
-        } catch (IllegalArgumentException ex) {
-            throw new RuntimeException(ex);
-        } catch (InvocationTargetException ex) {
+        } catch (ClassNotFoundException | InvocationTargetException | IllegalArgumentException |
+                 IllegalAccessException |
+                 NoSuchMethodException ex) {
             throw new RuntimeException(ex);
         }
     }

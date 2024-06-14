@@ -22,7 +22,17 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.ProgressMonitor;
 import javax.swing.filechooser.FileFilter;
+
 import org.catacombae.dmgextractor.ui.PasswordDialog;
+
+import static javax.swing.JOptionPane.ERROR_MESSAGE;
+import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
+import static javax.swing.JOptionPane.WARNING_MESSAGE;
+import static javax.swing.JOptionPane.YES_NO_OPTION;
+import static javax.swing.JOptionPane.showConfirmDialog;
+import static javax.swing.JOptionPane.showMessageDialog;
+import static org.catacombae.dmgextractor.DMGExtractor.APPNAME;
+
 
 /**
  * User interface implementation using Java Swing.
@@ -34,26 +44,18 @@ class SwingUI extends BasicUI implements UserInterface {
     private ProgressMonitor progmon = null;
     private String inputFilename = null;
     private String outputFilename = null;
-    
+
     public SwingUI(boolean verbose) {
         super(verbose);
-
-        //System.setProperty("swing.aatext", "true"); //Antialiased text
-        try {
-            javax.swing.UIManager.setLookAndFeel(
-                    javax.swing.UIManager.getSystemLookAndFeelClassName());
-        } catch(Exception e) {
-            // No big deal. Go with default.
-        }
     }
 
-    /** {@inheritDoc} */
+    @Override
     public boolean warning(String... messageLines) {
         StringBuilder sb = new StringBuilder();
 
         boolean firstLine = true;
-        for(String s : messageLines) {
-            if(!firstLine)
+        for (String s : messageLines) {
+            if (!firstLine)
                 sb.append("\n");
             else
                 firstLine = false;
@@ -62,39 +64,36 @@ class SwingUI extends BasicUI implements UserInterface {
 
         sb.append("\n\nDo you want to continue?");
 
-        int res = JOptionPane.showConfirmDialog(null, sb.toString(),
-                DMGExtractor.APPNAME + ": Warning", JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE);
+        String m = sb.toString();
+        int res = showConfirmDialog(null, m, APPNAME + ": Warning", YES_NO_OPTION, WARNING_MESSAGE);
         return res == JOptionPane.YES_OPTION;
     }
 
-    /** {@inheritDoc} */
+    @Override
     public void error(String... messageLines) {
         StringBuilder sb = new StringBuilder();
 
         boolean firstLine = true;
-        for(String s : messageLines) {
-            if(!firstLine)
+        for (String s : messageLines) {
+            if (!firstLine)
                 sb.append("\n");
             else
                 firstLine = false;
             sb.append(s);
         }
 
-        JOptionPane.showMessageDialog(null, sb.toString(),
-                DMGExtractor.APPNAME + ": Error", JOptionPane.ERROR_MESSAGE);
+        showMessageDialog(null, sb.toString(), APPNAME + ": Error", ERROR_MESSAGE);
     }
 
-    /** {@inheritDoc} */
+    @Override
     public void reportProgress(int progressPercentage) {
-        if(progressPercentage != previousPercentage) {
-            if(progmon == null) {
-                final String progmonText;
-                if(outputFilename != null) {
+        if (progressPercentage != previousPercentage) {
+            if (progmon == null) {
+                String progmonText;
+                if (outputFilename != null) {
                     progmonText = "Extracting \"" +
                             inputFilename + "\" to\n    \"" + outputFilename + "\"...";
-                }
-                else {
+                } else {
                     progmonText = "Simulating extraction of \"" +
                             inputFilename + "\"...";
                 }
@@ -102,47 +101,46 @@ class SwingUI extends BasicUI implements UserInterface {
                 progmon.setProgress(0);
                 progmon.setMillisToPopup(0);
             }
-            progmon.setProgress((int) progressPercentage);
+            progmon.setProgress(progressPercentage);
             progmon.setNote(progressPercentage + "%");
         }
     }
 
-    /** {@inheritDoc} */
+    @Override
     public void reportFinished(boolean simulation, int errorsReported, int warningsReported, long totalExtractedSize) {
         StringBuilder message = new StringBuilder();
-        if(simulation)
+        if (simulation)
             message.append("Simulation");
         else
             message.append("Extraction");
         message.append(" complete! ");
-        if(errorsReported != 0)
+        if (errorsReported != 0)
             message.append(errorsReported).append(" errors reported");
         else
             message.append("No errors reported");
 
-        if(warningsReported != 0)
+        if (warningsReported != 0)
             message.append(" (").append(warningsReported).append(" warnings emitted)");
 
         message.append(".\nSize of extracted data: ").append(totalExtractedSize);
         message.append(" bytes");
 
         progmon.close();
-        JOptionPane.showMessageDialog(null, message.toString(),
-                DMGExtractor.APPNAME, JOptionPane.INFORMATION_MESSAGE);
+        showMessageDialog(null, message.toString(), APPNAME, INFORMATION_MESSAGE);
         System.exit(0); // TODO check this
     }
 
-    /** {@inheritDoc} */
+    @Override
     public boolean cancelSignaled() {
         return progmon != null && progmon.isCanceled();
     }
 
-    /** {@inheritDoc} */
+    @Override
     public void displayMessage(String... messageLines) {
         StringBuilder resultString = new StringBuilder();
         boolean firstIteration = true;
-        for(String s : messageLines) {
-            if(!firstIteration)
+        for (String s : messageLines) {
+            if (!firstIteration)
                 resultString.append("\n");
             else
                 firstIteration = false;
@@ -150,11 +148,10 @@ class SwingUI extends BasicUI implements UserInterface {
             resultString.append(s);
         }
 
-        JOptionPane.showMessageDialog(null, resultString.toString(),
-                DMGExtractor.APPNAME, JOptionPane.INFORMATION_MESSAGE);
+        showMessageDialog(null, resultString.toString(), APPNAME, INFORMATION_MESSAGE);
     }
 
-    /** {@inheritDoc} */
+    @Override
     public File getInputFileFromUser() {
         SimpleFileFilter sff = new SimpleFileFilter();
         sff.addExtension("dmg");
@@ -165,31 +162,30 @@ class SwingUI extends BasicUI implements UserInterface {
         jfc.setMultiSelectionEnabled(false);
         jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         jfc.setDialogTitle("Choose the image file to read...");
-        while(true) {
-            if(jfc.showDialog(null, "Open") == JFileChooser.APPROVE_OPTION) {
+        while (true) {
+            if (jfc.showDialog(null, "Open") == JFileChooser.APPROVE_OPTION) {
                 File f = jfc.getSelectedFile();
-                if(f.exists()) {
+                if (f.exists()) {
                     return f;
-                }
-                else
-                    JOptionPane.showMessageDialog(null, "The file does not exist! Choose again...",
-                            "Error", JOptionPane.ERROR_MESSAGE);
-            }
-            else
+                } else
+                    showMessageDialog(null, "The file does not exist! Choose again...",
+                            "Error", ERROR_MESSAGE);
+            } else
                 return null;
         }
     }
 
-    /** {@inheritDoc} */
+    @Override
     public boolean getOutputConfirmationFromUser() {
-        return JOptionPane.showConfirmDialog(null, "Do you want to specify an output file?\n" +
-                "(Choosing \"No\" means the extraction will only be simulated,\n" +
-                "which can be useful for detecting errors in .dmg files...)",
-                "Confirmation", JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
+        return showConfirmDialog(null, """
+                        Do you want to specify an output file?
+                        (Choosing "No" means the extraction will only be simulated,
+                        which can be useful for detecting errors in .dmg files...)""",
+                "Confirmation", YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
     }
 
     /** {@inheritDoc} */
+    @Override
     public File getOutputFileFromUser(File inputFile) {
         final String msgFileExists = "The file already exists. Do you want to overwrite?";
 
@@ -204,53 +200,49 @@ class SwingUI extends BasicUI implements UserInterface {
         jfc.addChoosableFileFilter(new SimplerFileFilter(".dmg", "Mac OS X read/write disk image (*.dmg)"));
         jfc.setFileFilter(defaultFileFilter);
         jfc.setDialogTitle("Select your output file");
-        
-        if(inputFile != null) {
+
+        if (inputFile != null) {
             String name = inputFile.getName();
             String defaultOutName = name;
             int lastDotIndex = defaultOutName.lastIndexOf(".");
-            if(lastDotIndex >= 0) {
+            if (lastDotIndex >= 0) {
                 defaultOutName = defaultOutName.substring(0, lastDotIndex);
             }
-            jfc.setSelectedFile(new File(inputFile.getParentFile(),
-                    defaultOutName));
+            jfc.setSelectedFile(new File(inputFile.getParentFile(), defaultOutName));
         }
 
-        while(true) {
-            if(jfc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+        while (true) {
+            if (jfc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = jfc.getSelectedFile();
-                final File saveFile;
+                File saveFile;
                 FileFilter selectedFileFilter = jfc.getFileFilter();
-                if(selectedFileFilter instanceof SimplerFileFilter) {
-                    SimplerFileFilter sff = (SimplerFileFilter) selectedFileFilter;
-                    if(!selectedFile.getName().endsWith(sff.getExtension()))
+                if (selectedFileFilter instanceof SimplerFileFilter sff) {
+                    if (!selectedFile.getName().endsWith(sff.getExtension()))
                         saveFile = new File(selectedFile.getParentFile(), selectedFile.getName() + sff.getExtension());
                     else
                         saveFile = selectedFile;
-                }
-                else {
+                } else {
                     saveFile = selectedFile;
                 }
 
-                if(!saveFile.exists())
+                if (!saveFile.exists())
                     return saveFile;
-                else if(JOptionPane.showConfirmDialog(null, msgFileExists,
-                        "Confirmation", JOptionPane.YES_NO_OPTION,
+                else if (showConfirmDialog(null, msgFileExists, "Confirmation", YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
                     return saveFile;
                 }
-            }
-            else
+            } else
                 return null;
         }
     }
 
-    /** {@inheritDoc} */
+    @Override
     public char[] getPasswordFromUser() {
         return PasswordDialog.showDialog(null, "Reading encrypted disk image...",
                 "You need to enter a password to unlock this disk image:");
     }
 
+    @Override
     public void setProgressFilenames(String inputFilename, String outputFilename) {
         this.inputFilename = inputFilename;
         this.outputFilename = outputFilename;

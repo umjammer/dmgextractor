@@ -24,7 +24,7 @@ abstract class BasicUI implements UserInterface {
 
     protected long totalProgressLength = 0;
     protected long currentProgress = 0;
-    /** Used to prevent unneccessary updates of the progress meter. */
+    /** Used to prevent unnecessary updates of the progress meter. */
     protected long previousPercentage = -1;
     protected final boolean verbose;
 
@@ -32,25 +32,24 @@ abstract class BasicUI implements UserInterface {
         this.verbose = verbose;
     }
 
-    /** {@inheritDoc} */
+    @Override
     public void setTotalProgressLength(long len) {
         totalProgressLength = len;
     }
 
-    /** {@inheritDoc} */
+    @Override
     public void addProgressRaw(long value) {
         currentProgress += value;
-        if(totalProgressLength > 0) {
+        if (totalProgressLength > 0) {
             reportProgress((int) (currentProgress * 100 / totalProgressLength));
-        }
-        else {
+        } else {
             reportProgress(0);
         }
     }
 
-    /** {@inheritDoc} */
+    @Override
     public void displayMessageVerbose(String... messageLines) {
-        if(verbose)
+        if (verbose)
             displayMessage(messageLines);
     }
 }

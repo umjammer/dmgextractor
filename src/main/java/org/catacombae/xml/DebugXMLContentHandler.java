@@ -17,70 +17,82 @@
 
 package org.catacombae.xml;
 
-import java.util.List;
 import java.nio.charset.Charset;
+import java.util.List;
+
 
 public class DebugXMLContentHandler extends XMLContentHandler {
+
     public DebugXMLContentHandler(Charset encoding) {
-	super(encoding);
+        super(encoding);
     }
-    //public void doctype(String
+
+//    public void doctype(String
+    @Override
     public void xmlDecl(String version, String encoding, Boolean standalone) {
-	print("xmlDecl: <?xml version=\"" + version + "\"");
-	if(encoding != null)
-	    print(" encoding=\"" + encoding + "\"");
-	if(standalone != null) {
-	    print(" standalone=\"");
-	    if(standalone)
-		print("yes");
-	    else
-		print("no");
-	    print("\"");
-	}
-	println("?>");
+        print("xmlDecl: <?xml version=\"" + version + "\"");
+        if (encoding != null)
+            print(" encoding=\"" + encoding + "\"");
+        if (standalone != null) {
+            print(" standalone=\"");
+            if (standalone)
+                print("yes");
+            else
+                print("no");
+            print("\"");
+        }
+        println("?>");
     }
+
+    @Override
     public void pi(String id, String content) {
-	print("pi: <?" + id);
-	if(content != null)
-	    print(" " + content);
-	println("?>");
+        print("pi: <?" + id);
+        if (content != null)
+            print(" " + content);
+        println("?>");
     }
-    
+
+    @Override
     public void comment(String content) {
-	println("comment: <!--" + content + "-->");
+        println("comment: <!--" + content + "-->");
     }
 
+    @Override
     public void doctype(String name, ExternalID eid) {
-	print("doctype: <!DOCTYPE " + name);
-	if(eid != null) {
-	    if(eid.type == ExternalID.SYSTEM)
-		print("SYSTEM \"" + eid.systemLiteral + "\"");
-	    else if(eid.type == ExternalID.PUBLIC)
-		print("PUBLIC \"" + eid.pubidLiteral + "\" \"" + eid.systemLiteral + "\"");
-	}
-	println(">");
+        print("doctype: <!DOCTYPE " + name);
+        if (eid != null) {
+            if (eid.type == ExternalID.SYSTEM)
+                print("SYSTEM \"" + eid.systemLiteral + "\"");
+            else if (eid.type == ExternalID.PUBLIC)
+                print("PUBLIC \"" + eid.pubidLiteral + "\" \"" + eid.systemLiteral + "\"");
+        }
+        println(">");
     }
 
+    @Override
     public void cdata(String cdata) {
-	println("cdata: <![CDATA[" + cdata + "]]>");
+        println("cdata: <![CDATA[" + cdata + "]]>");
     }
 
+    @Override
     public void emptyElement(String name, List<Attribute> attributes) {
-	print("emptyElement: <" + name);
-	for(Attribute attr : attributes)
-	    print(" " + attr.identifier + "=\"" + attr.value + "\"");
-	println("/>");
+        print("emptyElement: <" + name);
+        for (Attribute attr : attributes)
+            print(" " + attr.identifier + "=\"" + attr.value + "\"");
+        println("/>");
     }
-    
+
+    @Override
     public void startElement(String name, List<Attribute> attributes) {
-	print("startElement: <" + name);
-	for(Attribute attr : attributes)
-	    print(" " + attr.identifier + "=\"" + attr.value + "\"");
-	println(">");
+        print("startElement: <" + name);
+        for (Attribute attr : attributes)
+            print(" " + attr.identifier + "=\"" + attr.value + "\"");
+        println(">");
     }
-    
+
+    @Override
     public void endElement(String name) {
-	println("endElement: </" + name + ">");
+        println("endElement: </" + name + ">");
     }
 
 //     public void chardata(CharSequence data) {
@@ -88,21 +100,24 @@ public class DebugXMLContentHandler extends XMLContentHandler {
 // 	for(int i = 0; i < data.length(); ++i)
 // 	    print(data.charAt(i)+"");
 // 	println("\"");
-	   
-//     }
+
+    //     }
+    @Override
     public void chardata(int beginLine, int beginColumn, int endLine, int endColumn) {
-	println("chardata: starting at (" + beginLine + "," + beginColumn + ") and ending at (" + endLine + "," + endColumn + ")");
+        println("chardata: starting at (" + beginLine + "," + beginColumn + ") and ending at (" + endLine + "," + endColumn + ")");
     }
 
+    @Override
     public void reference(String ref) {
-	println("reference: \"" + ref + "\"");
+        println("reference: \"" + ref + "\"");
     }
-    
+
     private static void print(String s) {
-	System.out.print(s);
+        System.out.print(s);
     }
+
     private static void println(String s) {
-	System.out.println(s);
+        System.out.println(s);
     }
-    
+
 }

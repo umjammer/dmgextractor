@@ -1,4 +1,4 @@
-/*-
+/*
  * Copyright (C) 2006-2008 Erik Larsson
  *
  * This program is free software: you can redistribute it and/or modify it under
@@ -20,44 +20,49 @@ package org.catacombae.dmg.udif;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.nio.charset.Charset;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import net.iharder.Base64;
 import org.catacombae.dmgextractor.Util;
 import org.catacombae.dmgextractor.io.ReaderInputStream;
 import org.catacombae.plist.PlistNode;
 import org.catacombae.plist.XmlPlist;
 import org.catacombae.plist.XmlPlistNode;
 
-import net.iharder.Base64;
+import static java.lang.System.getLogger;
+
 
 public class Plist extends XmlPlist {
 
-    static Logger logger = Logger.getLogger(Plist.class.getName());
+    static final Logger logger = getLogger(Plist.class.getName());
 
     public Plist(byte[] data) {
         this(data, 0, data.length);
     }
+
     public Plist(byte[] data, boolean useSAXParser) {
         this(data, 0, data.length, useSAXParser);
     }
+
     public Plist(byte[] data, int offset, int length) {
         this(data, offset, length, false);
     }
+
     public Plist(byte[] data, int offset, int length, boolean useSAXParser) {
         super(data, offset, length, useSAXParser);
     }
 
-    //public byte[] getData() { return Util.createCopy(plistData); }
+//    public byte[] getData() { return Util.createCopy(plistData); }
 
     public PlistPartition[] getPartitions() throws IOException {
         LinkedList<PlistPartition> partitionList = new LinkedList<>();
         PlistNode current = getRootNode();
-if (logger.isLoggable(Level.FINE)) {
- ((XmlPlistNode) current).getXMLNode().printTree(System.err);
-}
+        if (logger.isLoggable(Level.DEBUG)) {
+            ((XmlPlistNode) current).getXMLNode().printTree(System.err);
+        }
         current = current.cd("dict");
         current = current.cdkey("resource-fork");
         current = current.cdkey("blkx");
@@ -67,21 +72,21 @@ if (logger.isLoggable(Level.FINE)) {
         long previousInOffset = 0;
 
         // Iterate over the partitions and gather data
-        for(PlistNode pn : current.getChildren()) {
+        for (PlistNode pn : current.getChildren()) {
             String partitionName = pn.getKeyValue("Name") != null ? Util.readFully(pn.getKeyValue("Name")) : "";
             String partitionID = Util.readFully(pn.getKeyValue("ID"));
             String partitionAttributes = Util.readFully(pn.getKeyValue("Attributes"));
-            //System.err.println("Retrieving data...");
-            //(new BufferedReader(new InputStreamReader(System.in))).readLine();
+//            logger.log(Level.TRACE, "Retrieving data...");
+//            (new BufferedReader(new InputStreamReader(System.in))).readLine();
             Reader base64Data = pn.getKeyValue("Data");
-            //System.gc();
-            //System.err.println("Converting data to binary form... free memory: " + Runtime.getRuntime().freeMemory() + " total memory: " + Runtime.getRuntime().totalMemory());
-            //byte[] data = Base64.decode(base64Data);
+//            System.gc();
+//            logger.log(Level.TRACE, "Converting data to binary form... free memory: " + Runtime.getRuntime().freeMemory() + " total memory: " + Runtime.getRuntime().totalMemory());
+//            byte[] data = Base64.decode(base64Data);
 
 //             try {
 //                 InputStream yo = new Base64.InputStream(new ReaderInputStream(base64Data, Charset.forName("US-ASCII")));
 //                 String filename1 = "dump_plist_java-" + System.currentTimeMillis() + ".datadpp";
-//                 System.err.println("Dumping output from ReaderInputStream to file \"" + filename1 + "\"");
+//                 logger.log(Level.TRACE, "Dumping output from ReaderInputStream to file \"" + filename1 + "\"");
 //                 FileOutputStream fos = new FileOutputStream(filename1);
 //                 if(false) { // Standard way
 //                     byte[] buffer = new byte[4096];
@@ -110,17 +115,17 @@ if (logger.isLoggable(Level.FINE)) {
 //                 fos.close();
 //             } catch(Exception e) { e.printStackTrace(); }
 
-            InputStream base64DataInputStream = new Base64.InputStream(new ReaderInputStream(base64Data, Charset.forName("US-ASCII")));
+            InputStream base64DataInputStream = new Base64.InputStream(new ReaderInputStream(base64Data, StandardCharsets.US_ASCII));
 
-            //System.err.println("Creating PlistPartition.");
-            //System.out.println("Block list for partition " + i++ + ":");
+//            logger.log(Level.TRACE, "Creating PlistPartition.");
+//            logger.log(Level.TRACE, "Block list for partition " + i++ + ":");
             PlistPartition dpp = new PlistPartition(partitionName, partitionID, partitionAttributes,
-                                                          base64DataInputStream, previousOutOffset, previousInOffset);
+                    base64DataInputStream, previousOutOffset, previousInOffset);
             previousOutOffset = dpp.getFinalOutOffset();
             previousInOffset = dpp.getFinalInOffset();
             partitionList.addLast(dpp);
         }
 
-	return partitionList.toArray(new PlistPartition[partitionList.size()]);
+        return partitionList.toArray(PlistPartition[]::new);
     }
 }

@@ -17,13 +17,22 @@
 
 package org.catacombae.dmg.encrypted;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+
 import org.catacombae.dmgextractor.Util;
 import org.catacombae.io.ReadableRandomAccessStream;
+
+import static java.lang.System.getLogger;
+
 
 /**
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 class CEncryptedEncodingUtil {
+
+    private static final Logger logger = getLogger(CEncryptedEncodingUtil.class.getName());
+
     private static final String V1_SIGNATURE = "cdsaencr";
     private static final String V2_SIGNATURE = "encrcdsa";
 
@@ -32,23 +41,21 @@ class CEncryptedEncodingUtil {
         try {
             stream.seek(0);
             stream.readFully(signatureBytes);
-            if(Util.toASCIIString(signatureBytes).equals(V2_SIGNATURE))
+            if (Util.toASCIIString(signatureBytes).equals(V2_SIGNATURE))
                 return 2;
-        } catch(Exception e) {
-            System.err.println("Non-critical exception while detecting version 2" +
-                    " CEncryptedEncoding header:");
-            e.printStackTrace();
+        } catch (Exception e) {
+            logger.log(Level.ERROR, "Non-critical exception while detecting version 2" +
+                    " CEncryptedEncoding header:", e);
         }
 
         try {
-            stream.seek(stream.length()-signatureBytes.length);
+            stream.seek(stream.length() - signatureBytes.length);
             stream.readFully(signatureBytes);
-            if(Util.toASCIIString(signatureBytes).equals(V1_SIGNATURE))
+            if (Util.toASCIIString(signatureBytes).equals(V1_SIGNATURE))
                 return 1;
-        } catch(Exception e) {
-            System.err.println("Non-critical exception while detecting version 1" +
-                    " CEncryptedEncoding header:");
-            e.printStackTrace();
+        } catch (Exception e) {
+            logger.log(Level.ERROR, "Non-critical exception while detecting version 1" +
+                    " CEncryptedEncoding header:", e);
         }
 
         return -1;

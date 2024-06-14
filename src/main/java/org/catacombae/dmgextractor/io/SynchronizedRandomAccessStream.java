@@ -17,84 +17,82 @@
 
 package org.catacombae.dmgextractor.io;
 
-import java.io.*;
 import org.catacombae.io.BasicReadableRandomAccessStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.RuntimeIOException;
+
 
 /**
  * This class adds concurrency safety to a random access stream. It includes a seek+read
  * atomic operation. All operations on this object is synchronized on its own monitor.
  */
 public class SynchronizedRandomAccessStream extends BasicReadableRandomAccessStream {
+
     /** The underlying stream. */
-    private ReadableRandomAccessStream ras;
-    
+    private final ReadableRandomAccessStream ras;
+
     public SynchronizedRandomAccessStream(ReadableRandomAccessStream ras) {
-	this.ras = ras;
+        this.ras = ras;
     }
-     
+
     /** Atomic seek+read. */
     public synchronized int readFrom(long pos, byte[] b, int off, int len) throws RuntimeIOException {
-	if(getFilePointer() != pos)
-	    seek(pos);
-	return read(b, off, len);
+        if (getFilePointer() != pos)
+            seek(pos);
+        return read(b, off, len);
     }
-    
-    /** Atomic seek+skip. */
-    public synchronized long skipFrom(final long pos, final long length) throws RuntimeIOException {
-	long streamLength = length();
-	long newPos = pos+length;
 
-	if(newPos > streamLength) {
-	    seek(streamLength);
-	    return streamLength-pos;
-	}
-	else {
-	    seek(newPos);
-	    return length;
-	}
+    /** Atomic seek+skip. */
+    public synchronized long skipFrom(long pos, long length) throws RuntimeIOException {
+        long streamLength = length();
+        long newPos = pos + length;
+
+        if (newPos > streamLength) {
+            seek(streamLength);
+            return streamLength - pos;
+        } else {
+            seek(newPos);
+            return length;
+        }
     }
-    
+
     /** Atomic length() - getFilePointer(). */
     public synchronized long remainingLength() throws RuntimeIOException {
-	return length()-getFilePointer();
+        return length() - getFilePointer();
     }
-    
-    /** @see java.io.RandomAccessFile */
+
+    @Override
     public synchronized void close() throws RuntimeIOException {
-	ras.close();
+        ras.close();
     }
 
-    /** @see java.io.RandomAccessFile */
+    @Override
     public synchronized long getFilePointer() throws RuntimeIOException {
-	return ras.getFilePointer();
+        return ras.getFilePointer();
     }
 
-    /** @see java.io.RandomAccessFile */
+    @Override
     public synchronized long length() throws RuntimeIOException {
-	return ras.length();
+        return ras.length();
     }
 
-    /** @see java.io.RandomAccessFile */
     @Override
     public synchronized int read() throws RuntimeIOException {
-	return ras.read();
+        return ras.read();
     }
 
-    /** @see java.io.RandomAccessFile */
     @Override
     public synchronized int read(byte[] b) throws RuntimeIOException {
-	return ras.read(b);
+        return ras.read(b);
     }
 
-    /** @see java.io.RandomAccessFile */
+    @Override
     public synchronized int read(byte[] b, int off, int len) throws RuntimeIOException {
-	return ras.read(b, off, len);
+        return ras.read(b, off, len);
     }
 
-    /** @see java.io.RandomAccessFile */
+    @Override
     public synchronized void seek(long pos) throws RuntimeIOException {
-	ras.seek(pos);
+        ras.seek(pos);
     }
 }

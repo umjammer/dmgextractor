@@ -18,15 +18,23 @@
 package org.catacombae.dmg.sparsebundle;
 
 import java.io.IOException;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.RuntimeIOException;
+
+import static java.lang.System.getLogger;
+
 
 /**
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
 abstract class BundleMember {
 
-    /* Backing store. */
+    private static final Logger logger = getLogger(BundleMember.class.getName());
+
+    // Backing store.
     private final FileAccessor file;
     private final boolean fileLocked;
     protected final ReadableRandomAccessStream stream;
@@ -41,31 +49,28 @@ abstract class BundleMember {
         stream.close();
 
         try {
-            if(fileLocked) {
+            if (fileLocked) {
                 file.unlock();
             }
-        } catch(RuntimeIOException ex) {
-            final IOException cause = ex.getIOCause();
+        } catch (RuntimeIOException ex) {
+            IOException cause = ex.getIOCause();
 
-            if(cause != null) {
-                ex.printStackTrace();
-            }
-            else {
+            if (cause != null) {
+                logger.log(Level.ERROR, ex.getMessage(), ex);
+            } else {
                 throw ex;
             }
         }
 
         try {
             file.close();
-        } catch(RuntimeIOException ex) {
-            final IOException cause = ex.getIOCause();
-            if(cause != null) {
-                ex.printStackTrace();
-            }
-            else {
+        } catch (RuntimeIOException ex) {
+            IOException cause = ex.getIOCause();
+            if (cause != null) {
+                logger.log(Level.ERROR, ex.getMessage(), ex);
+            } else {
                 throw ex;
             }
         }
     }
-
 }

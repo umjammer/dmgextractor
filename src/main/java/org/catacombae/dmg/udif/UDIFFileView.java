@@ -20,50 +20,53 @@ package org.catacombae.dmg.udif;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+
 import org.catacombae.io.ReadableFileStream;
 import org.catacombae.io.ReadableRandomAccessStream;
 import org.catacombae.io.RuntimeIOException;
 
+
 public class UDIFFileView {
-    private ReadableRandomAccessStream dmgRaf;
-    
+
+    private final ReadableRandomAccessStream dmgRaf;
+
     public UDIFFileView(File file) {
-	try {
-	    //this.file = file;
-            this.dmgRaf =
-                new ReadableFileStream(new RandomAccessFile(file, "r"),
-                file.getPath());
-	} catch(IOException ioe) {
-	    throw new RuntimeIOException(ioe);
-	}
+        try {
+//            this.file = file;
+            this.dmgRaf = new ReadableFileStream(new RandomAccessFile(file, "r"), file.getPath());
+        } catch (IOException ioe) {
+            throw new RuntimeIOException(ioe);
+        }
     }
+
     public UDIFFileView(ReadableRandomAccessStream dmgRaf) {
-	this.dmgRaf = dmgRaf;
+        this.dmgRaf = dmgRaf;
     }
-    
+
     public byte[] getPlistData() throws RuntimeIOException {
-	Koly koly = getKoly();
-	byte[] plistData = new byte[(int)koly.getPlistSize()]; // Let's hope the plistsize is within int range... (though memory will run out long before that)
-	
-	dmgRaf.seek(koly.getPlistBegin1());
-	if(dmgRaf.read(plistData) == plistData.length)
-	    return plistData;
-	else
-	    throw new RuntimeException("Could not read the entire region of data containing the Plist");
+        Koly koly = getKoly();
+        // Let's hope the plistsize is within int range... (though memory will run out long before that)
+        byte[] plistData = new byte[(int) koly.getPlistSize()];
+
+        dmgRaf.seek(koly.getPlistBegin1());
+        if (dmgRaf.read(plistData) == plistData.length)
+            return plistData;
+        else
+            throw new RuntimeException("Could not read the entire region of data containing the Plist");
     }
-    
+
     public Plist getPlist() throws RuntimeIOException {
-	return new Plist(getPlistData());
+        return new Plist(getPlistData());
     }
-    
+
     public Koly getKoly() throws RuntimeIOException {
-	dmgRaf.seek(dmgRaf.length()-512);
-	byte[] kolyData = new byte[512];
-	dmgRaf.read(kolyData);
-	return new Koly(kolyData, 0);
+        dmgRaf.seek(dmgRaf.length() - 512);
+        byte[] kolyData = new byte[512];
+        dmgRaf.read(kolyData);
+        return new Koly(kolyData, 0);
     }
-    
+
     public void close() throws RuntimeIOException {
-	dmgRaf.close();
+        dmgRaf.close();
     }
 }
