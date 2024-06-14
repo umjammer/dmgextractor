@@ -17,9 +17,17 @@
 
 package org.catacombae.dmg.sparsebundle;
 
-import java.io.File;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import vavi.util.properties.annotation.Property;
+import vavi.util.properties.annotation.PropsEntity;
 
 import static java.lang.System.getLogger;
 
@@ -27,12 +35,29 @@ import static java.lang.System.getLogger;
 /**
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
-public class Test {
+@PropsEntity(url = "file:local.properties")
+public class TestCase {
 
-    private static final Logger logger = getLogger(Test.class.getName());
+    static boolean localPropertiesExists() {
+        return Files.exists(Paths.get("local.properties"));
+    }
 
-    public static void main(String[] args) {
-        SparseBundle sb = new SparseBundle(new File(args[0]));
+    @Property(name = "dmg")
+    String dmg = "src/test/resources/test.dmg";
+
+    @BeforeEach
+    void setup() throws Exception {
+        if (localPropertiesExists()) {
+            PropsEntity.Util.bind(this);
+        }
+    }
+
+    private static final Logger logger = getLogger(TestCase.class.getName());
+
+    @Test
+    @Disabled("file type is wrong")
+    void test1() {
+        SparseBundle sb = new SparseBundle(Path.of(dmg).toFile());
         System.out.println("image size: " + sb.getSize() + " bytes");
         System.out.println("band size: " + sb.getBandSize() + " bytes");
         System.out.println("band count: " + sb.getBandCount() + " bands");

@@ -3,7 +3,7 @@
 
   <groupId>catacombae</groupId>
   <artifactId>hfsx_dmglib</artifactId>
-  <version>0.70.2</version>
+  <version>0.70.3-SNAPSHOT</version>
 
   <profiles>
     <profile>
@@ -116,7 +116,7 @@
     <dependency>
       <groupId>com.github.umjammer</groupId> <!-- catacombae / com.github.umjammer -->
       <artifactId>catacombaeframework</artifactId> <!-- csframework / catacombaeframework -->
-      <version>0.0.5</version>
+      <version>0.0.4</version>
     </dependency>
     <dependency>
       <groupId>org.apache.ant</groupId>
@@ -128,11 +128,19 @@
       <artifactId>swing-layout</artifactId>
       <version>1.0.3</version>
     </dependency>
+<<<<<<< Updated upstream
+    <dependency>
+      <groupId>com.github.umjammer</groupId>
+      <artifactId>vavi-commons</artifactId>
+      <version>1.1.7</version>
+    </dependency>
     <dependency>
       <groupId>com.github.horrorho</groupId>
       <artifactId>RagingMoose</artifactId>
       <version>master</version>
     </dependency>
+=======
+>>>>>>> Stashed changes
 
     <dependency>
       <groupId>org.junit.jupiter</groupId>
