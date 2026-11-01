@@ -18,11 +18,13 @@
 package org.catacombae.xml;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
@@ -35,6 +37,8 @@ import org.catacombae.dmgextractor.io.SynchronizedRandomAccessStream;
 
 
 public class XMLText extends XMLElement {
+
+    private static final Logger logger = System.getLogger(XMLText.class.getName());
 
     private static final char CR = '\r';
     private static final char LF = '\n';
@@ -141,9 +145,17 @@ public class XMLText extends XMLElement {
 
     @Override
     protected void _printTree(PrintStream pw, int level) {
-        for (int i = 0; i < level; ++i)
-            pw.print(" ");
-        pw.println(text != null ? text : getTextAsString());
+        try {
+            BufferedReader r = new BufferedReader(getText());
+            String line;
+            while((line = r.readLine()) != null) {
+                for(int i = 0; i < level; ++i)
+                    pw.print(" ");
+                pw.println(line);
+            }
+        } catch(IOException ioe) {
+            logger.log(Level.ERROR, ioe.getMessage(), ioe);
+        }
     }
 
     private String getTextAsString() {

@@ -47,7 +47,7 @@ import java.util.*;
 import java.io.*;
 import java.nio.charset.Charset;
 
-/** Early version of the APX Parser for XML. Currently does not parse DTDs and so doesn't check
+/** Early version of the APX Parser for XML. Currently, does not parse DTDs and so doesn't check
     for any validity constraints. It just breaks up the syntactic structure of an XML file and
     reports it to an org.catacombae.xml.XMLContentHandler. This is sufficient for my needs so it
     remains to be seen if the parser will be extended in the future. */
@@ -99,7 +99,7 @@ PARSER_END(APXParser)
    might not be easy to do as part of a token, and it's really not urgent, considering this
    parser is only used to parse the Plist. This is non-urgent TODO. */
 <*> TOKEN: {
-      < #SINGLE_S: (" " | "\t" | "\n" | "\r") >
+      < #SINGLE_S: (" " | "\t" | "\n" | "\r" | "\0") >
     //| < #S: ( <SINGLE_S> )+ >
     | < #CHAR: ["\u0009", "\n", "\r", "\u0020"-"\uD7FF", "\uE000"-"\uFFFD"/*, "\u10000"-"\u10FFFF"*/] >
     | < #NAME: <NAMESTART> ( <NAMECHAR> )* >

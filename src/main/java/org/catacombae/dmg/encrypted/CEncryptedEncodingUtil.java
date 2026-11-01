@@ -44,18 +44,20 @@ class CEncryptedEncodingUtil {
             if (Util.toASCIIString(signatureBytes).equals(V2_SIGNATURE))
                 return 2;
         } catch (Exception e) {
-            logger.log(Level.ERROR, "Non-critical exception while detecting version 2" +
-                    " CEncryptedEncoding header:", e);
+            logger.log(Level.ERROR, "Non-critical exception while detecting " +
+                    "version 2 CEncryptedEncoding header", e);
         }
 
-        try {
-            stream.seek(stream.length() - signatureBytes.length);
-            stream.readFully(signatureBytes);
-            if (Util.toASCIIString(signatureBytes).equals(V1_SIGNATURE))
-                return 1;
-        } catch (Exception e) {
-            logger.log(Level.ERROR, "Non-critical exception while detecting version 1" +
-                    " CEncryptedEncoding header:", e);
+        if (stream.length() >= signatureBytes.length) {
+            try {
+                stream.seek(stream.length() - signatureBytes.length);
+                stream.readFully(signatureBytes);
+                if (Util.toASCIIString(signatureBytes).equals(V1_SIGNATURE))
+                    return 1;
+            } catch (Exception e) {
+                logger.log(Level.ERROR, "Non-critical exception while detecting " +
+                        "version 1 CEncryptedEncoding header", e);
+            }
         }
 
         return -1;
