@@ -47,7 +47,7 @@ import java.util.*;
 import java.io.*;
 import java.nio.charset.Charset;
 
-/** Early version of the APX Parser for XML. Currently does not parse DTDs and so doesn't check
+/** Early version of the APX Parser for XML. Currently, does not parse DTDs and so doesn't check
     for any validity constraints. It just breaks up the syntactic structure of an XML file and
     reports it to an org.catacombae.xml.XMLContentHandler. This is sufficient for my needs so it
     remains to be seen if the parser will be extended in the future. */
