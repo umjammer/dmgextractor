@@ -71,7 +71,7 @@ public class XmlPlist {
         rootNode = parseXMLData(data, useSAXParser);
     }
 
-    public PlistNode getRootNode() {
+    public XmlPlistNode getRootNode() {
         return new XmlPlistNode(rootNode);
     }
 
@@ -114,8 +114,14 @@ public class XmlPlist {
             APXParser encodingParser = APXParser.create(
                     new InputStreamReader(is, StandardCharsets.US_ASCII),
                     new NullXMLContentHandler(StandardCharsets.US_ASCII));
-            String encodingName = encodingParser.xmlDecl();
+            String encodingName = null;
+            try {
+                encodingName = encodingParser.xmlDecl();
 //            logger.log(Level.TRACE, "encodingName=" + encodingName);
+            } catch (ParseException pe) {
+                // Do nothing. The XML declaration may not exist, in which case
+                // we fall back to ASCII.
+            }
             if (encodingName == null)
                 encodingName = "US-ASCII";
 

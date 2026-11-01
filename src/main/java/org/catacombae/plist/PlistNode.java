@@ -23,13 +23,13 @@ import java.io.Reader;
 /**
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
-public abstract class PlistNode {
+public abstract class PlistNode<N extends PlistNode<?>> {
 
-    public abstract PlistNode[] getChildren();
+    public abstract N[] getChildren();
 
-    public abstract PlistNode cd(String type);
+    public abstract N cd(String type);
 
-    public abstract PlistNode cdkey(String key);
+    public abstract N cdkey(String key);
 
     public abstract Reader getKeyValue(String key);
 }

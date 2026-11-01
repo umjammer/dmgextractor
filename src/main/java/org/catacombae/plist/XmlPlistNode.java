@@ -36,7 +36,7 @@ import static java.lang.System.getLogger;
 /**
  * @author <a href="http://www.catacombae.org/" target="_top">Erik Larsson</a>
  */
-public class XmlPlistNode extends PlistNode {
+public class XmlPlistNode extends PlistNode<XmlPlistNode> {
 
     private static final Logger logger = getLogger(XmlPlistNode.class.getName());
 
@@ -77,8 +77,8 @@ public class XmlPlistNode extends PlistNode {
     }
 
     @Override
-    public PlistNode[] getChildren() {
-        LinkedList<PlistNode> children = new LinkedList<>();
+    public XmlPlistNode[] getChildren() {
+        LinkedList<XmlPlistNode> children = new LinkedList<>();
 
         if (xmlNode.qName.equals("dict")) {
             for (String key : getKeys()) {
@@ -105,7 +105,7 @@ public class XmlPlistNode extends PlistNode {
             throw new RuntimeException("getChildren called for non-dict/array type \"" + xmlNode.qName + "\".");
         }
 
-        return children.toArray(PlistNode[]::new);
+        return children.toArray(XmlPlistNode[]::new);
     }
 
     /**
@@ -117,7 +117,7 @@ public class XmlPlistNode extends PlistNode {
      * get the first.
      */
     @Override
-    public PlistNode cd(String type) {
+    public XmlPlistNode cd(String type) {
         for (XMLElement xn : xmlNode.getChildren()) {
             if (xn instanceof XMLNode && ((XMLNode) xn).qName.equals(type))
                 return new XmlPlistNode((XMLNode) xn);
@@ -134,11 +134,7 @@ public class XmlPlistNode extends PlistNode {
      * found, <code>null</code> is returned.
      */
     @Override
-    public PlistNode cdkey(String key) {
-        return cdkeyXml(key);
-    }
-
-    private XmlPlistNode cdkeyXml(String key) {
+    public XmlPlistNode cdkey(String key) {
         boolean keyFound = false;
         for (XMLElement xn : xmlNode.getChildren()) {
             if (xn instanceof XMLNode) {
@@ -167,7 +163,7 @@ public class XmlPlistNode extends PlistNode {
     @Override
     public Reader getKeyValue(String key) {
 //        logger.log(Level.TRACE, "XMLNode.getKeyValue(\"" + key + "\")");
-        XmlPlistNode keyNode = cdkeyXml(key);
+        XmlPlistNode keyNode = cdkey(key);
         if (keyNode == null)
             return null;
 

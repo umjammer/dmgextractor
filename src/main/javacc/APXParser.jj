@@ -99,7 +99,7 @@ PARSER_END(APXParser)
    might not be easy to do as part of a token, and it's really not urgent, considering this
    parser is only used to parse the Plist. This is non-urgent TODO. */
 <*> TOKEN: {
-      < #SINGLE_S: (" " | "\t" | "\n" | "\r") >
+      < #SINGLE_S: (" " | "\t" | "\n" | "\r" | "\0") >
     //| < #S: ( <SINGLE_S> )+ >
     | < #CHAR: ["\u0009", "\n", "\r", "\u0020"-"\uD7FF", "\uE000"-"\uFFFD"/*, "\u10000"-"\u10FFFF"*/] >
     | < #NAME: <NAMESTART> ( <NAMECHAR> )* >
